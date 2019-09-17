@@ -21,6 +21,7 @@ err_FDR = zeros(size(sigma_range, 2), 2);
 err_Bon = zeros(size(sigma_range, 2), 2);
 err_Hoc = zeros(size(sigma_range, 2), 2);
 
+% Initialize counters for total number of foreground and background pixels:
 t = zeros(1, 2);
 
 % Loop through all possible ROI with at least 1 pixel margin:
@@ -44,9 +45,11 @@ for tlc1 = 2:M-1
                 
                 % Determine correct ROI picture:
                 ROI = zeros(M, N);
-                ROI(tlc1-1:brc1, tlc2:brc2) = 255;
-                ROI(tlc1:brc1, tlc2-1:brc2) = 255;
+                ROI(tlc1:brc1, tlc2:brc2) = 255;
+                % ROI(tlc1-1:brc1, tlc2:brc2) = 255;
+                % ROI(tlc1:brc1, tlc2-1:brc2) = 255;
                 
+                % Count foreground and background pixels:
                 t = t + [sum(sum(ROI == 255)), sum(sum(ROI == 0))];
                 
                 % Initialize index counter:

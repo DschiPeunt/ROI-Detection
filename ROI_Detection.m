@@ -10,12 +10,12 @@ function f_ROI = ROI_Detection(f, sigma, alpha, type)
 % Determine height and width of the input picture:
 [M, N] = size(f);
 
-% Calculate the euclidean norm of the vertical and horizontal discrete
-% derivatives:
-d = discreteDerivative(f, M, N);
-
 % Calculate the total number of pixels in f:
 nr_pxl = M * N;
+
+% Calculate the euclidean norm of the vertical and horizontal discrete
+% derivatives:
+d = discreteDerivative(f, M, N, 'down');
 
 % Calculate p-values based on d:
 p = exp( - d .^2 / (4 * sigma^2) );
@@ -45,7 +45,15 @@ f_ROI = (1 - bgMap) * 255;
 end
 
 
-function d = discreteDerivative(f, M, N)
+function d = discreteDerivative(f, M, N, direction)
+% Determine direction of discrete derivative:
+switch direction
+    case 'down'
+        shift = 0;
+    case 'up'
+        shift = 1;
+end
+
 % Initialize d1, d2:
 % d1: vertical discrete derivative
 % d2: horizontal discrete derivative
@@ -53,12 +61,12 @@ d1 = ones(M, N);
 d2 = ones(M, N);
 
 % Calculate d1:
-d1(1:end-1, :) = f(2:end, :) - f(1:end-1, :);
-d1(end, :) = f(1, :) - f(end, :);
+d1(1 + shift:M - 1 + shift, :) = f(2 - shift:M - shift, :) - f(1 + shift:M - 1 + shift, :);
+d1((1 - shift) * M + shift, :) = f(shift * M + (1 - shift), :) - f((1 - shift) * M + shift, :);
 
 % Calculate d2:
-d2(:, 1:end-1) = f(:, 2:end) - f(:, 1:end-1);
-d2(:, end) = f(:, 1) - f(:, end);
+d2(:, 1 + shift:N - 1 + shift) = f(:, 2 - shift:N - shift) - f(:, 1 + shift:N - 1 + shift);
+d2(:, (1 - shift) * N + shift) = f(:, shift * N + (1 - shift)) - f(:, (1 - shift) * N + shift);
 
 % Calculate d as the euclidean norm of d1 and d2:
 d = sqrt(d1 .^2 + d2 .^2);
