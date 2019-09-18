@@ -9,7 +9,7 @@ function [err_FDR, err_Bon, err_Hoc, t] = ConfidenceTest(M, N, sigma_range, nois
 % alpha: statistical significance
 % c_bg: greyscale value for the image background (optional)
 
-% [err_FDR, err_Bon, err_Hoc] = ConfidenceTest(M, N, sigma_range, noise, alpha);
+% [err_FDR, err_Bon, err_Hoc, t] = ConfidenceTest(M, N, sigma_range, noise, alpha);
 
 % Check whether an alternative background greyvalue was given:
 if (~exist('c_bg', 'var'))

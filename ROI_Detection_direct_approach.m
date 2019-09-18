@@ -1,4 +1,4 @@
-function f_ROI = ROI_Detection(f, sigma, alpha, type)
+function f_ROI = ROI_Detection_direct_approach(f, sigma, alpha, type, c_bg)
 %ROI_DETECTION Extract ROI from a matrix
 % INPUT
 % -----
@@ -15,67 +15,32 @@ nr_pxl = M * N;
 
 % Calculate the euclidean norm of the vertical and horizontal discrete
 % derivatives:
-d_down = discreteDerivative(f, M, N, 'down');
-d_up = discreteDerivative(f, M, N, 'up');
+d = f - c_bg;
 
 % Calculate p-values based on d:
-p_down = exp( - d_down .^2 / (4 * sigma^2) );
-p_up = exp( - d_up .^2 / (4 * sigma^2) );
+p = 2 * (1 - normcdf(abs(d), 0, sigma));
 
 % Determine threshold probability:
 switch type
     case 'FDR'
         % Perform FDR thresholding approach:
-        p_lambda_down = FDRThresholding(nr_pxl, p_down, alpha);
-        p_lambda_up = FDRThresholding(nr_pxl, p_up, alpha);
+        p_lambda = FDRThresholding(nr_pxl, p, alpha);
     case 'Bonferroni'
         % Perform Bonferroni thresholding approach:
-        p_lambda_down = BonferroniThresholding(nr_pxl, p_down, alpha);
-        p_lambda_up = BonferroniThresholding(nr_pxl, p_up, alpha);
+        p_lambda = BonferroniThresholding(nr_pxl, p, alpha);
     case 'Hochberg'
         % Perform Hochberg thresholding approach:
-        p_lambda_down = HochbergThresholding(nr_pxl, p_down, alpha);
-        p_lambda_up = HochbergThresholding(nr_pxl, p_up, alpha);
+        p_lambda = HochbergThresholding(nr_pxl, p, alpha);
 end
 
 % Calculate threshold based on threshold probability:
-lambda_down = 2 * sigma * sqrt(- log(p_lambda_down));
-lambda_up = 2 * sigma * sqrt(- log(p_lambda_up));
+lambda = sigma * norminv(1 - p_lambda / 2);
 
 % Create background indicator map:
-bgMap = max(d_down < lambda_down, d_up < lambda_up);
+bgMap = abs(d) < lambda;
 
 % Create ROI indicator image f_ROI:
 f_ROI = (1 - bgMap) * 255;
-
-end
-
-
-function d = discreteDerivative(f, M, N, direction)
-% Determine direction of discrete derivative:
-switch direction
-    case 'down'
-        shift = 0;
-    case 'up'
-        shift = 1;
-end
-
-% Initialize d1, d2:
-% d1: vertical discrete derivative
-% d2: horizontal discrete derivative
-d1 = ones(M, N);
-d2 = ones(M, N);
-
-% Calculate d1:
-d1(1 + shift:M - 1 + shift, :) = f(2 - shift:M - shift, :) - f(1 + shift:M - 1 + shift, :);
-d1((1 - shift) * M + shift, :) = f(shift * M + (1 - shift), :) - f((1 - shift) * M + shift, :);
-
-% Calculate d2:
-d2(:, 1 + shift:N - 1 + shift) = f(:, 2 - shift:N - shift) - f(:, 1 + shift:N - 1 + shift);
-d2(:, (1 - shift) * N + shift) = f(:, shift * N + (1 - shift)) - f(:, (1 - shift) * N + shift);
-
-% Calculate d as the euclidean norm of d1 and d2:
-d = sqrt(d1 .^2 + d2 .^2);
 
 end
 
