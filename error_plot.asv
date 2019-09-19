@@ -10,7 +10,7 @@ plot(sigma_range, err_FDR_dA(:, 1) / t_dA(1), 'Linewidth', 2.0)
 plot(sigma_range, err_Hoc(:, 1) / t(1), 'Linewidth', 2.0)
 plot(sigma_range, err_Hoc_dA(:, 1) / t_dA(1), 'Linewidth', 2.0)
 hold off
-legend('Bonferroni', 'Bonferroni_{dA}', 'FDR', 'FDR_{dA}', 'Hochberg', 'Hochberg_{dA}', 'Location', 'southeast')
+legend('err_Bon', 'err_Bon_dA', 'err_FDR', 'err_FDR_dA', 'err_Hoc', 'err_Hoc_dA', 'Location', 'southeast')
 title('Type I error')
 
 % Type II error plot
@@ -23,5 +23,5 @@ plot(sigma_range, err_FDR_dA(:, 2) / t_dA(2), 'Linewidth', 2.0)
 plot(sigma_range, err_Hoc(:, 2) / t(2), 'Linewidth', 2.0)
 plot(sigma_range, err_Hoc_dA(:, 2) / t_dA(2), 'Linewidth', 2.0)
 hold off
-legend('Bonferroni', 'Bonferroni_{dA}', 'FDR', 'FDR_{dA}', 'Hochberg', 'Hochberg_{dA}', 'Location', 'southeast')
+legend('$err_{Bon)', 'err_Bon_dA', 'err_FDR', 'err_FDR_dA', 'err_Hoc', 'err_Hoc_dA', 'Location', 'southeast')
 title('Type II error')

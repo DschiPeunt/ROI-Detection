@@ -9,8 +9,6 @@ function [err_FDR, err_Bon, err_Hoc, t] = ConfidenceTest(M, N, sigma_range, nois
 % alpha: statistical significance
 % c_bg: greyscale value for the image background (optional)
 
-% [err_FDR, err_Bon, err_Hoc, t] = ConfidenceTest(M, N, sigma_range, noise, alpha);
-
 % Check whether an alternative background greyvalue was given:
 if (~exist('c_bg', 'var'))
     c_bg = 127.5;
@@ -45,9 +43,9 @@ for tlc1 = 2:M-1
                 
                 % Determine correct ROI picture:
                 ROI = zeros(M, N);
-                ROI(tlc1:brc1, tlc2:brc2) = 255;
-                % ROI(tlc1-1:brc1, tlc2:brc2) = 255;
-                % ROI(tlc1:brc1, tlc2-1:brc2) = 255;
+%                 ROI(tlc1:brc1, tlc2:brc2) = 255;
+                ROI(tlc1-1:brc1, tlc2:brc2) = 255;
+                ROI(tlc1:brc1, tlc2-1:brc2) = 255;
                 
                 % Count foreground and background pixels:
                 t = t + [sum(sum(ROI == 255)), sum(sum(ROI == 0))];

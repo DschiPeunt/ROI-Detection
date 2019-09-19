@@ -43,7 +43,8 @@ lambda_down = 2 * sigma * sqrt(- log(p_lambda_down));
 lambda_up = 2 * sigma * sqrt(- log(p_lambda_up));
 
 % Create background indicator map:
-bgMap = max(d_down < lambda_down, d_up < lambda_up);
+% bgMap = max(d_down < lambda_down, d_up < lambda_up);
+bgMap = d_down < lambda_down;
 
 % Create ROI indicator image f_ROI:
 f_ROI = (1 - bgMap) * 255;
