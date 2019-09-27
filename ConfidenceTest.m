@@ -24,6 +24,7 @@ t = zeros(1, 2);
 
 % Loop through all possible ROI with at least 1 pixel margin:
 for tlc1 = 2:M-1
+    tlc1
     for tlc2 = 2:N-1
         for brc1 = tlc1:M-1
             for brc2 = tlc2:N-1
@@ -43,9 +44,9 @@ for tlc1 = 2:M-1
                 
                 % Determine correct ROI picture:
                 ROI = zeros(M, N);
-%                 ROI(tlc1:brc1, tlc2:brc2) = 255;
-                ROI(tlc1-1:brc1, tlc2:brc2) = 255;
-                ROI(tlc1:brc1, tlc2-1:brc2) = 255;
+                ROI(tlc1:brc1, tlc2:brc2) = 255;
+%                 ROI(tlc1-1:brc1, tlc2:brc2) = 255;
+%                 ROI(tlc1:brc1, tlc2-1:brc2) = 255;
                 
                 % Count foreground and background pixels:
                 t = t + [sum(sum(ROI == 255)), sum(sum(ROI == 0))];
@@ -60,6 +61,9 @@ for tlc1 = 2:M-1
                     ROI_FDR = ROI_Detection(ROI_noisy, sigma, alpha, 'FDR');
                     ROI_Bon = ROI_Detection(ROI_noisy, sigma, alpha, 'Bonferroni');
                     ROI_Hoc = ROI_Detection(ROI_noisy, sigma, alpha, 'Hochberg');
+%                     ROI_FDR = ROI_Detection_direct_approach(ROI_noisy, sigma, alpha, 'FDR', 127.5);
+%                     ROI_Bon = ROI_Detection_direct_approach(ROI_noisy, sigma, alpha, 'Bonferroni', 127.5);
+%                     ROI_Hoc = ROI_Detection_direct_approach(ROI_noisy, sigma, alpha, 'Hochberg', 127.5);
                     
                     % Count type I and II errors:
                     err_FDR(ind, :) = err_FDR(ind, :) + [sum(sum(ROI == 0 & ROI_FDR == 255)), sum(sum(ROI == 255 & ROI_FDR == 0))];
