@@ -61,9 +61,6 @@ for tlc1 = 2:M-1
                     ROI_FDR = ROI_Detection(ROI_noisy, sigma, alpha, 'FDR');
                     ROI_Bon = ROI_Detection(ROI_noisy, sigma, alpha, 'Bonferroni');
                     ROI_Hoc = ROI_Detection(ROI_noisy, sigma, alpha, 'Hochberg');
-%                     ROI_FDR = ROI_Detection_direct_approach(ROI_noisy, sigma, alpha, 'FDR', 127.5);
-%                     ROI_Bon = ROI_Detection_direct_approach(ROI_noisy, sigma, alpha, 'Bonferroni', 127.5);
-%                     ROI_Hoc = ROI_Detection_direct_approach(ROI_noisy, sigma, alpha, 'Hochberg', 127.5);
                     
                     % Count type I and II errors:
                     err_FDR(ind, :) = err_FDR(ind, :) + [sum(sum(ROI == 0 & ROI_FDR == 255)), sum(sum(ROI == 255 & ROI_FDR == 0))];
