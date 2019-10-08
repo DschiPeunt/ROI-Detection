@@ -1,6 +1,5 @@
 function A_dil_B = BinDilation(A, B)
-%UNTITLED Summary of this function goes here
-%   Detailed explanation goes here
+%BINDILATION Perform binary dilation of A by B
 
 A_dil_B = zeros(size(A));
 
