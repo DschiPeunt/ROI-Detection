@@ -4,4 +4,3 @@ function [ output_args ] = MorphologicalProcessing( input_args )
 
 
 end
-
