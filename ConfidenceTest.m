@@ -22,10 +22,16 @@ err_Hoc = zeros(size(sigma_range, 2), 2);
 % Initialize counters for total number of foreground and background pixels:
 t = zeros(1, 2);
 
+% Initialize set B for morphological binary opening:
+B = ones(3, 3);
+
 % Loop through all possible ROI with at least 1 pixel margin:
 for tlc1 = 2:M-1
-    tlc1
     for tlc2 = 2:N-1
+        
+        % Display progress:
+        disp([tlc1 tlc2])
+        
         for brc1 = tlc1:M-1
             for brc2 = tlc2:N-1
                 % Initialize the picture with constant background:
@@ -61,6 +67,11 @@ for tlc1 = 2:M-1
                     ROI_FDR = ROI_Detection(ROI_noisy, sigma, alpha, 'FDR');
                     ROI_Bon = ROI_Detection(ROI_noisy, sigma, alpha, 'Bonferroni');
                     ROI_Hoc = ROI_Detection(ROI_noisy, sigma, alpha, 'Hochberg');
+                    
+                    % Perform morphological binary opening:
+                    ROI_FDR = BinOpening(ROI_FDR / 255, B) * 255;
+                    ROI_Bon = BinOpening(ROI_Bon / 255, B) * 255;
+                    ROI_Hoc = BinOpening(ROI_Hoc / 255, B) * 255;
                     
                     % Count type I and II errors:
                     err_FDR(ind, :) = err_FDR(ind, :) + [sum(sum(ROI == 0 & ROI_FDR == 255)), sum(sum(ROI == 255 & ROI_FDR == 0))];

@@ -1,8 +1,9 @@
 function A_open = BinOpening(A, B)
 %BINOPENING Perform binary opening of A by B
 
+% Check whether B was specified and set it, if it wasn't:
 if (~exist('B', 'var'))
-    B = zeros(3, 3);
+    B = ones(3, 3);
 end
 
 A_open = BinDilation(BinErosion(A, B), B);
