@@ -1,5 +1,5 @@
-function [err_FDR, err_Bon, err_Hoc, t] = StatSignificance(M, N, sigma_range, noise, alpha, c_bg)
-%CONFIDENCETEST Loop through all possible ROI to test significance
+function [err_FDR, err_Bon, err_Hoc, t] = StatSignificance(M, N, sigma_range, noise, alpha, min_size, c_bg)
+%STATSIGNIFICANCE Loop through all possible ROI to test significance
 % INPUT
 % -----
 % M: height/vertical size of the images to be tested
@@ -7,7 +7,17 @@ function [err_FDR, err_Bon, err_Hoc, t] = StatSignificance(M, N, sigma_range, no
 % sigma_range: vector with standard deviations of the noise to test
 % noise: M-by-N standard normally distributed noise matrix
 % alpha: statistical significance
+% min_size: minimal size of the ROI (optional)
 % c_bg: greyscale value for the image background (optional)
+
+
+% [err_FDR, err_Bon, err_Hoc, t] = StatSignificance(M, N, sigma_range, noise, alpha);
+
+
+% Check whether a minimal size was given:
+if (~exist('min_size', 'var'))
+    min_size = 0;
+end
 
 % Check whether an alternative background greyvalue was given:
 if (~exist('c_bg', 'var'))
@@ -26,20 +36,21 @@ t = zeros(1, 2);
 B = ones(3, 3);
 
 % Loop through all possible ROI with at least 1 pixel margin:
-for tlc1 = 2:M-1
-    for tlc2 = 2:N-1
+for tlc1 = 2 : M-1
+    for tlc2 = 2 : N-1
         
         % Display progress:
         disp([tlc1 tlc2])
         
-        for brc1 = tlc1:M-1
-            for brc2 = tlc2:N-1
+        % Loop through all ROI with the given minimal size:
+        for brc1 = tlc1 + min_size : M-1
+            for brc2 = tlc2 + min_size : N-1
                 % Initialize the picture with constant background:
                 ROI_Picture = ones(M, N) * c_bg;
                 
                 % Generate ROI pattern:
-                for i = tlc1:brc1
-                    for j = tlc2:brc2
+                for i = tlc1 : brc1
+                    for j = tlc2 : brc2
                         if mod(i+j, 2) == 0
                             ROI_Picture(i, j) = 0;
                         elseif mod(i+j, 2) == 1
