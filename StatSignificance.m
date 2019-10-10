@@ -11,7 +11,7 @@ function [err_FDR, err_Bon, err_Hoc, t] = StatSignificance(M, N, sigma_range, no
 % c_bg: greyscale value for the image background (optional)
 
 
-% [err_FDR, err_Bon, err_Hoc, t] = StatSignificance(M, N, sigma_range, noise, alpha);
+% [err_FDR, err_Bon, err_Hoc, t] = StatSignificance(M, N, sigma_range, noise, alpha, 3);
 
 
 % Check whether a minimal size was given:
@@ -76,7 +76,7 @@ for tlc1 = 2 : M-1
                     ROI_Bon = ROI_Detection(ROI_noisy, sigma, alpha, 'Bonferroni');
                     ROI_Hoc = ROI_Detection(ROI_noisy, sigma, alpha, 'Hochberg');
                     
-                    % Perform morphological binary opening:
+                    % Perform morphological operations:
                     ROI_FDR = MorphologicalProcessing(ROI_FDR / 255) * 255;
                     ROI_Bon = MorphologicalProcessing(ROI_Bon / 255) * 255;
                     ROI_Hoc = MorphologicalProcessing(ROI_Hoc / 255) * 255;
