@@ -1,8 +1,8 @@
 % Specify dimensions, range of standard deviations and results to be loaded:
 dims = '8x16';
 sigma_range = 1:150;
-res1 = 'open';
-res2 = 'open_3min';
+res1 = 'open_3min';
+res2 = 'open_3min_conv';
 
 % ------------------------------------------------------------------------
 
