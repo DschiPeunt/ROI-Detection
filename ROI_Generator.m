@@ -1,4 +1,4 @@
-function ROI_Picture = ROI_Generator(M, N, min_size, c_bg)
+function [ROI_Picture, tlc, brc] = ROI_Generator(M, N, min_size, c_bg)
 %ROI_GENERATOR Generate random rectangle with checkerboard pattern
 % INPUT
 % -----
