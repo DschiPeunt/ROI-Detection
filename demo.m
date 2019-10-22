@@ -26,6 +26,6 @@ f_ROI_Hoc_morph = MorphologicalProcessing(f_ROI_Hoc / 255) * 255;
 % Plot ROI_Picture and ROI:
 figure,
 subplot(2,2,1), imshow(uint8(f));
-subplot(2,2,2), imshow(uint8(f_ROI_FDR_morph));
-subplot(2,2,3), imshow(uint8(f_ROI_Bon_morph));
-subplot(2,2,4), imshow(uint8(f_ROI_Hoc_morph));
+subplot(2,2,2), imshow(uint8(f_ROI_FDR));
+subplot(2,2,3), imshow(uint8(f_ROI_Bon));
+subplot(2,2,4), imshow(uint8(f_ROI_Hoc));

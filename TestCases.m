@@ -31,7 +31,7 @@ end
 function cases = createTestCases(dims, nr_pictures, min_size)
 
 % Initialize structure to store images and coordinates of the ROI:
-cases = struct;
+cases = struct;a
 
 % Loop over dimensions to create:
 for i = 1 : size(dims, 2)

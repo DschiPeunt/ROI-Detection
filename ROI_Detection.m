@@ -15,36 +15,33 @@ nr_pxl = M * N;
 
 % Calculate the euclidean norm of the vertical and horizontal discrete
 % derivatives:
-d_down = discreteDerivative(f, M, N, 'down');
-d_up = discreteDerivative(f, M, N, 'up');
+d_plus = discreteDerivative(f, M, N, 'plus');
+d_minus = discreteDerivative(f, M, N, 'minus');
+
+% Calculate test statistic:
+d = min(d_plus, d_minus);
 
 % Calculate p-values based on d:
-p_down = exp( - d_down .^2 / (4 * sigma^2) );
-p_up = exp( - d_up .^2 / (4 * sigma^2) );
+p = exp( - d .^2 / (4 * sigma^2) );
 
 % Determine threshold probability:
 switch type
     case 'FDR'
         % Perform FDR thresholding approach:
-        p_lambda_down = FDRThresholding(nr_pxl, p_down, alpha);
-        p_lambda_up = FDRThresholding(nr_pxl, p_up, alpha);
+        p_lambda = FDRThresholding(nr_pxl, p, alpha);
     case 'Bonferroni'
         % Perform Bonferroni thresholding approach:
-        p_lambda_down = BonferroniThresholding(nr_pxl, p_down, alpha);
-        p_lambda_up = BonferroniThresholding(nr_pxl, p_up, alpha);
+        p_lambda = BonferroniThresholding(nr_pxl, p, alpha);
     case 'Hochberg'
         % Perform Hochberg thresholding approach:
-        p_lambda_down = HochbergThresholding(nr_pxl, p_down, alpha);
-        p_lambda_up = HochbergThresholding(nr_pxl, p_up, alpha);
+        p_lambda = HochbergThresholding(nr_pxl, p, alpha);
 end
 
 % Calculate threshold based on threshold probability:
-lambda_down = 2 * sigma * sqrt(- log(p_lambda_down));
-lambda_up = 2 * sigma * sqrt(- log(p_lambda_up));
+lambda = 2 * sigma * sqrt(- log(p_lambda));
 
 % Create background indicator map:
-bgMap = max(d_down < lambda_down, d_up < lambda_up);
-% bgMap = d_down < lambda_down;
+bgMap = d < lambda;
 
 % Create ROI indicator image f_ROI:
 f_ROI = (1 - bgMap) * 255;
@@ -55,9 +52,9 @@ end
 function d = discreteDerivative(f, M, N, direction)
 % Determine direction of discrete derivative:
 switch direction
-    case 'down'
+    case 'plus'
         shift = 0;
-    case 'up'
+    case 'minus'
         shift = 1;
 end
 
@@ -68,11 +65,11 @@ d1 = ones(M, N);
 d2 = ones(M, N);
 
 % Calculate d1:
-d1(1 + shift:M - 1 + shift, :) = f(2 - shift:M - shift, :) - f(1 + shift:M - 1 + shift, :);
+d1(1 + shift : M - 1 + shift, :) = f(2 - shift : M - shift, :) - f(1 + shift : M - 1 + shift, :);
 d1((1 - shift) * M + shift, :) = f(shift * M + (1 - shift), :) - f((1 - shift) * M + shift, :);
 
 % Calculate d2:
-d2(:, 1 + shift:N - 1 + shift) = f(:, 2 - shift:N - shift) - f(:, 1 + shift:N - 1 + shift);
+d2(:, 1 + shift : N - 1 + shift) = f(:, 2 - shift : N - shift) - f(:, 1 + shift : N - 1 + shift);
 d2(:, (1 - shift) * N + shift) = f(:, shift * N + (1 - shift)) - f(:, (1 - shift) * N + shift);
 
 % Calculate d as the euclidean norm of d1 and d2:
