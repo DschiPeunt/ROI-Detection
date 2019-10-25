@@ -3,6 +3,9 @@ function cases = StatSignificanceTestCases(dims, nr_pictures, cases, alpha, max_
 % Load library of morphological operations:
 MO = MorphologicalOperations;
 
+% Define structuring element:
+SE = strel('square', 3);
+
 % Loop over dimensions:
 for i = 1 : size(dims, 2)
     
@@ -62,9 +65,12 @@ for i = 1 : size(dims, 2)
                 err_Hoc(sigma, :) = err_Hoc(sigma, :) + [sum(sum(ROI == 0 & ROI_Hoc == 255)), sum(sum(ROI == 255 & ROI_Hoc == 0))];
                 
                 % Perform binary opening:
-                ROI_FDR_o = MO.BinOpening(ROI_FDR / 255) * 255;
-                ROI_Bon_o = MO.BinOpening(ROI_Bon / 255) * 255;
-                ROI_Hoc_o = MO.BinOpening(ROI_Hoc / 255) * 255;
+%                 ROI_FDR_o = MO.BinOpening(ROI_FDR / 255) * 255;
+%                 ROI_Bon_o = MO.BinOpening(ROI_Bon / 255) * 255;
+%                 ROI_Hoc_o = MO.BinOpening(ROI_Hoc / 255) * 255;
+                ROI_FDR_o = imopen(ROI_FDR / 255, SE) * 255;
+                ROI_Bon_o = imopen(ROI_Bon / 255, SE) * 255;
+                ROI_Hoc_o = imopen(ROI_Hoc / 255, SE) * 255;
                 
                 % Count type I and II errors:
                 err_FDR_o(sigma, :) = err_FDR_o(sigma, :) + [sum(sum(ROI == 0 & ROI_FDR_o == 255)), sum(sum(ROI == 255 & ROI_FDR_o == 0))];

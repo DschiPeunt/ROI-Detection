@@ -10,10 +10,6 @@ function [err_FDR, err_Bon, err_Hoc, t] = StatSignificance(M, N, sigma_range, no
 % min_size: minimal size of the ROI (optional)
 % c_bg: greyscale value for the image background (optional)
 
-
-% [err_FDR, err_Bon, err_Hoc, t] = StatSignificance(M, N, sigma_range, noise, alpha, 3);
-
-
 % Check whether a minimal size was given:
 if (~exist('min_size', 'var'))
     min_size = 0;
@@ -23,6 +19,9 @@ end
 if (~exist('c_bg', 'var'))
     c_bg = 127.5;
 end
+
+% Load library of morphological operations:
+MO = MorphologicalOperations;
 
 % Initialize counters for type I and II errors:
 err_FDR = zeros(size(sigma_range, 2), 2);
@@ -59,8 +58,6 @@ for tlc1 = 2 : M-1
                 % Determine correct ROI picture:
                 ROI = zeros(M, N);
                 ROI(tlc1:brc1, tlc2:brc2) = 255;
-%                 ROI(tlc1-1:brc1, tlc2:brc2) = 255;
-%                 ROI(tlc1:brc1, tlc2-1:brc2) = 255;
                 
                 % Count foreground and background pixels:
                 t = t + [sum(sum(ROI == 255)), sum(sum(ROI == 0))];
@@ -77,9 +74,9 @@ for tlc1 = 2 : M-1
                     ROI_Hoc = ROI_Detection(ROI_noisy, sigma, alpha, 'Hochberg');
                     
                     % Perform morphological operations:
-                    ROI_FDR = MorphologicalProcessing(ROI_FDR / 255) * 255;
-                    ROI_Bon = MorphologicalProcessing(ROI_Bon / 255) * 255;
-                    ROI_Hoc = MorphologicalProcessing(ROI_Hoc / 255) * 255;
+                    ROI_FDR = MO.BinConvexHull(MO.BinOpening(ROI_FDR / 255)) * 255;
+                    ROI_Bon = MO.BinConvexHull(MO.BinOpening(ROI_Bon / 255)) * 255;
+                    ROI_Hoc = MO.BinConvexHull(MO.BinOpening(ROI_Hoc / 255)) * 255;
                     
                     % Count type I and II errors:
                     err_FDR(ind, :) = err_FDR(ind, :) + [sum(sum(ROI == 0 & ROI_FDR == 255)), sum(sum(ROI == 255 & ROI_FDR == 0))];
