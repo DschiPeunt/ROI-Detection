@@ -1,14 +1,14 @@
 % Specify dimensions, range of standard deviations and results to be loaded:
 dims = '8x16';
 sigma_range = 1:150;
-res1 = 'open_3min';
-res2 = 'open_3min_conv';
+res1 = 'o';
+res2 = 'oc';
 
 % ------------------------------------------------------------------------
 
 % Load results to display and compare:
-R1 = load(strcat('statSignificance', dims, '_', res1));
-R2 = load(strcat('statSignificance', dims, '_', res2));
+R1 = load(strcat('resultsStatSignificance', dims, '_', res1));
+R2 = load(strcat('resultsStatSignificance', dims, '_', res2));
 
 % Rename loaded variables:
 err_Bon_res1 = R1.(strcat('err_Bon_', res1));

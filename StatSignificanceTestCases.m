@@ -81,7 +81,7 @@ for i = 1 : size(dims, 2)
         end
         
         % Save results:
-        cases.(dim_name).(strcat('t', num2str(j))) = t * nr_noise * sigma;
+        cases.(dim_name).(strcat('t', num2str(j))) = t * nr_noise;
         cases.(dim_name).(strcat('err_FDR', num2str(j))) = err_FDR;
         cases.(dim_name).(strcat('err_Bon', num2str(j))) = err_Bon;
         cases.(dim_name).(strcat('err_Hoc', num2str(j))) = err_Hoc;
