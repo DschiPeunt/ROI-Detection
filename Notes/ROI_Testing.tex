@@ -124,14 +124,16 @@ Let $M, N \in \mathbb{N}$ and $G = \left\{ 0, \dots, M-1 \right\} \times  \left\
 \end{equation}
 where $(m, n) \in G$, $c_{bg} \in \mathbb{R}$ is constant, $v: G \to \{ 0, \pm c_{bg} \}$ and $\varepsilon_{m, n} \sim \mathcal{N}(0, \sigma^2)$ are i.i.d. normal distributed random variables for some $\sigma > 0$ and for all $(m, n) \in G$.
 
-We treat $v$ as an image, that contains a rectangular, thus convex, region of interest. That means, that the pixels, that have a value $\pm c_{bg}$ are arranged in a rectangular shape and all other pixels have value $0$.
+We treat $v$ as an image, that contains a rectangular, thus convex, region of interest. That means, that the pixels with value $\pm c_{bg}$ are arranged in a rectangular shape and all other pixels have value $0$.
 
 \subsection{Testing for the ROI}
 
+\subsubsection{Preparations}
+
 For each pair $(m, n) \in G$ we define four values
 \begin{align}
-	\hat{d}^\pm_1(m, n) &= f(m \pm 1, n) - f(m, n) \label{d1} \\
-	\hat{d}^\pm_2(m, n) &= f(m, n \pm 1) - f(m, n) \label{d2}
+	\tilde{d}^\pm_1(m, n) &= f(m \pm 1, n) - f(m, n) \label{d1} \\
+	\tilde{d}^\pm_2(m, n) &= f(m, n \pm 1) - f(m, n) \label{d2}
 \end{align}
 where we define
 \begin{align*}
@@ -141,15 +143,15 @@ where we define
 	f(M, n) &= f(0, n)
 \end{align*}
 to adjust to boundary issues. We now combine these values into two new values and assign to each pair $(m, n) \in G$ the values
-\begin{equation}\label{d_hat}
-	\hat{d}^\pm(m, n) = \sqrt{\hat{d}^\pm_1(m, n)^2 + \hat{d}^\pm_2(m, n)^2}
+\begin{equation}\label{d_tilde}
+	\tilde{d}^\pm(m, n) = \sqrt{\tilde{d}^\pm_1(m, n)^2 + \tilde{d}^\pm_2(m, n)^2}
 \end{equation}
 
 We now want to test if a pixel is part of the aforementioned region of interest (ROI). To do this, we define another two values for each pixel $(m, n) \in G$:
 \begin{equation}\label{d}
 	d^\pm(m, n) = \sqrt{(v(m \pm 1, n) - v(m, n))^2 + (v(m, n \pm 1) - v(m, n))^2}
 \end{equation}
-Although the definitions of $d^\pm(m, n)$ and $\hat{d}^\pm(m, n)$ are quite similar, note, that we can only actually compute the values of the latter. The definition of $d^\pm(m, n)$ helps us define a null hypothesis for our testing procedure. Since we want to test for the ROI, our null hypothesis for a given pixel is, that it is a background pixel. That translates to $v(m, n) = 0$. If a pixel is background and since we assumed the ROI to be rectangular, that means, that its top and left neighbour pixels or bottom and right neighbour pixels are background as well. This leads to the null hypothesis
+Although the definitions of $d^\pm(m, n)$ and $\tilde{d}^\pm(m, n)$ are quite similar, note, that we can only actually compute the values of the latter. The definition of $d^\pm(m, n)$ helps us define a null hypothesis for our testing procedure. Since we want to test for the ROI, our null hypothesis for a given pixel is, that it is a background pixel. That translates to $v(m, n) = 0$. If a pixel is background and since we assumed the ROI to be rectangular, that means, that its top and left neighbour pixels or bottom and right neighbour pixels are background as well. This leads to the null hypothesis
 \begin{equation}
 	H_0 : \min\{ d^+(m, n), d^-(m, n) \} = 0
 \end{equation}
@@ -158,17 +160,43 @@ Since by definition $d^\pm(m, n) \geq 0$, our alternative hypothesis becomes
 	H_1 : \min\{ d^+(m, n), d^-(m, n) \} > 0
 \end{equation}
 
-We use $T = \hat{d}(m, n) = \min \{ \hat{d}^+(m, n), \hat{d}^-(m, n) \}$ as our test statistic. Dropping $(m, n)$ in every term for readability, we get
+Since $v$ only takes values in $\{ 0, -c_{bg}, c_{bg} \}$, $d^\pm$ also can only attain values in
+\begin{equation*}
+	\mathcal{D} = \{ 0, c_{bg}, 2 c_{bg}, \sqrt{2} c_{bg}, \sqrt{5} c_{bg}, \sqrt{8} c_{bg} \}
+\end{equation*}
+This means, that we can define two sets $\mathcal{D}_0$ and $\mathcal{D}_1$ as follows
+\begin{equation*}
+	\mathcal{D}_1 = ( \mathcal{D} \setminus \{ 0 \} ) \times ( \mathcal{D} \setminus \{ 0 \} )
+\end{equation*}
+\begin{equation*}
+	\mathcal{D}_0 = ( \mathcal{D} \setminus \{ 0 \} ) \times \{ 0 \} \cup \{ 0 \} \times ( \mathcal{D} \setminus \{ 0 \} ) \cup ( \{ 0 \} \times \{ 0 \} ) = ( \mathcal{D} \times \mathcal{D} ) \setminus \mathcal{D}_1
+\end{equation*}
+Now, if $(d^+, d^-) \in \mathcal{D}_0$ then the null hypothesis is true and if $(d^+, d^-) \in \mathcal{D}_1$, the alternative hypothesis is true.
+
+\subsubsection{Statistical significance}
+
+We use $T = \tilde{d}(m, n) = \min \{ \tilde{d}^+(m, n), \tilde{d}^-(m, n) \}$ as our test statistic. Dropping $(m, n)$ in every term for readability, we get
 \begin{align*}
 	&\mathbb{P}(T \geq t \mid H_0) \\
-	&= \mathbb{P}(\min \{ \hat{d}^+, \hat{d}^- \} \geq t \mid \min\{ d^+, d^- \} = 0) \\
-	&= \mathbb{P}(\{ \hat{d}^+ \geq t \} \cap \{ \hat{d}^- \geq t \} \mid \{ d^+ = 0 \} \cup \{ d^- = 0 \}) \\
-	&\leq \min \left\{ \mathbb{P}(\{ \hat{d}^+ \geq t \} \mid \{ d^+ = 0 \} \cup \{ d^- = 0 \}), \mathbb{P}(\{ \hat{d}^- \geq t \} \mid \{ d^+ = 0 \} \cup \{ d^- = 0 \}) \right\}
+	&= \sum_{(d_1, d_2) \in \mathcal{D}_0} \mathbb{P}(d^+ = d_1, d^- = d_2 \mid H_0) \cdot \mathbb{P}(T \geq t \mid d^+ = d_1, d^- = d_2, H_0) \\
+	&= \sum_{(d_1, d_2) \in \mathcal{D}_0} \mathbb{P}(d^+ = d_1, d^- = d_2 \mid H_0) \cdot \mathbb{P}(T \geq t \mid d^+ = d_1, d^- = d_2) \\
+	&= \sum_{d_1 \in \mathcal{D} \setminus \{ 0 \}} \mathbb{P}(d^+ = d_1, d^- = 0 \mid H_0) \cdot \mathbb{P}(T \geq t \mid d^+ = d_1, d^- = 0) \\
+	&+ \sum_{d_2 \in \mathcal{D} \setminus \{ 0 \}} \mathbb{P}(d^+ = 0, d^- = d_2 \mid H_0) \cdot \mathbb{P}(T \geq t \mid d^+ = 0, d^- = d_2) \\
+	&+ \mathbb{P}(d^+ = 0, d^- = 0 \mid H_0) \cdot \mathbb{P}(T \geq t \mid d^+ = 0, d^- = 0) \\
+	&\leq \sum_{d_1 \in \mathcal{D} \setminus \{ 0 \}} \mathbb{P}(d^+ = d_1, d^- = 0 \mid H_0) \cdot \mathbb{P}(\tilde{d}^- \geq t \mid d^+ = d_1, d^- = 0) \\
+	&+ \sum_{d_2 \in \mathcal{D} \setminus \{ 0 \}} \mathbb{P}(d^+ = 0, d^- = d_2 \mid H_0) \cdot \mathbb{P}(\tilde{d}^+ \geq t \mid d^+ = 0, d^- = d_2) \\
+	&+ \mathbb{P}(d^+ = 0, d^- = 0 \mid H_0) \cdot \mathbb{P}(\tilde{d}^+ \geq t \mid d^+ = 0, d^- = 0) \\
+	&= \sum_{d_1 \in \mathcal{D} \setminus \{ 0 \}} \mathbb{P}(d^+ = d_1, d^- = 0 \mid H_0) \cdot \mathbb{P}(\tilde{d}^- \geq t \mid d^- = 0) \\
+	&+ \sum_{d_2 \in \mathcal{D} \setminus \{ 0 \}} \mathbb{P}(d^+ = 0, d^- = d_2 \mid H_0) \cdot \mathbb{P}(\tilde{d}^+ \geq t \mid d^+ = 0) \\
+	&+ \mathbb{P}(d^+ = 0, d^- = 0 \mid H_0) \cdot \mathbb{P}(\tilde{d}^+ \geq t \mid d^+ = 0) \\
+	&= \mathbb{P}(\tilde{d}^+ \geq t \mid d^+ = 0) \underbrace{\sum_{(d_1, d_2) \in \mathcal{D}_0} \mathbb{P}(d^+ = d_1, d^- = d_2 \mid H_0)}_{= 1} \\
+	&= \mathbb{P}(\tilde{d}^+ \geq t \mid d^+ = 0)
 \end{align*}
+where we used, that $\mathbb{P}(\tilde{d}^+ \geq t \mid d^+ = 0) = \mathbb{P}(\tilde{d}^- \geq t \mid d^- = 0)$.
 
 To proceed, we need to determine the following distributions:
 \begin{align*}
-	&\mathbb{P}(\hat{d}^\pm(m, n) \leq t \mid d^\pm(m, n) = 0) \\
+	&\mathbb{P}(\tilde{d}^\pm(m, n) \leq t \mid d^\pm(m, n) = 0) \\
 	&= \mathbb{P}(( (c_{bg} + v(m \pm 1, n) + \varepsilon_{m \pm 1, n} - c_{bg} - v(m, n) - \varepsilon_{m, n})^2 \\
 	&+ (c_{bg} + v(m, n \pm 1) + \varepsilon_{m, n \pm 1} - c_{bg} - v(m, n) - \varepsilon_{m, n})^2 )^{\frac{1}{2}} \leq t \mid d^\pm(m, n) = 0) \\
 	&= \mathbb{P}(( (v(m \pm 1, n) - v(m, n) + \varepsilon_{m \pm 1, n} - \varepsilon_{m, n})^2 \\
@@ -183,11 +211,11 @@ Using the well-known properties of the standard normal distribution, we see that
 
 The random variable on the left side of the inequality sign thus is the square root of the sum of two squared normal distributions with standard deviation $\sqrt{2} \sigma$. It thus is Rayleigh-distributed with parameter $\sqrt{2} \sigma$, i.e.
 \begin{equation}\label{dist}
-	\hat{d}^\pm(m, n) \mid d^\pm(m, n) = 0 \sim \text{Rayleigh}(\sqrt{2} \sigma)
+	\tilde{d}^\pm(m, n) \mid d^\pm(m, n) = 0 \sim \text{Rayleigh}(\sqrt{2} \sigma)
 \end{equation}
 Thus we get
 \begin{align*}
-	&\mathbb{P}(\hat{d}^\pm(m, n) \leq t \mid d^\pm(m, n) = 0) \\
+	&\mathbb{P}(\tilde{d}^\pm(m, n) \leq t \mid d^\pm(m, n) = 0) \\
 	&= \mathbb{P} \left( \sqrt{ \left( \varepsilon_{m \pm 1, n} - \varepsilon_{m, n} \right)^2 + \left( \varepsilon_{m, n \pm 1} - \varepsilon_{m, n} \right)^2} \leq t \right) \\
 	&= 1 - \exp \left( - \frac{t^2}{4 \sigma^2} \right)
 \end{align*}
@@ -195,9 +223,9 @@ Thus we get
 Using this knowledge, we can turn back to our testing procedure. The null hypothesis states, that $d^+ = 0$ or $d^- = 0$. In the first case, we get
 \begin{align*}
 	&\mathbb{P}(T \geq t \mid H_0) \\
-	&\leq \min \left\{ \mathbb{P}(\{ \hat{d}^+ \geq t \} \mid \{ d^+ = 0 \} \cup \{ d^- = 0 \}), \mathbb{P}(\{ \hat{d}^- \geq t \} \mid \{ d^+ = 0 \} \cup \{ d^- = 0 \}) \right\} \\
-	&\leq \mathbb{P}(\{ \hat{d}^+ \geq t \} \mid \{ d^+ = 0 \} \cup \{ d^- = 0 \}) \\
-	&\leq \mathbb{P}(\hat{d}^+ \geq t \mid d^+ = 0) \\
+	&\leq \min \left\{ \mathbb{P}(\{ \tilde{d}^+ \geq t \} \mid \{ d^+ = 0 \} \cup \{ d^- = 0 \}), \mathbb{P}(\{ \tilde{d}^- \geq t \} \mid \{ d^+ = 0 \} \cup \{ d^- = 0 \}) \right\} \\
+	&\leq \mathbb{P}(\{ \tilde{d}^+ \geq t \} \mid \{ d^+ = 0 \} \cup \{ d^- = 0 \}) \\
+	&\leq \mathbb{P}(\tilde{d}^+ \geq t \mid d^+ = 0) \\
 	&= \exp \left( - \frac{t^2}{4 \sigma^2} \right)
 \end{align*}
 
@@ -358,7 +386,7 @@ The other two procedures control the family-wise error rate at level $\alpha$, i
 
 First, we calculate for every pixel $(m, n) \in G$ the $p$-value
 \begin{equation}
-	p(m, n) = \exp \left( - \frac{\hat{d}(m, n)^2}{4 \sigma^2} \right) \geq \mathbb{P}(T \geq \hat{d}(m, n) \mid H_0)
+	p(m, n) = \exp \left( - \frac{\tilde{d}(m, n)^2}{4 \sigma^2} \right) \geq \mathbb{P}(T \geq \tilde{d}(m, n) \mid H_0)
 \end{equation}
 
 \subsection{FDR Thresholding}
@@ -366,25 +394,25 @@ First, we calculate for every pixel $(m, n) \in G$ the $p$-value
 	\item Sort $p$-values in ascending order: $p_{(1)} \leq p_{(2)} \leq \dots \leq p_{(M \cdot N)}$
 	\item Calculate the maximal index $k$, such that $p_{(k)} \leq \frac{k \cdot \alpha}{M \cdot N}$
 	\item Calculate the threshold $\lambda_{k} = 2 \sigma \sqrt{- \log(p_{(k)})}$
-	\item Reject all hypotheses $H_{(i)}$ with $p_{(i)} \leq p_{(k)}$, i.e. all hypotheses with $$\hat{d}_{(i)} \geq \hat{d}_{(k)} = \lambda_{k} = 2 \sigma \sqrt{- \log(p_{(k)})}$$
+	\item Reject all hypotheses $H_{(i)}$ with $p_{(i)} \leq p_{(k)}$, i.e. all hypotheses with $$\tilde{d}_{(i)} \geq \tilde{d}_{(k)} = \lambda_{k} = 2 \sigma \sqrt{- \log(p_{(k)})}$$
 \end{enumerate}
 
 \subsection{Bonferroni Thresholding}
 \begin{enumerate}[(i)]
-	\item Reject all hypotheses $H_{i}$ with $p_{i} \leq \frac{\alpha}{M \cdot N}$, i.e. all hypotheses with $$\hat{d}_{i} \geq \lambda_k = 2 \sigma \sqrt{- \log \left( \frac{\alpha}{M \cdot N} \right)}$$
+	\item Reject all hypotheses $H_{i}$ with $p_{i} \leq \frac{\alpha}{M \cdot N}$, i.e. all hypotheses with $$\tilde{d}_{i} \geq \lambda_k = 2 \sigma \sqrt{- \log \left( \frac{\alpha}{M \cdot N} \right)}$$
 \end{enumerate}
 
 \subsection{Hochberg Thresholding}
 \begin{enumerate}[(i)]
 	\item Sort $p$-values in ascending order: $p_{(1)} \leq p_{(2)} \leq \dots \leq p_{(M \cdot N)}$
 	\item Calculate the maximal index $k$, such that $p_{(k)} \leq \frac{\alpha}{M \cdot N - k + 1}$
-	\item Reject all hypotheses $H_{(i)}$ with $p_{(i)} \leq p_{(k)}$, i.e. all hypotheses with $$\hat{d}_{(i)} \geq \hat{d}_{(k)} = \lambda_{k} = 2 \sigma \sqrt{- \log(p_{(k)})}$$
+	\item Reject all hypotheses $H_{(i)}$ with $p_{(i)} \leq p_{(k)}$, i.e. all hypotheses with $$\tilde{d}_{(i)} \geq \tilde{d}_{(k)} = \lambda_{k} = 2 \sigma \sqrt{- \log(p_{(k)})}$$
 \end{enumerate}
 
 \begin{remark}
 	All these methods are defined for actual $p$-values, i.e.
 	\begin{equation*}
-		p(m, n) = \mathbb{P}(T \geq \hat{d}(m, n) \mid H_0)
+		p(m, n) = \mathbb{P}(T \geq \tilde{d}(m, n) \mid H_0)
 	\end{equation*}
 	In contrast to that, we have taken upper bounds for the $p$-values. This is not an issue though, since by taking upper bounds we might decrease the number of hypotheses we reject. Thus it will not increase the error rate.
 \end{remark}
@@ -392,8 +420,8 @@ First, we calculate for every pixel $(m, n) \in G$ the $p$-value
 \begin{remark}
 	The threshold has the following interpretation:
 	\begin{itemize}
-		\item If $\hat{d}(m, n) \geq \lambda_{k}$, then $(m, n)$ is part of the ROI.
-		\item If $\hat{d}(m, n) < \lambda_{k}$, then $(m, n)$ is NOT part of the ROI.
+		\item If $\tilde{d}(m, n) \geq \lambda_{k}$, then $(m, n)$ is part of the ROI.
+		\item If $\tilde{d}(m, n) < \lambda_{k}$, then $(m, n)$ is NOT part of the ROI.
 	\end{itemize}
 \end{remark}
 
