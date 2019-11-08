@@ -1,0 +1,409 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+\usepackage{lmodern}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage[superscript]{cite}
+\usepackage{nicefrac}
+\usepackage{upgreek}
+\usepackage{paralist}
+\usepackage{stmaryrd}
+\usepackage{tikz}
+\usepackage{graphicx}
+\usepackage{qtree}
+\usepackage{dsfont}
+\usepackage{eurosym}
+\usepackage{tabulary}
+\usepackage{setspace}
+\usepackage{fancyhdr}
+% \usepackage[colorlinks=true,linkcolor=blue]{hyperref}				% Blaue Links sehen meiner Ansicht nach besser aus als die rot umrandeten Verweise
+
+% Kopfzeile
+\newcommand\shorttitle{ROI Hypothesis Testing}
+\newcommand\authors{Dominik Blank}
+
+\fancyhf{} % sets all head and foot elements empty
+\fancyhead[L]{\shorttitle}
+\fancyhead[R]{\authors}
+\pagestyle{fancy} % sets the page style to the style delivered and editable with fancyhdr
+
+% Kommandos, Operatoren, etc.
+\newcommand{\abs}[1]{\lvert#1\rvert}
+\newcommand{\norm}[1]{\lVert#1\rVert}
+\DeclareMathOperator{\thetafunc}{\uptheta}
+
+% Mathe-Umgebungen
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{corollary}{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}
+\theoremstyle{remark}
+\newtheorem{remark}{Remark}
+\newtheorem{example}{Example}
+
+% ENDE PRÄAMBEL
+
+\author{Dominik Blank}
+\title{Gleichmäßige obere Schranken beim Kreisproblem}
+
+\onehalfspacing
+\setlength{\parindent}{0pt}
+\allowdisplaybreaks
+
+\begin{document}
+%\begin{titlepage}
+%
+%\newcommand{\HRule}{\rule{\linewidth}{0.5mm}} % Defines a new command for the horizontal lines, change thickness here
+%
+%\center % Center everything on the page
+% 
+%%----------------------------------------------------------------------------------------
+%%	HEADING SECTIONS
+%%----------------------------------------------------------------------------------------
+%
+%\textsc{\Large Georg-August-Universität Göttingen}\\[1.5cm] % Name of your university/college
+%\textsc{\large Bachelor-Arbeit zum Thema}\\[0.5cm] % Major heading such as course name
+%% \textsc{\large Minor Heading}\\[0.5cm] % Minor heading such as course title
+%
+%%----------------------------------------------------------------------------------------
+%%	TITLE SECTION
+%%----------------------------------------------------------------------------------------
+%
+%\HRule \\[0.4cm]
+%{\large \bfseries Gleichmäßige obere Schranken beim Kreisproblem}\\[0.2cm] % Title of your document
+%\HRule \\[1.5cm]
+% 
+%%----------------------------------------------------------------------------------------
+%%	AUTHOR SECTION
+%%----------------------------------------------------------------------------------------
+%
+%\begin{minipage}{0.4\textwidth}
+%\begin{flushleft} \large
+%\emph{Autor:}\\
+%Dominik \textsc{Blank} % Your name
+%\end{flushleft}
+%\end{minipage}
+%~
+%\begin{minipage}{0.5\textwidth}
+%\begin{flushright} \large
+%\emph{Betreuer:} \\
+%Prof. Dr. Valentin \textsc{Blomer} % Supervisor's Name
+%\end{flushright}
+%\end{minipage}\\[4cm]
+%
+%%----------------------------------------------------------------------------------------
+%%	DATE SECTION
+%%----------------------------------------------------------------------------------------
+%
+%{\large Göttingen, den \today}\\[3cm] % Date, change the \today to a set date if you want to be precise
+%
+%\begin{abstract}
+%	In dieser Arbeit wird eine asymptotische Formel für die ganzzahligen Darstellungen der natürlichen Zahlen $m \leq R$ durch eine positiv-definite quadratische Form hergeleitet.
+%	Die implizite Konstante des Fehlerterms wird dabei nicht von der jeweiligen quadratischen Form abhängen.
+%\end{abstract}
+%\end{titlepage}
+%
+%\newpage
+
+\tableofcontents
+
+\newpage
+
+\section{ROI Testing}
+
+\subsection{The statistical model}
+
+Let $M, N \in \mathbb{N}$ and $G = \left\{ 0, \dots, M-1 \right\} \times  \left\{ 0, \dots, N-1 \right\}$. Assume we are given data
+\begin{equation}\label{f}
+	f(m, n) = c_{bg} + v(m, n) + \varepsilon_{m, n}
+\end{equation}
+where $(m, n) \in G$, $c_{bg} \in \mathbb{R}$ is constant, $v: G \to \{ 0, \pm c_{bg} \}$ and $\varepsilon_{m, n} \sim \mathcal{N}(0, \sigma^2)$ are i.i.d. normal distributed random variables for some $\sigma > 0$ and for all $(m, n) \in G$.
+
+We treat $v$ as an image, that contains a rectangular, thus convex, region of interest. That means, that the pixels, that have a value $\pm c_{bg}$ are arranged in a rectangular shape and all other pixels have value $0$.
+
+\subsection{Testing for the ROI}
+
+For each pair $(m, n) \in G$ we define four values
+\begin{align}
+	\hat{d}^\pm_1(m, n) &= f(m \pm 1, n) - f(m, n) \label{d1} \\
+	\hat{d}^\pm_2(m, n) &= f(m, n \pm 1) - f(m, n) \label{d2}
+\end{align}
+where we define
+\begin{align*}
+	f(m, -1) &= f(m, N-1) \\
+	f(-1, n) &= f(M-1, n) \\
+	f(m, N) &= f(m, 0) \\
+	f(M, n) &= f(0, n)
+\end{align*}
+to adjust to boundary issues. We now combine these values into two new values and assign to each pair $(m, n) \in G$ the values
+\begin{equation}\label{d_hat}
+	\hat{d}^\pm(m, n) = \sqrt{\hat{d}^\pm_1(m, n)^2 + \hat{d}^\pm_2(m, n)^2}
+\end{equation}
+
+We now want to test if a pixel is part of the aforementioned region of interest (ROI). To do this, we define another two values for each pixel $(m, n) \in G$:
+\begin{equation}\label{d}
+	d^\pm(m, n) = \sqrt{(v(m \pm 1, n) - v(m, n))^2 + (v(m, n \pm 1) - v(m, n))^2}
+\end{equation}
+Although the definitions of $d^\pm(m, n)$ and $\hat{d}^\pm(m, n)$ are quite similar, note, that we can only actually compute the values of the latter. The definition of $d^\pm(m, n)$ helps us define a null hypothesis for our testing procedure. Since we want to test for the ROI, our null hypothesis for a given pixel is, that it is a background pixel. That translates to $v(m, n) = 0$. If a pixel is background and since we assumed the ROI to be rectangular, that means, that its top and left neighbour pixels or bottom and right neighbour pixels are background as well. This leads to the null hypothesis
+\begin{equation}
+	H_0 : \min\{ d^+(m, n), d^-(m, n) \} = 0
+\end{equation}
+Since by definition $d^\pm(m, n) \geq 0$, our alternative hypothesis becomes
+\begin{equation}
+	H_1 : \min\{ d^+(m, n), d^-(m, n) \} > 0
+\end{equation}
+
+We use $T = \hat{d}(m, n) = \min \{ \hat{d}^+(m, n), \hat{d}^-(m, n) \}$ as our test statistic. Dropping $(m, n)$ in every term for readability, we get
+\begin{align*}
+	&\mathbb{P}(T \geq t \mid H_0) \\
+	&= \mathbb{P}(\min \{ \hat{d}^+, \hat{d}^- \} \geq t \mid \min\{ d^+, d^- \} = 0) \\
+	&= \mathbb{P}(\{ \hat{d}^+ \geq t \} \cap \{ \hat{d}^- \geq t \} \mid \{ d^+ = 0 \} \cup \{ d^- = 0 \}) \\
+	&\leq \min \left\{ \mathbb{P}(\{ \hat{d}^+ \geq t \} \mid \{ d^+ = 0 \} \cup \{ d^- = 0 \}), \mathbb{P}(\{ \hat{d}^- \geq t \} \mid \{ d^+ = 0 \} \cup \{ d^- = 0 \}) \right\}
+\end{align*}
+
+To proceed, we need to determine the following distributions:
+\begin{align*}
+	&\mathbb{P}(\hat{d}^\pm(m, n) \leq t \mid d^\pm(m, n) = 0) \\
+	&= \mathbb{P}(( (c_{bg} + v(m \pm 1, n) + \varepsilon_{m \pm 1, n} - c_{bg} - v(m, n) - \varepsilon_{m, n})^2 \\
+	&+ (c_{bg} + v(m, n \pm 1) + \varepsilon_{m, n \pm 1} - c_{bg} - v(m, n) - \varepsilon_{m, n})^2 )^{\frac{1}{2}} \leq t \mid d^\pm(m, n) = 0) \\
+	&= \mathbb{P}(( (v(m \pm 1, n) - v(m, n) + \varepsilon_{m \pm 1, n} - \varepsilon_{m, n})^2 \\
+	&+ (v(m, n \pm 1) - v(m, n) + \varepsilon_{m, n \pm 1} - \varepsilon_{m, n})^2 )^{\frac{1}{2}} \leq t \mid d^\pm(m, n) = 0) \\
+	&= \mathbb{P} \left( \sqrt{ \left( \varepsilon_{m \pm 1, n} - \varepsilon_{m, n} \right)^2 + \left( \varepsilon_{m, n \pm 1} - \varepsilon_{m, n} \right)^2} \leq t \right)
+\end{align*}
+Using the well-known properties of the standard normal distribution, we see that
+\begin{align*}
+	\varepsilon_{m \pm 1, n} - \varepsilon_{m, n} &\sim \mathcal{N}(0, 2 \sigma^2) \\
+	\varepsilon_{m, n \pm 1} - \varepsilon_{m, n} &\sim \mathcal{N}(0, 2 \sigma^2)
+\end{align*}
+
+The random variable on the left side of the inequality sign thus is the square root of the sum of two squared normal distributions with standard deviation $\sqrt{2} \sigma$. It thus is Rayleigh-distributed with parameter $\sqrt{2} \sigma$, i.e.
+\begin{equation}\label{dist}
+	\hat{d}^\pm(m, n) \mid d^\pm(m, n) = 0 \sim \text{Rayleigh}(\sqrt{2} \sigma)
+\end{equation}
+Thus we get
+\begin{align*}
+	&\mathbb{P}(\hat{d}^\pm(m, n) \leq t \mid d^\pm(m, n) = 0) \\
+	&= \mathbb{P} \left( \sqrt{ \left( \varepsilon_{m \pm 1, n} - \varepsilon_{m, n} \right)^2 + \left( \varepsilon_{m, n \pm 1} - \varepsilon_{m, n} \right)^2} \leq t \right) \\
+	&= 1 - \exp \left( - \frac{t^2}{4 \sigma^2} \right)
+\end{align*}
+
+Using this knowledge, we can turn back to our testing procedure. The null hypothesis states, that $d^+ = 0$ or $d^- = 0$. In the first case, we get
+\begin{align*}
+	&\mathbb{P}(T \geq t \mid H_0) \\
+	&\leq \min \left\{ \mathbb{P}(\{ \hat{d}^+ \geq t \} \mid \{ d^+ = 0 \} \cup \{ d^- = 0 \}), \mathbb{P}(\{ \hat{d}^- \geq t \} \mid \{ d^+ = 0 \} \cup \{ d^- = 0 \}) \right\} \\
+	&\leq \mathbb{P}(\{ \hat{d}^+ \geq t \} \mid \{ d^+ = 0 \} \cup \{ d^- = 0 \}) \\
+	&\leq \mathbb{P}(\hat{d}^+ \geq t \mid d^+ = 0) \\
+	&= \exp \left( - \frac{t^2}{4 \sigma^2} \right)
+\end{align*}
+
+Similarly, we get the same inequality in the second case, which yields
+\begin{equation}
+	\mathbb{P}(T \geq t \mid H_0) \leq \exp \left( - \frac{t^2}{4 \sigma^2} \right)
+\end{equation}
+
+\newpage
+
+\section{Morphological operations}
+
+\subsection{Opening and closing}
+
+To define opening and closing, we first need to define erosion and dilation of binary images.
+
+\begin{definition}
+	Let $A, B \subseteq \mathbb{R}^m$. The binary erosion of $A$ by $B$ is defined as
+	\begin{equation*}
+		A \ominus_b B = \left\{ x \in \mathbb{R}^m \mid x + b \in A \; \mathrm{for \; every} \; b \in B \right\}
+	\end{equation*}
+\end{definition}
+\begin{definition}
+	Let $A, B \subseteq \mathbb{R}^m$. The binary dilation of $A$ by $B$ is defined as
+	\begin{equation*}
+		A \oplus_b B = \left\{ c \in \mathbb{R}^m \mid c = a + b \; \mathrm{for \; some} \; a \in A \; \mathrm{and} \; b \in B \right\}
+	\end{equation*}
+\end{definition}
+
+This can be rewritten in a more implementation-friendly form:
+\begin{align*}
+	A \ominus_b B_{(i, j)} &= \underset{m, n}{\mathrm{AND}} [ \mathrm{OR} (A_{(i + m, j + n)}, (1 - B)_{(m, n)}) ] \\
+	A \oplus_b B_{(i, j)} &= \underset{m, n}{\mathrm{OR}} [ \mathrm{AND} (A_{(i - m, j - n)}, B_{(m, n)}) ]
+\end{align*}
+
+Where $m, n$ go through the indices, where $B = 1$. Now we can define binary opening and closing.
+
+\begin{definition}
+	The opening of an image $A$ by a structuring element $B$ is defined as
+	\begin{equation*}
+		A \circ B = (A \ominus B) \oplus B
+	\end{equation*}
+\end{definition}
+\begin{definition}
+	The closing of an image $A$ by a structuring element $B$ is defined as
+	\begin{equation*}
+		A \bullet B = (A \oplus B) \ominus B
+	\end{equation*}
+\end{definition}
+
+\subsection{Hypothesis testing and opening}
+
+From now on, we assume $B$ to be a square of ones centered around our current pixel. Using the notation from above we can take a closer look at what opening really does. We have
+\begin{align*}
+	A \circ B_{(i, j)} &= (A \ominus B) \oplus B \\
+	&= ( \underset{m, n}{\mathrm{AND}} ( \mathrm{OR} (A_{(i + m, j + n)}, \underbrace{(1 - B)_{(m, n)}}_{= 0} ) ) ) \oplus B \\
+	&= ( \underset{m, n}{\mathrm{AND}} ( A_{(i + m, j + n)} ) ) \oplus B \\
+	&= \underset{\tilde{m}, \tilde{n}}{\mathrm{OR}} ( \mathrm{AND} (\underset{m, n}{\mathrm{AND}} ( A_{(i + m - \tilde{m}, j + n - \tilde{n})} ), \underbrace{B_{(m, n)}}_{= 1} ) ) \\
+	&= \underset{\tilde{m}, \tilde{n}}{\mathrm{OR}} ( \underset{m, n}{\mathrm{AND}} ( A_{(i + m - \tilde{m}, j + n - \tilde{n})} ) )
+\end{align*}
+
+Now, we can see, that $A \circ B_{(i, j)} = 1$ if and only if $(i, j)$ is part of a square the size of $B$. In the above formula $(\tilde{m}, \tilde{n})$ determines the offset of the center of the square and thus loops through all possible positions of $(i, j)$ in the square. The inner part on the other hand assures, that there is actually a square of same size as $B$, that $(i, j)$ is part of.
+
+We will now take a look at the effect of opening on the significance level.
+
+\begin{theorem}
+	Let $f$ be an image that contains a rectangular ROI. Assume that we are given a binarized image $f_{bin}$ with
+	\begin{equation*}
+	\mathbb{P}(f_{bin}(i, j) = 1 \mid H_0(i, j)) \leq \alpha
+	\end{equation*}
+	where $H_0(i, j)$ denotes the null hypothesis for the pixel $(i, j)$, which is, that it is a background pixel and thus should be set to zero.
+	
+	Let $k \in \mathbb{N}$ be odd and $B$ be a square structuring element with side length $k$. For $\tilde{m}, \tilde{n} \in \{ -\frac{k - 1}{2}, \dots, \frac{k - 1}{2} \}$ we denote by $\mathcal{G}_{(\tilde{m}, \tilde{n})}^k(i, j)$ the set of all possible ground truths in the square with side length $k$, where the pixel $(i, j)$ has offest $(\tilde{m}, \tilde{n})$ from the center of the square and assuming that the null hypothesis for the pixel $(i, j)$ is true.
+	Then the following inequality holds:
+	\begin{equation*}
+		\mathbb{P}((f_{bin} \circ B)(i, j) = 1 \mid H_0(i, j)) \leq k^2 \alpha^k
+	\end{equation*}
+\end{theorem}
+\begin{proof}
+	First we notice that for fixed $\tilde{m}, \tilde{n}$ the set $\mathcal{G}_{(\tilde{m}, \tilde{n})}^k(i, j)$ contains ALL possible ground truths according to our assumptions, thus
+	\begin{equation*}
+		\sum_{G \in \mathcal{G}_{(\tilde{m}, \tilde{n})}^k(i, j)} \mathbb{P}(G) = 1
+	\end{equation*}
+	Second we notice, that any element $G \in \mathcal{G}_{(\tilde{m}, \tilde{n})}^k(i, j)$ already contains the null hypothesis for the pixel $(i, j)$, thus giving
+	\begin{equation*}
+		\mathbb{P}(G \mid H_0(i, j)) = \mathbb{P}(G)
+	\end{equation*}
+	Third we see that for any possible ground truth $G \in \mathcal{G}_{(\tilde{m}, \tilde{n})}^k(i, j)$ for the whole $k$ by $k$ square to be set to one in $f_{bin}$, there are at least $k$ falsely identified pixels in that square.
+	
+	Let $K = \{ -\frac{k - 1}{2}, \dots, \frac{k - 1}{2} \}$. Using above observations, we get
+	\begin{align*}
+		\mathbb{P}&((f_{bin} \circ B)(i, j) = 1 \mid H_0(i, j)) \\
+		&= \sum_{\tilde{m}, \tilde{n} \in K} \mathbb{P} \left( \bigcap_{m, n \in K} ( f_{bin}(i + m - \tilde{m}, j + n - \tilde{n}) = 1 ) \mid H_0(i, j) \right) \\
+		&= \sum_{\tilde{m}, \tilde{n} \in K} \sum_{G \in \mathcal{G}_{(\tilde{m}, \tilde{n})}^k(i, j)} \mathbb{P}(G \mid H_0(i, j)) \cdot \mathbb{P} \left( \bigcap_{m, n \in K} ( f_{bin}(i + m - \tilde{m}, j + n - \tilde{n}) = 1 ) \mid G, H_0(i, j) \right) \\
+		&= \sum_{\tilde{m}, \tilde{n} \in K} \sum_{G \in \mathcal{G}_{(\tilde{m}, \tilde{n})}^k(i, j)} \mathbb{P}(G) \cdot \underbrace{\mathbb{P} \left( \bigcap_{m, n \in K} ( f_{bin}(i + m - \tilde{m}, j + n - \tilde{n}) = 1 ) \mid G, H_0(i, j) \right)}_{\leq \alpha^k} \\
+		&\leq \sum_{\tilde{m}, \tilde{n} \in K} \sum_{G \in \mathcal{G}_{(\tilde{m}, \tilde{n})}^k(i, j)} \mathbb{P}(G) \cdot \alpha^k \\
+		&= \alpha^k \cdot \sum_{\tilde{m}, \tilde{n} \in K} \underbrace{\sum_{G \in \mathcal{G}_{(\tilde{m}, \tilde{n})}^k(i, j)} \mathbb{P}(G)}_{= 1} \\
+		&= \alpha^k \cdot \sum_{\tilde{m}, \tilde{n} \in K} 1 \\
+		&= \alpha^k \cdot \abs{K}^2 \\
+		&= k^2 \alpha^k
+	\end{align*}
+\end{proof}
+
+\subsection{Convex hull}
+
+As we have seen in the section about multiple testing procedures, we defined the family-wise error rate as $\mathbb{P}(V \geq 1) = 1 - \mathbb{P}(V = 0)$.
+
+\newpage
+
+\section{Multiple testing procedures}
+
+In a next step, we want to employ one of three multiple testing procedures. Consider the following setup:
+\begin{table}[h]
+	\tymax .3\textwidth
+	\begin{tabulary}{\textwidth}{|CCCC|}
+		\hline
+		& \textit{Declared non-significant} & \textit{Declared significant} & \textit{Total} \\
+		\hline
+		\textit{True null hypotheses} & $\mathbf{U}$ & $\mathbf{V}$ & $m_0$ \\
+		\textit{Non-true null hypotheses} & $\mathbf{T}$ & $\mathbf{S}$ & $m - m_0$ \\
+		& $m - \mathbf{R}$ & $\mathbf{R}$ & $m$ \\
+		\hline
+	\end{tabulary}
+\end{table}
+
+\begin{itemize}
+	\item $m$ is the total number hypotheses tested
+	\item $m_0$ is the number of true null hypotheses, an unknown parameter
+	\item $m - m_0$ is the number of true alternative hypotheses
+	\item $V$ is the number of false positives (Type I error) (also called "false discoveries")
+	\item $S$ is the number of true positives
+	\item $T$ is the number of false negatives (Type II error)
+	\item $U$ is the number of true negatives
+	\item $R = V + S$ is the number of rejected null hypotheses (also called "discoveries", either true or false)
+\end{itemize}
+In $m$ hypothesis tests of which $m_0$ are true null hypotheses, $R$ is an observable random variable, and $S$, $T$, $U$, and $V$ are unobservable random variables.
+
+We define another random variable $Q = \frac{V}{V + S}$, which is the proportion of the rejected null hypotheses which are erroneously rejected. We set $Q = 0$, if $V + S = 0$. Based on this, we define the false discovery rate to be
+\begin{equation}
+	FDR = \mathbb{E}(Q) = \mathbb{E} \left( \frac{V}{V + S} \right)
+\end{equation}
+
+We also define the family-wise error rate to be
+\begin{equation}
+	FWER = \mathbb{P}( V \geq 1 ) = 1 - \mathbb{P}( V = 0 )
+\end{equation}
+that is the probability of making one or more type I errors.
+
+Three of these multiple testing procedures are given in detail in the following. The first one controls the false discovery rate at level $\alpha$, i.e.
+\begin{equation}
+	FDR = \mathbb{E}(Q) \leq \alpha
+\end{equation}
+
+The other two procedures control the family-wise error rate at level $\alpha$, i.e.
+\begin{equation}
+	FWER = \mathbb{P}( V \geq 1 ) \leq \alpha
+\end{equation}
+
+First, we calculate for every pixel $(m, n) \in G$ the $p$-value
+\begin{equation}
+	p(m, n) = \exp \left( - \frac{\hat{d}(m, n)^2}{4 \sigma^2} \right) \geq \mathbb{P}(T \geq \hat{d}(m, n) \mid H_0)
+\end{equation}
+
+\subsection{FDR Thresholding}
+\begin{enumerate}[(i)]
+	\item Sort $p$-values in ascending order: $p_{(1)} \leq p_{(2)} \leq \dots \leq p_{(M \cdot N)}$
+	\item Calculate the maximal index $k$, such that $p_{(k)} \leq \frac{k \cdot \alpha}{M \cdot N}$
+	\item Calculate the threshold $\lambda_{k} = 2 \sigma \sqrt{- \log(p_{(k)})}$
+	\item Reject all hypotheses $H_{(i)}$ with $p_{(i)} \leq p_{(k)}$, i.e. all hypotheses with $$\hat{d}_{(i)} \geq \hat{d}_{(k)} = \lambda_{k} = 2 \sigma \sqrt{- \log(p_{(k)})}$$
+\end{enumerate}
+
+\subsection{Bonferroni Thresholding}
+\begin{enumerate}[(i)]
+	\item Reject all hypotheses $H_{i}$ with $p_{i} \leq \frac{\alpha}{M \cdot N}$, i.e. all hypotheses with $$\hat{d}_{i} \geq \lambda_k = 2 \sigma \sqrt{- \log \left( \frac{\alpha}{M \cdot N} \right)}$$
+\end{enumerate}
+
+\subsection{Hochberg Thresholding}
+\begin{enumerate}[(i)]
+	\item Sort $p$-values in ascending order: $p_{(1)} \leq p_{(2)} \leq \dots \leq p_{(M \cdot N)}$
+	\item Calculate the maximal index $k$, such that $p_{(k)} \leq \frac{\alpha}{M \cdot N - k + 1}$
+	\item Reject all hypotheses $H_{(i)}$ with $p_{(i)} \leq p_{(k)}$, i.e. all hypotheses with $$\hat{d}_{(i)} \geq \hat{d}_{(k)} = \lambda_{k} = 2 \sigma \sqrt{- \log(p_{(k)})}$$
+\end{enumerate}
+
+\begin{remark}
+	All these methods are defined for actual $p$-values, i.e.
+	\begin{equation*}
+		p(m, n) = \mathbb{P}(T \geq \hat{d}(m, n) \mid H_0)
+	\end{equation*}
+	In contrast to that, we have taken upper bounds for the $p$-values. This is not an issue though, since by taking upper bounds we might decrease the number of hypotheses we reject. Thus it will not increase the error rate.
+\end{remark}
+
+\begin{remark}
+	The threshold has the following interpretation:
+	\begin{itemize}
+		\item If $\hat{d}(m, n) \geq \lambda_{k}$, then $(m, n)$ is part of the ROI.
+		\item If $\hat{d}(m, n) < \lambda_{k}$, then $(m, n)$ is NOT part of the ROI.
+	\end{itemize}
+\end{remark}
+
+\newpage
+
+\subsection{Example}
+\begin{figure}[h]
+	\includegraphics[width=\linewidth]{Thresholding_Comparison}
+	\caption[Comparison of different thresholding procedures]{The top left is the original image f of testDemo.mat, top right is the ROI with FDR thresholding, bottom left is the ROI with Bonferroni thresholding and bottom right is the ROI with Hochberg thresholding. (Standard deviation of the noise is $\sigma = 7$.)}
+	\label{fig:demo1comparison}
+\end{figure}
+
+\end{document}
