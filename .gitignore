@@ -33,3 +33,9 @@
 
 # Matlab autosave files
 *.asv
+
+# TeX files
+*.aux
+*.log
+*.synctex.gz
+*.toc
