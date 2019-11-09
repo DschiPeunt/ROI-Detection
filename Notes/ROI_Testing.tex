@@ -173,7 +173,7 @@ This means, that we can define two sets $\mathcal{D}_0$ and $\mathcal{D}_1$ as f
 \end{equation*}
 Now, if $(d^+, d^-) \in \mathcal{D}_0$ then the null hypothesis is true and if $(d^+, d^-) \in \mathcal{D}_1$, the alternative hypothesis is true.
 
-\subsubsection{Distribution of $\tilde{d}^\pm$}
+\subsubsection{Distribution of $\mathbb{P}(\tilde{d}^\pm(m, n) \leq t \mid d^\pm(m, n) = d)$}
 
 We want to determine the distribution of $\tilde{d}^\pm(m, n)$ conditioned on $d^\pm(m, n) = d$ for some $d \in \mathcal{D}$. We define
 \begin{align*}
@@ -182,22 +182,25 @@ We want to determine the distribution of $\tilde{d}^\pm(m, n)$ conditioned on $d
 \end{align*}
 Then $d^\pm(m, n) = \sqrt{d_1^\pm(m, n)^2 + d_2^\pm(m, n)^2}$. We note that the roles of $d_1^\pm(m, n)$ and $d_2^\pm(m, n)$ are symmetrical. Furthermore we can see, that for $d^\pm(m, n) = d$ given, we can determine, what $d_1^\pm(m, n)$ and $d_2^\pm(m, n)$ are.
 
-\begin{tabular}{c|c|c}
-	$d$ & $d_1^\pm$ & $d_2^\pm$ \\
-	\hline
-	$0$ & $0$ & $0$ \\
-	\hline
-	$c_{bg}$ & $\{ c_{bg}, 0 \}$ & $\{ 0, c_{bg} \}$ \\
-	\hline
-	$2 c_{bg}$ & $\{ 2 c_{bg}, 0 \}$ & $\{ 0, 2 c_{bg} \}$ \\
-	\hline
-	$\sqrt{2} c_{bg}$ & $c_{bg}$ & $c_{bg}$ \\
-	\hline
-	$\sqrt{5} c_{bg}$ & $\{ 2 c_{bg}, c_{bg} \}$ & $\{ c_{bg}, 2 c_{bg} \}$ \\
-	\hline
-	$\sqrt{8} c_{bg}$ & $2 c_{bg}$ & $2 c_{bg}$ \\
-\end{tabular}
+\begin{center}
+	\begin{tabular}{c|c|c}
+		$d$ & $d_1^\pm$ & $d_2^\pm$ \\
+		\hline
+		$0$ & $0$ & $0$ \\
+		\hline
+		$c_{bg}$ & $\{ c_{bg}, 0 \}$ & $\{ 0, c_{bg} \}$ \\
+		\hline
+		$2 c_{bg}$ & $\{ 2 c_{bg}, 0 \}$ & $\{ 0, 2 c_{bg} \}$ \\
+		\hline
+		$\sqrt{2} c_{bg}$ & $c_{bg}$ & $c_{bg}$ \\
+		\hline
+		$\sqrt{5} c_{bg}$ & $\{ 2 c_{bg}, c_{bg} \}$ & $\{ c_{bg}, 2 c_{bg} \}$ \\
+		\hline
+		$\sqrt{8} c_{bg}$ & $2 c_{bg}$ & $2 c_{bg}$ \\
+	\end{tabular}
+\end{center}
 
+Using this relation, we get
 \begin{align*}
 	&\mathbb{P}(\tilde{d}^\pm(m, n) \leq t \mid d^\pm(m, n) = d) \\
 	&= \mathbb{P}(( (c_{bg} + v(m \pm 1, n) + \varepsilon_{m \pm 1, n} - c_{bg} - v(m, n) - \varepsilon_{m, n})^2 \\
@@ -268,6 +271,47 @@ Thus, we have obtained the inequality
 \begin{equation}
 	\mathbb{P}(T \geq t \mid H_0) \leq \exp \left( - \frac{t^2}{4 \sigma^2} \right)
 \end{equation}
+
+\subsubsection{Power of the test}
+After having established an upper bound for the statistical significance, we aim to provide a lower and upper bound for the power of our test. Especially the upper bound will be quite loose.
+
+Using results and notations from the previous sections, we get the lower bound
+\begin{align*}
+	\beta &= \mathbb{P}(T \leq t \mid H_1) \\
+	&= \sum_{(d_1, d_2) \in \mathcal{D}_1} \mathbb{P}(d^+ = d_1, d^- = d_2 \mid H_1) \cdot \mathbb{P}(T \leq t \mid d^+ = d_1, d^- = d_2, H_1) \\
+	&= \sum_{(d_1, d_2) \in \mathcal{D}_1} \mathbb{P}(d^+ = d_1, d^- = d_2 \mid H_1) \cdot \mathbb{P}(T \leq t \mid d^+ = d_1, d^- = d_2) \\
+	&\geq \sum_{(d_1, d_2) \in \mathcal{D}_1} \mathbb{P}(d^+ = d_1, d^- = d_2 \mid H_1) \cdot \mathbb{P}(\tilde{d}^+ \leq t \mid d^+ = d_1, d^- = d_2) \\
+	&= \sum_{(d_1, d_2) \in \mathcal{D}_1} \mathbb{P}(d^+ = d_1, d^- = d_2 \mid H_1) \cdot \mathbb{P}(\tilde{d}^+ \leq t \mid d^+ = d_1) \\
+	&\geq \sum_{(d_1, d_2) \in \mathcal{D}_1} \mathbb{P}(d^+ = d_1, d^- = d_2 \mid H_1) \cdot \min_{d_1 \in \mathcal{D} \setminus \{ 0 \}} \mathbb{P}(\tilde{d}^+ \leq t \mid d^+ = d_1) \\
+	&= \sum_{(d_1, d_2) \in \mathcal{D}_1} \mathbb{P}(d^+ = d_1, d^- = d_2 \mid H_1) \cdot \mathbb{P}(\tilde{d}^+ \leq t \mid d^+ = \min_{d_1 \in \mathcal{D} \setminus \{ 0 \}} d_1) \\
+	&= \mathbb{P}(\tilde{d}^+ \leq t \mid d^+ = \min_{d_1 \in \mathcal{D} \setminus \{ 0 \}} d_1) \\
+	&= \mathbb{P}(\tilde{d}^+ \leq t \mid d^+ = c_{bg}) \\
+	&= 1 - Q_1 \left( \frac{c_{bg}}{\sqrt{2} \sigma}, \frac{t}{\sqrt{2} \sigma} \right)
+\end{align*}
+
+On the other hand, we get the upper bound
+\begin{align*}
+	\beta &= \mathbb{P}(T \leq t \mid H_1) \\
+	&= \sum_{(d_1, d_2) \in \mathcal{D}_1} \mathbb{P}(d^+ = d_1, d^- = d_2 \mid H_1) \cdot \mathbb{P}(T \leq t \mid d^+ = d_1, d^- = d_2, H_1) \\
+	&= \sum_{(d_1, d_2) \in \mathcal{D}_1} \mathbb{P}(d^+ = d_1, d^- = d_2 \mid H_1) \cdot \mathbb{P}(T \leq t \mid d^+ = d_1, d^- = d_2) \\
+	&\leq \sum_{(d_1, d_2) \in \mathcal{D}_1} \mathbb{P}(d^+ = d_1, d^- = d_2 \mid H_1) \cdot \mathbb{P}(\tilde{d}^+ \leq t \mid d^+ = d_1, d^- = d_2) \\
+	&+ \sum_{(d_1, d_2) \in \mathcal{D}_1} \mathbb{P}(d^+ = d_1, d^- = d_2 \mid H_1) \cdot \mathbb{P}(\tilde{d}^- \leq t \mid d^+ = d_1, d^- = d_2) \\
+	&= \sum_{(d_1, d_2) \in \mathcal{D}_1} \mathbb{P}(d^+ = d_1, d^- = d_2 \mid H_1) \cdot \mathbb{P}(\tilde{d}^+ \leq t \mid d^+ = d_1) \\
+	&+ \sum_{(d_1, d_2) \in \mathcal{D}_1} \mathbb{P}(d^+ = d_1, d^- = d_2 \mid H_1) \cdot \mathbb{P}(\tilde{d}^- \leq t \mid d^- = d_2) \\
+	&\leq \sum_{(d_1, d_2) \in \mathcal{D}_1} \mathbb{P}(d^+ = d_1, d^- = d_2 \mid H_1) \cdot \max_{d_1 \in \mathcal{D} \setminus \{ 0 \}} \mathbb{P}(\tilde{d}^+ \leq t \mid d^+ = d_1) \\
+	&+ \sum_{(d_1, d_2) \in \mathcal{D}_1} \mathbb{P}(d^+ = d_1, d^- = d_2 \mid H_1) \cdot \max_{d_2 \in \mathcal{D} \setminus \{ 0 \}} \mathbb{P}(\tilde{d}^- \leq t \mid d^- = d_2) \\
+	&= \sum_{(d_1, d_2) \in \mathcal{D}_1} \mathbb{P}(d^+ = d_1, d^- = d_2 \mid H_1) \cdot \mathbb{P}(\tilde{d}^+ \leq t \mid d^+ = \max_{d_1 \in \mathcal{D} \setminus \{ 0 \}} d_1) \\
+	&+ \sum_{(d_1, d_2) \in \mathcal{D}_1} \mathbb{P}(d^+ = d_1, d^- = d_2 \mid H_1) \cdot \mathbb{P}(\tilde{d}^- \leq t \mid d^- = \max_{d_2 \in \mathcal{D} \setminus \{ 0 \}} d_2) \\
+	&= \mathbb{P}(\tilde{d}^+ \leq t \mid d^+ = \max_{d_1 \in \mathcal{D} \setminus \{ 0 \}} d_1) + \mathbb{P}(\tilde{d}^- \leq t \mid d^- = \max_{d_2 \in \mathcal{D} \setminus \{ 0 \}} d_2) \\
+	&= 2 \cdot \mathbb{P}(\tilde{d}^+ \leq t \mid d^+ = \max_{d_1 \in \mathcal{D} \setminus \{ 0 \}} d_1) \\
+	&= 2 \cdot \mathbb{P}(\tilde{d}^+ \leq t \mid d^+ = \sqrt{8} c_{bg}) \\
+	&= 2 \cdot \left( 1 - Q_1 \left( \frac{\sqrt{8} c_{bg}}{\sqrt{2} \sigma}, \frac{t}{\sqrt{2} \sigma} \right) \right)
+\end{align*}
+
+Thus we can conclude, that
+\begin{equation*}
+	\beta = \mathbb{P}(T \leq t \mid H_1) \in \left[ 1 - Q_1 \left( \frac{c_{bg}}{\sqrt{2} \sigma}, \frac{t}{\sqrt{2} \sigma} \right), 2 \cdot \left( 1 - Q_1 \left( \frac{\sqrt{8} c_{bg}}{\sqrt{2} \sigma}, \frac{t}{\sqrt{2} \sigma} \right) \right) \right]
+\end{equation*}
 
 \newpage
 
