@@ -144,7 +144,7 @@ where we define
 \end{align*}
 to adjust to boundary issues. We now combine these values into two new values and assign to each pair $(m, n) \in G$ the values
 \begin{equation}\label{d_tilde}
-	\tilde{d}^\pm(m, n) = \sqrt{\tilde{d}^\pm_1(m, n)^2 + \tilde{d}^\pm_2(m, n)^2}
+	\tilde{d}^\pm(m, n) = \sqrt{\tilde{d}_1^\pm(m, n)^2 + \tilde{d}_2^\pm(m, n)^2}
 \end{equation}
 
 We now want to test if a pixel is part of the aforementioned region of interest (ROI). To do this, we define another two values for each pixel $(m, n) \in G$:
@@ -173,7 +173,76 @@ This means, that we can define two sets $\mathcal{D}_0$ and $\mathcal{D}_1$ as f
 \end{equation*}
 Now, if $(d^+, d^-) \in \mathcal{D}_0$ then the null hypothesis is true and if $(d^+, d^-) \in \mathcal{D}_1$, the alternative hypothesis is true.
 
+\subsubsection{Distribution of $\tilde{d}^\pm$}
+
+We want to determine the distribution of $\tilde{d}^\pm(m, n)$ conditioned on $d^\pm(m, n) = d$ for some $d \in \mathcal{D}$. We define
+\begin{align*}
+	d_1^\pm(m, n) &= v(m \pm 1, n) - v(m, n) \\
+	d_2^\pm(m, n) &= v(m, n \pm 1) - v(m, n)
+\end{align*}
+Then $d^\pm(m, n) = \sqrt{d_1^\pm(m, n)^2 + d_2^\pm(m, n)^2}$. We note that the roles of $d_1^\pm(m, n)$ and $d_2^\pm(m, n)$ are symmetrical. Furthermore we can see, that for $d^\pm(m, n) = d$ given, we can determine, what $d_1^\pm(m, n)$ and $d_2^\pm(m, n)$ are.
+
+\begin{tabular}{c|c|c}
+	$d$ & $d_1^\pm$ & $d_2^\pm$ \\
+	\hline
+	$0$ & $0$ & $0$ \\
+	\hline
+	$c_{bg}$ & $\{ c_{bg}, 0 \}$ & $\{ 0, c_{bg} \}$ \\
+	\hline
+	$2 c_{bg}$ & $\{ 2 c_{bg}, 0 \}$ & $\{ 0, 2 c_{bg} \}$ \\
+	\hline
+	$\sqrt{2} c_{bg}$ & $c_{bg}$ & $c_{bg}$ \\
+	\hline
+	$\sqrt{5} c_{bg}$ & $\{ 2 c_{bg}, c_{bg} \}$ & $\{ c_{bg}, 2 c_{bg} \}$ \\
+	\hline
+	$\sqrt{8} c_{bg}$ & $2 c_{bg}$ & $2 c_{bg}$ \\
+\end{tabular}
+
+\begin{align*}
+	&\mathbb{P}(\tilde{d}^\pm(m, n) \leq t \mid d^\pm(m, n) = d) \\
+	&= \mathbb{P}(( (c_{bg} + v(m \pm 1, n) + \varepsilon_{m \pm 1, n} - c_{bg} - v(m, n) - \varepsilon_{m, n})^2 \\
+	&+ (c_{bg} + v(m, n \pm 1) + \varepsilon_{m, n \pm 1} - c_{bg} - v(m, n) - \varepsilon_{m, n})^2 )^{\frac{1}{2}} \leq t \mid d^\pm(m, n) = d) \\
+	&= \mathbb{P}\left( \sqrt{(d_1^\pm(m, n) + \varepsilon_{m \pm 1, n} - \varepsilon_{m, n})^2 + (d_2^\pm(m, n) + \varepsilon_{m, n \pm 1} - \varepsilon_{m, n})^2} \leq t \right) \\
+	&= \mathbb{P}\left( \sqrt{2} \sigma \sqrt{\left( \frac{X_1}{\sqrt{2} \sigma} \right)^2 + \left( \frac{X_2}{\sqrt{2} \sigma} \right)^2} \leq t \right)
+\end{align*}
+with
+\begin{align*}
+	X_1 &= d_1^\pm(m, n) + \varepsilon_{m \pm 1, n} - \varepsilon_{m, n} \sim \mathcal{N}(d_1^\pm(m, n), 2 \sigma^2) \\
+	X_2 &= d_2^\pm(m, n) + \varepsilon_{m, n \pm 1} - \varepsilon_{m, n} \sim \mathcal{N}(d_2^\pm(m, n), 2 \sigma^2)
+\end{align*}
+
+Then we can see, that the square root inside has non-central chi distribution with two degrees of freedom and parameter
+\begin{equation*}
+	\lambda = \sqrt{\left( \frac{d_1^\pm}{\sqrt{2} \sigma} \right)^2 + \left( \frac{d_2^\pm}{\sqrt{2} \sigma} \right)^2} = \frac{\sqrt{d_1^\pm(m, n)^2 + d_2^\pm(m, n)^2}}{\sqrt{2} \sigma} = \frac{d^\pm(m, n)}{\sqrt{2} \sigma}
+\end{equation*}
+
+The cumulative distribution function of the non-central chi distribution with parameter $\lambda$ and two degrees of freedom is $1 - Q_1(\lambda, x)$, where $Q_M(a, b)$ denotes the Marcum $Q$-function, which is defined as
+\begin{equation*}
+	Q_M(a, b) = \int_b^\infty x \left( \frac{x}{a} \right)^{M-1} \exp \left( - \frac{x^2 + a^2}{2} \right) I_{M-1}(ax) dx
+\end{equation*}
+with modified Bessel function $I_{M-1}$.
+
+Putting this together, we obtain
+\begin{align*}
+	\mathbb{P}(\tilde{d}^\pm(m, n) \leq t \mid d^\pm(m, n) = d) &= \mathbb{P}\left( \sqrt{2} \sigma \sqrt{\left( \frac{X_1}{\sqrt{2} \sigma} \right)^2 + \left( \frac{X_2}{\sqrt{2} \sigma} \right)^2} \leq t \right) \\
+	&= \mathbb{P}\left( \sqrt{\left( \frac{X_1}{\sqrt{2} \sigma} \right)^2 + \left( \frac{X_2}{\sqrt{2} \sigma} \right)^2} \leq \frac{t}{\sqrt{2} \sigma} \right) \\
+	&= 1 - Q_1 \left( \frac{d}{\sqrt{2} \sigma}, \frac{t}{\sqrt{2} \sigma} \right)
+\end{align*}
+
+For $d = 0$ this simplifies a lot and we get
+\begin{align*}
+	\mathbb{P}(\tilde{d}^\pm(m, n) \leq t \mid d^\pm(m, n) = 0) &= 1 - Q_1 \left( 0, \frac{t}{\sqrt{2} \sigma} \right) \\
+	&= 1 - \exp \left( - \frac{t^2}{4 \sigma^2} \right)
+\end{align*}
+
 \subsubsection{Statistical significance}
+
+We aim to use the law of total probability in the following way. Let $B_n$ be a partition of $B$, that is a countable number of sets, such that $\bigcup_n B_n = B$. Then
+\begin{align*}
+	\mathbb{P}(A \mid B) &= \frac{\mathbb{P}(A \cap B)}{\mathbb{P}(B)} = \frac{\mathbb{P}(A \cap (\bigcup_n B_n ))}{\mathbb{P}(B)} = \frac{\mathbb{P}(\bigcup_n (A \cap B_n))}{\mathbb{P}(B)} \\
+	&= \sum_n \frac{\mathbb{P}(A \cap B_n)}{\mathbb{P}(B)} = \sum_n \frac{\mathbb{P}(A \cap B_n \cap B)}{\mathbb{P}(B)} = \sum_n \mathbb{P}(A \cap B_n \mid B) \\
+	&= \sum_n \mathbb{P}(B_n \mid B) \cdot \mathbb{P}(A \mid B_n, B)
+\end{align*}
 
 We use $T = \tilde{d}(m, n) = \min \{ \tilde{d}^+(m, n), \tilde{d}^-(m, n) \}$ as our test statistic. Dropping $(m, n)$ in every term for readability, we get
 \begin{align*}
@@ -190,46 +259,12 @@ We use $T = \tilde{d}(m, n) = \min \{ \tilde{d}^+(m, n), \tilde{d}^-(m, n) \}$ a
 	&+ \sum_{d_2 \in \mathcal{D} \setminus \{ 0 \}} \mathbb{P}(d^+ = 0, d^- = d_2 \mid H_0) \cdot \mathbb{P}(\tilde{d}^+ \geq t \mid d^+ = 0) \\
 	&+ \mathbb{P}(d^+ = 0, d^- = 0 \mid H_0) \cdot \mathbb{P}(\tilde{d}^+ \geq t \mid d^+ = 0) \\
 	&= \mathbb{P}(\tilde{d}^+ \geq t \mid d^+ = 0) \underbrace{\sum_{(d_1, d_2) \in \mathcal{D}_0} \mathbb{P}(d^+ = d_1, d^- = d_2 \mid H_0)}_{= 1} \\
-	&= \mathbb{P}(\tilde{d}^+ \geq t \mid d^+ = 0)
+	&= \mathbb{P}(\tilde{d}^+ \geq t \mid d^+ = 0) \\
+	&= \exp \left( - \frac{t^2}{4 \sigma^2} \right)
 \end{align*}
 where we used, that $\mathbb{P}(\tilde{d}^+ \geq t \mid d^+ = 0) = \mathbb{P}(\tilde{d}^- \geq t \mid d^- = 0)$.
 
-To proceed, we need to determine the following distributions:
-\begin{align*}
-	&\mathbb{P}(\tilde{d}^\pm(m, n) \leq t \mid d^\pm(m, n) = 0) \\
-	&= \mathbb{P}(( (c_{bg} + v(m \pm 1, n) + \varepsilon_{m \pm 1, n} - c_{bg} - v(m, n) - \varepsilon_{m, n})^2 \\
-	&+ (c_{bg} + v(m, n \pm 1) + \varepsilon_{m, n \pm 1} - c_{bg} - v(m, n) - \varepsilon_{m, n})^2 )^{\frac{1}{2}} \leq t \mid d^\pm(m, n) = 0) \\
-	&= \mathbb{P}(( (v(m \pm 1, n) - v(m, n) + \varepsilon_{m \pm 1, n} - \varepsilon_{m, n})^2 \\
-	&+ (v(m, n \pm 1) - v(m, n) + \varepsilon_{m, n \pm 1} - \varepsilon_{m, n})^2 )^{\frac{1}{2}} \leq t \mid d^\pm(m, n) = 0) \\
-	&= \mathbb{P} \left( \sqrt{ \left( \varepsilon_{m \pm 1, n} - \varepsilon_{m, n} \right)^2 + \left( \varepsilon_{m, n \pm 1} - \varepsilon_{m, n} \right)^2} \leq t \right)
-\end{align*}
-Using the well-known properties of the standard normal distribution, we see that
-\begin{align*}
-	\varepsilon_{m \pm 1, n} - \varepsilon_{m, n} &\sim \mathcal{N}(0, 2 \sigma^2) \\
-	\varepsilon_{m, n \pm 1} - \varepsilon_{m, n} &\sim \mathcal{N}(0, 2 \sigma^2)
-\end{align*}
-
-The random variable on the left side of the inequality sign thus is the square root of the sum of two squared normal distributions with standard deviation $\sqrt{2} \sigma$. It thus is Rayleigh-distributed with parameter $\sqrt{2} \sigma$, i.e.
-\begin{equation}\label{dist}
-	\tilde{d}^\pm(m, n) \mid d^\pm(m, n) = 0 \sim \text{Rayleigh}(\sqrt{2} \sigma)
-\end{equation}
-Thus we get
-\begin{align*}
-	&\mathbb{P}(\tilde{d}^\pm(m, n) \leq t \mid d^\pm(m, n) = 0) \\
-	&= \mathbb{P} \left( \sqrt{ \left( \varepsilon_{m \pm 1, n} - \varepsilon_{m, n} \right)^2 + \left( \varepsilon_{m, n \pm 1} - \varepsilon_{m, n} \right)^2} \leq t \right) \\
-	&= 1 - \exp \left( - \frac{t^2}{4 \sigma^2} \right)
-\end{align*}
-
-Using this knowledge, we can turn back to our testing procedure. The null hypothesis states, that $d^+ = 0$ or $d^- = 0$. In the first case, we get
-\begin{align*}
-	&\mathbb{P}(T \geq t \mid H_0) \\
-	&\leq \min \left\{ \mathbb{P}(\{ \tilde{d}^+ \geq t \} \mid \{ d^+ = 0 \} \cup \{ d^- = 0 \}), \mathbb{P}(\{ \tilde{d}^- \geq t \} \mid \{ d^+ = 0 \} \cup \{ d^- = 0 \}) \right\} \\
-	&\leq \mathbb{P}(\{ \tilde{d}^+ \geq t \} \mid \{ d^+ = 0 \} \cup \{ d^- = 0 \}) \\
-	&\leq \mathbb{P}(\tilde{d}^+ \geq t \mid d^+ = 0) \\
-	&= \exp \left( - \frac{t^2}{4 \sigma^2} \right)
-\end{align*}
-
-Similarly, we get the same inequality in the second case, which yields
+Thus, we have obtained the inequality
 \begin{equation}
 	\mathbb{P}(T \geq t \mid H_0) \leq \exp \left( - \frac{t^2}{4 \sigma^2} \right)
 \end{equation}
