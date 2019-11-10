@@ -282,11 +282,12 @@ Using results and notations from the previous sections, we get the lower bound
 	&= \sum_{(d_1, d_2) \in \mathcal{D}_1} \mathbb{P}(d^+ = d_1, d^- = d_2 \mid H_1) \cdot \mathbb{P}(T \leq t \mid d^+ = d_1, d^- = d_2) \\
 	&\geq \sum_{(d_1, d_2) \in \mathcal{D}_1} \mathbb{P}(d^+ = d_1, d^- = d_2 \mid H_1) \cdot \mathbb{P}(\tilde{d}^+ \leq t \mid d^+ = d_1, d^- = d_2) \\
 	&= \sum_{(d_1, d_2) \in \mathcal{D}_1} \mathbb{P}(d^+ = d_1, d^- = d_2 \mid H_1) \cdot \mathbb{P}(\tilde{d}^+ \leq t \mid d^+ = d_1) \\
-	&\geq \sum_{(d_1, d_2) \in \mathcal{D}_1} \mathbb{P}(d^+ = d_1, d^- = d_2 \mid H_1) \cdot \min_{d_1 \in \mathcal{D} \setminus \{ 0 \}} \mathbb{P}(\tilde{d}^+ \leq t \mid d^+ = d_1) \\
-	&= \sum_{(d_1, d_2) \in \mathcal{D}_1} \mathbb{P}(d^+ = d_1, d^- = d_2 \mid H_1) \cdot \mathbb{P}(\tilde{d}^+ \leq t \mid d^+ = \min_{d_1 \in \mathcal{D} \setminus \{ 0 \}} d_1) \\
-	&= \mathbb{P}(\tilde{d}^+ \leq t \mid d^+ = \min_{d_1 \in \mathcal{D} \setminus \{ 0 \}} d_1) \\
-	&= \mathbb{P}(\tilde{d}^+ \leq t \mid d^+ = c_{bg}) \\
-	&= 1 - Q_1 \left( \frac{c_{bg}}{\sqrt{2} \sigma}, \frac{t}{\sqrt{2} \sigma} \right)
+	&\geq \sum_{(d_1, d_2) \in \mathcal{D}_1} \mathbb{P}(d^+ = d_1, d^- = d_2 \mid H_1) \cdot \min_{d \in \mathcal{D} \setminus \{ 0 \}} \mathbb{P}(\tilde{d}^+ \leq t \mid d^+ = d) \\
+	&= \sum_{(d_1, d_2) \in \mathcal{D}_1} \mathbb{P}(d^+ = d_1, d^- = d_2 \mid H_1) \cdot \mathbb{P}(\tilde{d}^+ \leq t \mid d^+ = \max_{d \in \mathcal{D} \setminus \{ 0 \}} d) \\
+	&= \mathbb{P}(\tilde{d}^+ \leq t \mid d^+ = \max_{d \in \mathcal{D} \setminus \{ 0 \}} d) \\
+	&= \mathbb{P}(\tilde{d}^+ \leq t \mid d^+ = \sqrt{8} c_{bg}) \\
+	&= 1 - Q_1 \left( \frac{\sqrt{8} c_{bg}}{\sqrt{2} \sigma}, \frac{t}{\sqrt{2} \sigma} \right) \\
+	&= 1 - Q_1 \left( \frac{2 c_{bg}}{\sigma}, \frac{t}{\sqrt{2} \sigma} \right)
 \end{align*}
 
 On the other hand, we get the upper bound
@@ -298,20 +299,32 @@ On the other hand, we get the upper bound
 	&+ \sum_{(d_1, d_2) \in \mathcal{D}_1} \mathbb{P}(d^+ = d_1, d^- = d_2 \mid H_1) \cdot \mathbb{P}(\tilde{d}^- \leq t \mid d^+ = d_1, d^- = d_2) \\
 	&= \sum_{(d_1, d_2) \in \mathcal{D}_1} \mathbb{P}(d^+ = d_1, d^- = d_2 \mid H_1) \cdot \mathbb{P}(\tilde{d}^+ \leq t \mid d^+ = d_1) \\
 	&+ \sum_{(d_1, d_2) \in \mathcal{D}_1} \mathbb{P}(d^+ = d_1, d^- = d_2 \mid H_1) \cdot \mathbb{P}(\tilde{d}^- \leq t \mid d^- = d_2) \\
-	&\leq \sum_{(d_1, d_2) \in \mathcal{D}_1} \mathbb{P}(d^+ = d_1, d^- = d_2 \mid H_1) \cdot \max_{d_1 \in \mathcal{D} \setminus \{ 0 \}} \mathbb{P}(\tilde{d}^+ \leq t \mid d^+ = d_1) \\
-	&+ \sum_{(d_1, d_2) \in \mathcal{D}_1} \mathbb{P}(d^+ = d_1, d^- = d_2 \mid H_1) \cdot \max_{d_2 \in \mathcal{D} \setminus \{ 0 \}} \mathbb{P}(\tilde{d}^- \leq t \mid d^- = d_2) \\
-	&= \sum_{(d_1, d_2) \in \mathcal{D}_1} \mathbb{P}(d^+ = d_1, d^- = d_2 \mid H_1) \cdot \mathbb{P}(\tilde{d}^+ \leq t \mid d^+ = \max_{d_1 \in \mathcal{D} \setminus \{ 0 \}} d_1) \\
-	&+ \sum_{(d_1, d_2) \in \mathcal{D}_1} \mathbb{P}(d^+ = d_1, d^- = d_2 \mid H_1) \cdot \mathbb{P}(\tilde{d}^- \leq t \mid d^- = \max_{d_2 \in \mathcal{D} \setminus \{ 0 \}} d_2) \\
-	&= \mathbb{P}(\tilde{d}^+ \leq t \mid d^+ = \max_{d_1 \in \mathcal{D} \setminus \{ 0 \}} d_1) + \mathbb{P}(\tilde{d}^- \leq t \mid d^- = \max_{d_2 \in \mathcal{D} \setminus \{ 0 \}} d_2) \\
-	&= 2 \cdot \mathbb{P}(\tilde{d}^+ \leq t \mid d^+ = \max_{d_1 \in \mathcal{D} \setminus \{ 0 \}} d_1) \\
-	&= 2 \cdot \mathbb{P}(\tilde{d}^+ \leq t \mid d^+ = \sqrt{8} c_{bg}) \\
-	&= 2 \cdot \left( 1 - Q_1 \left( \frac{\sqrt{8} c_{bg}}{\sqrt{2} \sigma}, \frac{t}{\sqrt{2} \sigma} \right) \right)
+	&\leq \sum_{(d_1, d_2) \in \mathcal{D}_1} \mathbb{P}(d^+ = d_1, d^- = d_2 \mid H_1) \cdot \max_{d \in \mathcal{D} \setminus \{ 0 \}} \mathbb{P}(\tilde{d}^+ \leq t \mid d^+ = d) \\
+	&+ \sum_{(d_1, d_2) \in \mathcal{D}_1} \mathbb{P}(d^+ = d_1, d^- = d_2 \mid H_1) \cdot \max_{d \in \mathcal{D} \setminus \{ 0 \}} \mathbb{P}(\tilde{d}^- \leq t \mid d^- = d) \\
+	&= \sum_{(d_1, d_2) \in \mathcal{D}_1} \mathbb{P}(d^+ = d_1, d^- = d_2 \mid H_1) \cdot \mathbb{P}(\tilde{d}^+ \leq t \mid d^+ = \min_{d \in \mathcal{D} \setminus \{ 0 \}} d) \\
+	&+ \sum_{(d_1, d_2) \in \mathcal{D}_1} \mathbb{P}(d^+ = d_1, d^- = d_2 \mid H_1) \cdot \mathbb{P}(\tilde{d}^- \leq t \mid d^- = \min_{d \in \mathcal{D} \setminus \{ 0 \}} d) \\
+	&= \mathbb{P}(\tilde{d}^+ \leq t \mid d^+ = \min_{d \in \mathcal{D} \setminus \{ 0 \}} d) + \mathbb{P}(\tilde{d}^- \leq t \mid d^- = \min_{d \in \mathcal{D} \setminus \{ 0 \}} d) \\
+	&= 2 \cdot \mathbb{P}(\tilde{d}^+ \leq t \mid d^+ = \min_{d \in \mathcal{D} \setminus \{ 0 \}} d) \\
+	&= 2 \cdot \mathbb{P}(\tilde{d}^+ \leq t \mid d^+ = c_{bg}) \\
+	&= 2 \cdot \left( 1 - Q_1 \left( \frac{c_{bg}}{\sqrt{2} \sigma}, \frac{t}{\sqrt{2} \sigma} \right) \right)
 \end{align*}
 
 Thus we can conclude, that
 \begin{equation*}
-	\beta = \mathbb{P}(T \leq t \mid H_1) \in \left[ 1 - Q_1 \left( \frac{c_{bg}}{\sqrt{2} \sigma}, \frac{t}{\sqrt{2} \sigma} \right), 2 \cdot \left( 1 - Q_1 \left( \frac{\sqrt{8} c_{bg}}{\sqrt{2} \sigma}, \frac{t}{\sqrt{2} \sigma} \right) \right) \right]
+	\beta = \mathbb{P}(T \leq t \mid H_1) \in \left[ 1 - Q_1 \left( \frac{2 c_{bg}}{\sigma}, \frac{t}{\sqrt{2} \sigma} \right), \min \left\{ 2 \cdot \left( 1 - Q_1 \left( \frac{c_{bg}}{\sqrt{2} \sigma}, \frac{t}{\sqrt{2} \sigma} \right) \right), 1 \right\} \right]
 \end{equation*}
+
+\subsubsection{Numerical results}
+
+In the case of a grayscale image, we assume $c_{bg} = 127.5$. As we have seen $\mathbb{P}(T \geq t \mid H_0) \leq \exp \left( - \frac{t^2}{4 \sigma^2} \right)$. By taking $t = 2 \sigma \sqrt{- \log(\alpha)}$ we thus can assure a statistical significance of $\alpha$.
+
+\begin{figure}[h]
+	\includegraphics[width=\linewidth]{Power_Bounds}
+	\caption[Power bounds]{For $\alpha = 0.05$ this graph shows the lower and upper bounds for the power of the test for $\sigma \in \{ 1, 2, \dots, 150 \}$.}
+	\label{fig:demo1comparison}
+\end{figure}
+
+As we can see in the graph, we can assure, that there are no type II errors for $\sigma \in \{ 1, 2, \dots, 8 \}$. Up until $\sigma = 21$ the power stays below $\alpha = 0.05$. The upper bound increases then very fast and starting at $\sigma = 41$ we can only use the trivial upper bound, i.e. $1$. The lower bound stays at $0$ until $\sigma = 23$ and increases slowly. At $\sigma = 115$ it becomes bigger than $0.5$.
 
 \newpage
 
