@@ -9,7 +9,6 @@
 \usepackage[superscript]{cite}
 \usepackage{nicefrac}
 \usepackage{upgreek}
-\usepackage{paralist}
 \usepackage{stmaryrd}
 \usepackage{tikz}
 \usepackage{graphicx}
@@ -30,7 +29,7 @@
 % ENDE PRÄAMBEL
 
 \author{Dominik Blank}
-\title{Gleichmäßige obere Schranken beim Kreisproblem}
+\title{ROI Testing}
 
 \setlength{\parindent}{0pt}
 \allowdisplaybreaks
@@ -47,12 +46,17 @@
 	\subsection{The statistical model}
 	
 	Let $M, N \in \mathbb{N}$ and $G = \left\{ 0, \dots, M-1 \right\} \times  \left\{ 0, \dots, N-1 \right\}$. Assume we are given data
-	\begin{equation}\label{f}
-		f(m, n) = c_{bg} + v(m, n) + \varepsilon_{m, n}
-	\end{equation}
-	where $(m, n) \in G$, $c_{bg} \in \mathbb{R}$ is constant, $v: G \to \{ 0, \pm c_{bg} \}$ and $\varepsilon_{m, n} \sim \mathcal{N}(0, \sigma^2)$ are i.i.d. normal distributed random variables for some $\sigma > 0$ and for all $(m, n) \in G$.
+	\begin{equation*}\label{f}
+		f(i, j) = c + v(i, j) + \varepsilon_{i, j}
+	\end{equation*}
+	\begin{itemize}
+		\item $(i, j) \in G$
+		\item $c \in \mathbb{R}$ is constant
+		\item $v: G \to \{ 0, \pm c \}$
+		\item $\varepsilon_{m, n} \sim \mathcal{N}(0, \sigma^2)$ i.i.d. normal distributed random variables
+	\end{itemize}
 	
-	We treat $v$ as an image, that contains a rectangular, thus convex, region of interest. That means, that the pixels with value $\pm c_{bg}$ are arranged in a rectangular shape and all other pixels have value $0$.
+	ASSUMPTION: The image $f$ contains a rectangular region of interest, i.e. there is a rectangle with $\abs{v(i, j)}$ 
 \end{frame}
 
 \begin{frame}
@@ -66,30 +70,30 @@
 		\tilde{d}^\pm_2(m, n) &= f(m, n \pm 1) - f(m, n) \label{d2}
 	\end{align}
 	We now combine these values into two new values and assign to each pair $(m, n) \in G$ the values
-	\begin{equation}\label{d_tilde}
+	\begin{equation*}\label{d_tilde}
 		\tilde{d}^\pm(m, n) = \sqrt{\tilde{d}_1^\pm(m, n)^2 + \tilde{d}_2^\pm(m, n)^2}
-	\end{equation}
+	\end{equation*}
 \end{frame}
 
 \begin{frame}
 	We now want to test if a pixel is part of the aforementioned region of interest (ROI). To do this, we define another two values for each pixel $(m, n) \in G$:
-	\begin{equation}\label{d}
+	\begin{equation*}\label{d}
 		d^\pm(m, n) = \sqrt{(v(m \pm 1, n) - v(m, n))^2 + (v(m, n \pm 1) - v(m, n))^2}
-	\end{equation}
+	\end{equation*}
 	The definition of $d^\pm(m, n)$ helps us define a null hypothesis for our testing procedure. If a pixel is background and since we assumed the ROI to be rectangular, that means, that its top and left neighbour pixels or bottom and right neighbour pixels are background as well. This leads to the null hypothesis
-	\begin{equation}
+	\begin{equation*}
 		H_0 : \min\{ d^+(m, n), d^-(m, n) \} = 0
-	\end{equation}
+	\end{equation*}
 	Since by definition $d^\pm(m, n) \geq 0$, our alternative hypothesis becomes
-	\begin{equation}
+	\begin{equation*}
 		H_1 : \min\{ d^+(m, n), d^-(m, n) \} > 0
-	\end{equation}
+	\end{equation*}
 \end{frame}
 
 \begin{frame}
-	Since $v$ only takes values in $\{ 0, -c_{bg}, c_{bg} \}$, $d^\pm$ also can only attain values in
+	Since $v$ only takes values in $\{ 0, -c, c \}$, $d^\pm$ also can only attain values in
 	\begin{equation*}
-		\mathcal{D} = \{ 0, c_{bg}, 2 c_{bg}, \sqrt{2} c_{bg}, \sqrt{5} c_{bg}, \sqrt{8} c_{bg} \}
+		\mathcal{D} = \{ 0, c, 2 c, \sqrt{2} c, \sqrt{5} c, \sqrt{8} c \}
 	\end{equation*}
 	This means, that we can define two sets $\mathcal{D}_0$ and $\mathcal{D}_1$ as follows
 	\begin{equation*}
@@ -119,15 +123,15 @@
 			\hline
 			$0$ & $0$ & $0$ \\
 			\hline
-			$c_{bg}$ & $\{ c_{bg}, 0 \}$ & $\{ 0, c_{bg} \}$ \\
+			$c$ & $\{ c, 0 \}$ & $\{ 0, c \}$ \\
 			\hline
-			$2 c_{bg}$ & $\{ 2 c_{bg}, 0 \}$ & $\{ 0, 2 c_{bg} \}$ \\
+			$2 c$ & $\{ 2 c, 0 \}$ & $\{ 0, 2 c \}$ \\
 			\hline
-			$\sqrt{2} c_{bg}$ & $c_{bg}$ & $c_{bg}$ \\
+			$\sqrt{2} c$ & $c$ & $c$ \\
 			\hline
-			$\sqrt{5} c_{bg}$ & $\{ 2 c_{bg}, c_{bg} \}$ & $\{ c_{bg}, 2 c_{bg} \}$ \\
+			$\sqrt{5} c$ & $\{ 2 c, c \}$ & $\{ c, 2 c \}$ \\
 			\hline
-			$\sqrt{8} c_{bg}$ & $2 c_{bg}$ & $2 c_{bg}$ \\
+			$\sqrt{8} c$ & $2 c$ & $2 c$ \\
 		\end{tabular}
 	\end{center}
 \end{frame}
@@ -182,27 +186,27 @@
 	
 	Using results and notations from the previous sections, we get the lower bound
 	\begin{equation*}
-		\beta = \mathbb{P}(T \leq t \mid H_1) \geq 1 - Q_1 \left( \frac{2 c_{bg}}{\sigma}, \frac{t}{\sqrt{2} \sigma} \right)
+		\beta = \mathbb{P}(T \leq t \mid H_1) \geq 1 - Q_1 \left( \frac{2 c}{\sigma}, \frac{t}{\sqrt{2} \sigma} \right)
 	\end{equation*}
 	
 	On the other hand, we get the upper bound
 	\begin{equation*}
-		\beta = \mathbb{P}(T \leq t \mid H_1) \leq 2 \cdot \left( 1 - Q_1 \left( \frac{c_{bg}}{\sqrt{2} \sigma}, \frac{t}{\sqrt{2} \sigma} \right) \right)
+		\beta = \mathbb{P}(T \leq t \mid H_1) \leq 2 \cdot \left( 1 - Q_1 \left( \frac{c}{\sqrt{2} \sigma}, \frac{t}{\sqrt{2} \sigma} \right) \right)
 	\end{equation*}
 	
 	Thus we can conclude, that
 	\begin{equation*}
-		\beta \in \left[ 1 - Q_1 \left( \frac{2 c_{bg}}{\sigma}, \frac{t}{\sqrt{2} \sigma} \right), \min \left\{ 2 \cdot \left( 1 - Q_1 \left( \frac{c_{bg}}{\sqrt{2} \sigma}, \frac{t}{\sqrt{2} \sigma} \right) \right), 1 \right\} \right]
+		\beta \in \left[ 1 - Q_1 \left( \frac{2 c}{\sigma}, \frac{t}{\sqrt{2} \sigma} \right), \min \left\{ 2 \cdot \left( 1 - Q_1 \left( \frac{c}{\sqrt{2} \sigma}, \frac{t}{\sqrt{2} \sigma} \right) \right), 1 \right\} \right]
 	\end{equation*}
 \end{frame}
 
 \begin{frame}
 	\subsubsection{Numerical results}
 	
-	In the case of a grayscale image, we assume $c_{bg} = 127.5$. As we have seen $\mathbb{P}(T \geq t \mid H_0) \leq \exp \left( - \frac{t^2}{4 \sigma^2} \right)$. By taking $t = 2 \sigma \sqrt{- \log(\alpha)}$ we thus can assure a statistical significance of $\alpha$.
+	In the case of a grayscale image, we assume $c = 127.5$. As we have seen $\mathbb{P}(T \geq t \mid H_0) \leq \exp \left( - \frac{t^2}{4 \sigma^2} \right)$. By taking $t = 2 \sigma \sqrt{- \log(\alpha)}$ we thus can assure a statistical significance of $\alpha$.
 	
 	\begin{figure}[h]
-		\includegraphics[width=0.6\linewidth]{Power_Bounds}
+		\includegraphics[width=0.6\linewidth]{Testing/Power_Bounds}
 		\caption[Power bounds]{For $\alpha = 0.05$ this graph shows the lower and upper bounds for the power of the test for $\sigma \in \{ 1, 2, \dots, 150 \}$.}
 		\label{fig:demo1comparison}
 	\end{figure}
@@ -334,34 +338,34 @@
 
 \begin{frame}
 	We define another random variable $Q = \frac{V}{V + S}$, which is the proportion of the rejected null hypotheses which are erroneously rejected. We set $Q = 0$, if $V + S = 0$. Based on this, we define the false discovery rate to be
-	\begin{equation}
+	\begin{equation*}
 		FDR = \mathbb{E}(Q) = \mathbb{E} \left( \frac{V}{V + S} \right)
-	\end{equation}
+	\end{equation*}
 	
 	We also define the family-wise error rate to be
-	\begin{equation}
+	\begin{equation*}
 		FWER = \mathbb{P}( V \geq 1 ) = 1 - \mathbb{P}( V = 0 )
-	\end{equation}
+	\end{equation*}
 	that is the probability of making one or more type I errors.
 \end{frame}
 
 \begin{frame}
 	Three of these multiple testing procedures are given in detail in the following. The first one controls the false discovery rate at level $\alpha$, i.e.
-	\begin{equation}
+	\begin{equation*}
 		FDR = \mathbb{E}(Q) \leq \alpha
-	\end{equation}
+	\end{equation*}
 	
 	The other two procedures control the family-wise error rate at level $\alpha$, i.e.
-	\begin{equation}
+	\begin{equation*}
 		FWER = \mathbb{P}( V \geq 1 ) \leq \alpha
-	\end{equation}
+	\end{equation*}
 \end{frame}
 
 \begin{frame}
 	First, we calculate for every pixel $(m, n) \in G$ the $p$-value
-	\begin{equation}
+	\begin{equation*}
 		p(m, n) = \exp \left( - \frac{\tilde{d}(m, n)^2}{4 \sigma^2} \right) \geq \mathbb{P}(T \geq \tilde{d}(m, n) \mid H_0)
-	\end{equation}
+	\end{equation*}
 \end{frame}
 
 \begin{frame}

@@ -19,3 +19,5 @@ plot(sigma_range, upper_bound, 'Linewidth', 2.0)
 hold off
 legend('Lower bound', 'Upper bound', 'Location', 'southeast')
 title('Lower and upper bound for the power')
+xlabel('sigma')
+ylabel('power')
