@@ -3,8 +3,11 @@ function [] = BoxGraph
 close all
 
 % Specify vertical and horizontal size of the grid:
-height = 9;
-width = 9;
+height = 5;
+width = 5;
+
+% Set boxes to be marked for structuring element:
+markedStructuringElement = [[-1 -1]; [-1 0]; [-1 1]; [0 -1]; [0 0]; [0 1]; [1 -1]; [1 0]; [1 1]]; 
 
 % Set boxes to be marked for opening:
 markedOpeningBefore = [[-3 -1]; [-2 -1]; [-2 0]; [-2 1]; [-1 -2]; [-1 -1]; [-1 0]; [-1 1]; [-1 2]; [0 -2]; [0 -1]; [0 0]; [0 1]; [2 -3]; [2 -2]; [3 -3]; [3 -2]];
@@ -32,13 +35,13 @@ for x = -width / 2 : 1 : width / 2
 end
 
 % Mark specific boxes:
-for p = 1 : size(markedClosingClosed, 1)
-    fill(xCoord(markedClosingClosed(p, 1)), yCoord(markedClosingClosed(p, 2)), 'k')
+for p = 1 : size(markedStructuringElement, 1)
+    fill(xCoord(markedStructuringElement(p, 1)), yCoord(markedStructuringElement(p, 2)), 'k')
 end
 
 hold off
 axis off
-title('Closed image')
+title('Structuring element')
 
 end
 
