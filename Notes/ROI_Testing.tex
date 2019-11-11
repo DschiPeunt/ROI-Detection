@@ -349,8 +349,8 @@ To define opening and closing, we first need to define erosion and dilation of b
 
 This can be rewritten in a more implementation-friendly form:
 \begin{align*}
-	A \ominus_b B_{(i, j)} &= \underset{m, n}{\mathrm{AND}} [ \mathrm{OR} (A_{(i + m, j + n)}, (1 - B)_{(m, n)}) ] \\
-	A \oplus_b B_{(i, j)} &= \underset{m, n}{\mathrm{OR}} [ \mathrm{AND} (A_{(i - m, j - n)}, B_{(m, n)}) ]
+	(A \ominus_b B)_{(i, j)} &= \underset{m, n}{\mathrm{AND}} \left( \mathrm{OR} (A_{(i + m, j + n)}, (1 - B)_{(m, n)}) \right) \\
+	(A \oplus_b B)_{(i, j)} &= \underset{m, n}{\mathrm{OR}} \left( \mathrm{AND} (A_{(i - m, j - n)}, B_{(m, n)}) \right)
 \end{align*}
 
 Where $m, n$ go through the indices, where $B = 1$. Now we can define binary opening and closing.
@@ -372,11 +372,11 @@ Where $m, n$ go through the indices, where $B = 1$. Now we can define binary ope
 
 From now on, we assume $B$ to be a square of ones centered around our current pixel. Using the notation from above we can take a closer look at what opening really does. We have
 \begin{align*}
-	A \circ B_{(i, j)} &= (A \ominus B) \oplus B \\
-	&= ( \underset{m, n}{\mathrm{AND}} ( \mathrm{OR} (A_{(i + m, j + n)}, \underbrace{(1 - B)_{(m, n)}}_{= 0} ) ) ) \oplus B \\
-	&= ( \underset{m, n}{\mathrm{AND}} ( A_{(i + m, j + n)} ) ) \oplus B \\
-	&= \underset{\tilde{m}, \tilde{n}}{\mathrm{OR}} ( \mathrm{AND} (\underset{m, n}{\mathrm{AND}} ( A_{(i + m - \tilde{m}, j + n - \tilde{n})} ), \underbrace{B_{(m, n)}}_{= 1} ) ) \\
-	&= \underset{\tilde{m}, \tilde{n}}{\mathrm{OR}} ( \underset{m, n}{\mathrm{AND}} ( A_{(i + m - \tilde{m}, j + n - \tilde{n})} ) )
+	(A \circ B)_{(i, j)} &= ((A \ominus B) \oplus B)_{(i, j)} \\
+	&= \left( \underset{m, n}{\mathrm{AND}} \left( \mathrm{OR} (A_{(i + m, j + n)}, \underbrace{(1 - B)_{(m, n)}}_{= 0} ) \right) \right) \oplus B \\
+	&= \left( \underset{m, n}{\mathrm{AND}} ( A_{(i + m, j + n)} ) \right) \oplus B \\
+	&= \underset{\tilde{m}, \tilde{n}}{\mathrm{OR}} \left( \mathrm{AND} \left( \underset{m, n}{\mathrm{AND}} ( A_{(i + m - \tilde{m}, j + n - \tilde{n})} ), \underbrace{B_{(m, n)}}_{= 1} \right) \right) \\
+	&= \underset{\tilde{m}, \tilde{n}}{\mathrm{OR}} \left( \underset{m, n}{\mathrm{AND}} ( A_{(i + m - \tilde{m}, j + n - \tilde{n})} ) \right)
 \end{align*}
 
 Now, we can see, that $A \circ B_{(i, j)} = 1$ if and only if $(i, j)$ is part of a square the size of $B$. In the above formula $(\tilde{m}, \tilde{n})$ determines the offset of the center of the square and thus loops through all possible positions of $(i, j)$ in the square. The inner part on the other hand assures, that there is actually a square of same size as $B$, that $(i, j)$ is part of.
@@ -397,9 +397,9 @@ We will now take a look at the effect of opening on the significance level.
 	\end{equation*}
 \end{theorem}
 \begin{proof}
-	First we notice that for fixed $\tilde{m}, \tilde{n}$ the set $\mathcal{G}_{(\tilde{m}, \tilde{n})}^k(i, j)$ contains ALL possible ground truths according to our assumptions, thus
+	First we notice that for fixed $\tilde{m}, \tilde{n}$ the set $\mathcal{G}_{(\tilde{m}, \tilde{n})}^k(i, j)$ contains ALL possible ground truths given that the null hypothesis for the pixel $(i, j)$ is true, thus
 	\begin{equation*}
-		\sum_{G \in \mathcal{G}_{(\tilde{m}, \tilde{n})}^k(i, j)} \mathbb{P}(G) = 1
+		\sum_{G \in \mathcal{G}_{(\tilde{m}, \tilde{n})}^k(i, j)} \mathbb{P}(G \mid H_0(i, j)) = 1
 	\end{equation*}
 	Second we notice, that any element $G \in \mathcal{G}_{(\tilde{m}, \tilde{n})}^k(i, j)$ already contains the null hypothesis for the pixel $(i, j)$, thus giving
 	\begin{equation*}
@@ -410,16 +410,24 @@ We will now take a look at the effect of opening on the significance level.
 	Let $K = \{ -\frac{k - 1}{2}, \dots, \frac{k - 1}{2} \}$. Using above observations, we get
 	\begin{align*}
 		\mathbb{P}&((f_{bin} \circ B)(i, j) = 1 \mid H_0(i, j)) \\
+		&= \mathbb{P} \left( \bigcup_{\tilde{m}, \tilde{n} \in K} \bigcap_{m, n \in K} ( f_{bin}(i + m - \tilde{m}, j + n - \tilde{n}) = 1 ) \mid H_0(i, j) \right) \\
 		&= \sum_{\tilde{m}, \tilde{n} \in K} \mathbb{P} \left( \bigcap_{m, n \in K} ( f_{bin}(i + m - \tilde{m}, j + n - \tilde{n}) = 1 ) \mid H_0(i, j) \right) \\
 		&= \sum_{\tilde{m}, \tilde{n} \in K} \sum_{G \in \mathcal{G}_{(\tilde{m}, \tilde{n})}^k(i, j)} \mathbb{P}(G \mid H_0(i, j)) \cdot \mathbb{P} \left( \bigcap_{m, n \in K} ( f_{bin}(i + m - \tilde{m}, j + n - \tilde{n}) = 1 ) \mid G, H_0(i, j) \right) \\
 		&= \sum_{\tilde{m}, \tilde{n} \in K} \sum_{G \in \mathcal{G}_{(\tilde{m}, \tilde{n})}^k(i, j)} \mathbb{P}(G) \cdot \underbrace{\mathbb{P} \left( \bigcap_{m, n \in K} ( f_{bin}(i + m - \tilde{m}, j + n - \tilde{n}) = 1 ) \mid G, H_0(i, j) \right)}_{\leq \alpha^k} \\
 		&\leq \sum_{\tilde{m}, \tilde{n} \in K} \sum_{G \in \mathcal{G}_{(\tilde{m}, \tilde{n})}^k(i, j)} \mathbb{P}(G) \cdot \alpha^k \\
-		&= \alpha^k \cdot \sum_{\tilde{m}, \tilde{n} \in K} \underbrace{\sum_{G \in \mathcal{G}_{(\tilde{m}, \tilde{n})}^k(i, j)} \mathbb{P}(G)}_{= 1} \\
-		&= \alpha^k \cdot \sum_{\tilde{m}, \tilde{n} \in K} 1 \\
-		&= \alpha^k \cdot \abs{K}^2 \\
-		&= k^2 \alpha^k
+		&= \alpha^k \cdot \sum_{\tilde{m}, \tilde{n} \in K} \underbrace{\sum_{G \in \mathcal{G}_{(\tilde{m}, \tilde{n})}^k(i, j)} \mathbb{P}(G)}_{= 1} = \alpha^k \cdot \sum_{\tilde{m}, \tilde{n} \in K} 1 = \alpha^k \cdot \abs{K}^2 = k^2 \alpha^k
 	\end{align*}
 \end{proof}
+
+\subsection{Hypothesis testing and closing}
+In a similar way as above, we can also see, what closing does. We have
+\begin{align*}
+	(A \bullet B)_{(i, j)} &= ((A \oplus B) \ominus B)_{(i, j)} \\
+	&= \left( \underset{m, n}{\mathrm{OR}} \left( \mathrm{AND} (A_{(i - m, j - n)}, \underbrace{B_{(m, n)}}_{= 1} ) \right) \right) \ominus B \\
+	&= \left( \underset{m, n}{\mathrm{OR}} ( A_{(i - m, j - n)} ) \right) \ominus B \\
+	&= \underset{\tilde{m}, \tilde{n}}{\mathrm{AND}} \left( \mathrm{OR} \left( \underset{m, n}{\mathrm{OR}} ( A_{(i - m + \tilde{m}, j - n + \tilde{n})} ), \underbrace{(1 - B)_{(m, n)}}_{= 0} \right) \right) \\
+	&= \underset{\tilde{m}, \tilde{n}}{\mathrm{AND}} \left( \underset{m, n}{\mathrm{OR}} ( A_{(i - m + \tilde{m}, j - n + \tilde{n})} ) \right)
+\end{align*}
 
 \subsection{Convex hull}
 
