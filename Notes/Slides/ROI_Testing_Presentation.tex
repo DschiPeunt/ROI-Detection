@@ -28,8 +28,20 @@
 
 % ENDE PRÄAMBEL
 
+\AtBeginSection[]{
+	\begin{frame}
+		\vfill
+		\centering
+		\begin{beamercolorbox}[sep=8pt,center,shadow=true,rounded=true]{title}
+			\usebeamerfont{title}\insertsectionhead\par%
+		\end{beamercolorbox}
+		\vfill
+	\end{frame}
+}
+
 \author{Dominik Blank}
 \title{ROI Testing}
+\institute{Georg-August-Universität Göttingen}
 
 \setlength{\parindent}{0pt}
 \allowdisplaybreaks
@@ -37,14 +49,18 @@
 \begin{document}
 
 \begin{frame}
-	\tableofcontents
+	\maketitle
 \end{frame}
 
 \begin{frame}
-	\section{ROI Testing}
-	
-	\subsection{The statistical model}
-	
+	\tableofcontents
+\end{frame}
+
+\section{ROI Testing}
+
+\subsection{The statistical model}
+
+\begin{frame}
 	Let $M, N \in \mathbb{N}$ and $G = \left\{ 0, \dots, M-1 \right\} \times  \left\{ 0, \dots, N-1 \right\}$. Assume we are given data
 	\begin{equation*}\label{f}
 		f(i, j) = c + v(i, j) + \varepsilon_{i, j}
@@ -56,133 +72,130 @@
 		\item $\varepsilon_{m, n} \sim \mathcal{N}(0, \sigma^2)$ i.i.d. normal distributed random variables
 	\end{itemize}
 	
-	ASSUMPTION: The image $f$ contains a rectangular region of interest, i.e. there is a rectangle with $\abs{v(i, j)}$ 
+	Assumption 1: The image $f$ contains a rectangular region of interest.
+	Assumption 2: The ROI has a checkerboard pattern.
 \end{frame}
 
 \begin{frame}
-	\subsection{Testing for the ROI}
-	
-	\subsubsection{Preparations}
-	
-	For each pair $(m, n) \in G$ we define four values
-	\begin{align}
-		\tilde{d}^\pm_1(m, n) &= f(m \pm 1, n) - f(m, n) \label{d1} \\
-		\tilde{d}^\pm_2(m, n) &= f(m, n \pm 1) - f(m, n) \label{d2}
-	\end{align}
-	We now combine these values into two new values and assign to each pair $(m, n) \in G$ the values
-	\begin{equation*}\label{d_tilde}
-		\tilde{d}^\pm(m, n) = \sqrt{\tilde{d}_1^\pm(m, n)^2 + \tilde{d}_2^\pm(m, n)^2}
-	\end{equation*}
+	\begin{figure}
+		\includegraphics[width=0.6\linewidth]{Testing/ROI}
+		\caption[ROI]{Example of a possible region of interest. ($M = 16$, $N = 16$)}
+		\label{fig:ROI}
+	\end{figure}
 \end{frame}
 
 \begin{frame}
-	We now want to test if a pixel is part of the aforementioned region of interest (ROI). To do this, we define another two values for each pixel $(m, n) \in G$:
+	\begin{figure}
+		\includegraphics[width=0.6\linewidth]{Testing/ROI_noisy}
+		\caption[Noisy ROI]{Same region of interest with noise added. ($\sigma = 30$)}
+		\label{fig:ROI_noisy}
+	\end{figure}
+\end{frame}
+
+\subsection{Testing for the ROI}
+
+\begin{frame}
+	\begin{beamercolorbox}[sep=8pt,center,shadow=true,rounded=true]{title}
+		Goal: Construct a statistical test for the region of interest.
+	\end{beamercolorbox}
+\end{frame}
+
+\begin{frame}
+	\begin{beamercolorbox}[sep=8pt,center,shadow=true,rounded=true]{title}
+		Observation: If a pixel is background, its top and left neighbour pixels or bottom and right neighbour pixels are background as well.
+	\end{beamercolorbox}
+\end{frame}
+
+\subsubsection{Preparations}
+
+\begin{frame}
+	For each pair $(i, j) \in G$ we define four non-observable values
+	\begin{align*}
+		d_1^\pm(i, j) &= v(i \pm 1, j) - v(i, j) \\
+		d_2^\pm(i, j) &= v(i, j \pm 1) - v(i, j)
+	\end{align*}
+	and combine them to two new values
 	\begin{equation*}\label{d}
-		d^\pm(m, n) = \sqrt{(v(m \pm 1, n) - v(m, n))^2 + (v(m, n \pm 1) - v(m, n))^2}
-	\end{equation*}
-	The definition of $d^\pm(m, n)$ helps us define a null hypothesis for our testing procedure. If a pixel is background and since we assumed the ROI to be rectangular, that means, that its top and left neighbour pixels or bottom and right neighbour pixels are background as well. This leads to the null hypothesis
-	\begin{equation*}
-		H_0 : \min\{ d^+(m, n), d^-(m, n) \} = 0
-	\end{equation*}
-	Since by definition $d^\pm(m, n) \geq 0$, our alternative hypothesis becomes
-	\begin{equation*}
-		H_1 : \min\{ d^+(m, n), d^-(m, n) \} > 0
+		d^\pm(i, j) = \sqrt{(v(i \pm 1, j) - v(i, j))^2 + (v(i, j \pm 1) - v(i, j))^2}
 	\end{equation*}
 \end{frame}
+
+\begin{frame}
+	The definition of $d^\pm(i, j)$ helps us define the null hypothesis:
+	\begin{equation*}
+		H_0 : \min\{ d^+(i, j), d^-(i, j) \} = 0
+	\end{equation*}
+	Since by definition $d^\pm(i, j) \geq 0$, our alternative hypothesis becomes
+	\begin{equation*}
+		H_1 : \min\{ d^+(i, j), d^-(i, j) \} > 0
+	\end{equation*}
+\end{frame}
+
+\begin{frame}
+	We also define four observable values
+	\begin{align*}
+		\tilde{d}^\pm_1(i, j) &= f(i \pm 1, j) - f(i, j) \\
+		\tilde{d}^\pm_2(i, j) &= f(i, j \pm 1) - f(i, j)
+	\end{align*}
+	and combine them to
+	\begin{equation*}\label{d_tilde}
+		\tilde{d}^\pm(i, j) = \sqrt{\tilde{d}_1^\pm(i, j)^2 + \tilde{d}_2^\pm(i, j)^2}
+	\end{equation*}
+	
+	We use $T = \min \{ \tilde{d}^+(i, j), \tilde{d}^-(i, j) \}$ as our test statistic.
+\end{frame}
+
+\subsubsection{Distribution of $\mathbb{P}(\tilde{d}^\pm(i, j) \leq t \mid d^\pm(i, j) = d)$}
 
 \begin{frame}
 	Since $v$ only takes values in $\{ 0, -c, c \}$, $d^\pm$ also can only attain values in
 	\begin{equation*}
 		\mathcal{D} = \{ 0, c, 2 c, \sqrt{2} c, \sqrt{5} c, \sqrt{8} c \}
 	\end{equation*}
-	This means, that we can define two sets $\mathcal{D}_0$ and $\mathcal{D}_1$ as follows
-	\begin{equation*}
-		\mathcal{D}_1 = ( \mathcal{D} \setminus \{ 0 \} ) \times ( \mathcal{D} \setminus \{ 0 \} )
-	\end{equation*}
-	\begin{equation*}
-		\mathcal{D}_0 = ( \mathcal{D} \setminus \{ 0 \} ) \times \{ 0 \} \cup \{ 0 \} \times ( \mathcal{D} \setminus \{ 0 \} ) \cup ( \{ 0 \} \times \{ 0 \} ) = ( \mathcal{D} \times \mathcal{D} ) \setminus \mathcal{D}_1
-	\end{equation*}
-	Now, if $(d^+, d^-) \in \mathcal{D}_0$ then the null hypothesis is true and if $(d^+, d^-) \in \mathcal{D}_1$, the alternative hypothesis is true.
-\end{frame}
-
-\begin{frame}
-	\subsubsection{Distribution of $\mathbb{P}(\tilde{d}^\pm(m, n) \leq t \mid d^\pm(m, n) = d)$}
 	
-	We want to determine the distribution of $\tilde{d}^\pm(m, n)$ conditioned on $d^\pm(m, n) = d$ for some $d \in \mathcal{D}$. We define
-	\begin{align*}
-		d_1^\pm(m, n) &= v(m \pm 1, n) - v(m, n) \\
-		d_2^\pm(m, n) &= v(m, n \pm 1) - v(m, n)
-	\end{align*}
-	Then $d^\pm(m, n) = \sqrt{d_1^\pm(m, n)^2 + d_2^\pm(m, n)^2}$. We note that the roles of $d_1^\pm(m, n)$ and $d_2^\pm(m, n)$ are symmetrical. Furthermore we can see, that for $d^\pm(m, n) = d$ given, we can determine, what $d_1^\pm(m, n)$ and $d_2^\pm(m, n)$ are.
+	We want to determine the distribution of $\tilde{d}^\pm(i, j)$ conditioned on $d^\pm(i, j) = d$ for some $d \in \mathcal{D}$.
 \end{frame}
 
 \begin{frame}
-	\begin{center}
-		\begin{tabular}{c|c|c}
-			$d$ & $d_1^\pm$ & $d_2^\pm$ \\
-			\hline
-			$0$ & $0$ & $0$ \\
-			\hline
-			$c$ & $\{ c, 0 \}$ & $\{ 0, c \}$ \\
-			\hline
-			$2 c$ & $\{ 2 c, 0 \}$ & $\{ 0, 2 c \}$ \\
-			\hline
-			$\sqrt{2} c$ & $c$ & $c$ \\
-			\hline
-			$\sqrt{5} c$ & $\{ 2 c, c \}$ & $\{ c, 2 c \}$ \\
-			\hline
-			$\sqrt{8} c$ & $2 c$ & $2 c$ \\
-		\end{tabular}
-	\end{center}
-\end{frame}
-
-\begin{frame}
-	Using this relation, we get
+	We get
 	\begin{equation*}
-		\mathbb{P}(\tilde{d}^\pm(m, n) \leq t \mid d^\pm(m, n) = d) = \mathbb{P}\left( \sqrt{2} \sigma \sqrt{\left( \frac{X_1}{\sqrt{2} \sigma} \right)^2 + \left( \frac{X_2}{\sqrt{2} \sigma} \right)^2} \leq t \right)
+		\mathbb{P}(\tilde{d}^\pm(i, j) \leq t \mid d^\pm(i, j) = d) = \mathbb{P}\left( \sqrt{2} \sigma \sqrt{\left( \frac{X_1}{\sqrt{2} \sigma} \right)^2 + \left( \frac{X_2}{\sqrt{2} \sigma} \right)^2} \leq t \right)
 	\end{equation*}
 	with
 	\begin{align*}
-		X_1 &= d_1^\pm(m, n) + \varepsilon_{m \pm 1, n} - \varepsilon_{m, n} \sim \mathcal{N}(d_1^\pm(m, n), 2 \sigma^2) \\
-		X_2 &= d_2^\pm(m, n) + \varepsilon_{m, n \pm 1} - \varepsilon_{m, n} \sim \mathcal{N}(d_2^\pm(m, n), 2 \sigma^2)
+		X_1 &= d_1^\pm(i, j) + \varepsilon_{m \pm 1, n} - \varepsilon_{m, n} \sim \mathcal{N}(d_1^\pm(i, j), 2 \sigma^2) \\
+		X_2 &= d_2^\pm(i, j) + \varepsilon_{m, n \pm 1} - \varepsilon_{m, n} \sim \mathcal{N}(d_2^\pm(i, j), 2 \sigma^2)
 	\end{align*}
-	
-	Then we can see, that the square root inside has non-central chi distribution with two degrees of freedom and parameter
-	\begin{equation*}
-		\lambda = \sqrt{\left( \frac{d_1^\pm}{\sqrt{2} \sigma} \right)^2 + \left( \frac{d_2^\pm}{\sqrt{2} \sigma} \right)^2} = \frac{\sqrt{d_1^\pm(m, n)^2 + d_2^\pm(m, n)^2}}{\sqrt{2} \sigma} = \frac{d^\pm(m, n)}{\sqrt{2} \sigma}
-	\end{equation*}
 \end{frame}
 
 \begin{frame}
-	The cumulative distribution function of the non-central chi distribution with parameter $\lambda$ and two degrees of freedom is $1 - Q_1(\lambda, x)$, where $Q_M(a, b)$ denotes the Marcum $Q$-function, which is defined as
-	\begin{equation*}
-		Q_M(a, b) = \int_b^\infty x \left( \frac{x}{a} \right)^{M-1} \exp \left( - \frac{x^2 + a^2}{2} \right) I_{M-1}(ax) dx
-	\end{equation*}
-	with modified Bessel function $I_{M-1}$.
-	
-	Putting this together, we obtain
+	Using the cumulative distribution function of the non-central chi distribution, we obtain
 	\begin{align*}
-		\mathbb{P}(\tilde{d}^\pm(m, n) \leq t \mid d^\pm(m, n) = d) &= \mathbb{P}\left( \sqrt{\left( \frac{X_1}{\sqrt{2} \sigma} \right)^2 + \left( \frac{X_2}{\sqrt{2} \sigma} \right)^2} \leq \frac{t}{\sqrt{2} \sigma} \right) \\
+		\mathbb{P}(\tilde{d}^\pm(i, j) \leq t \mid d^\pm(i, j) = d) &= \mathbb{P}\left( \sqrt{\left( \frac{X_1}{\sqrt{2} \sigma} \right)^2 + \left( \frac{X_2}{\sqrt{2} \sigma} \right)^2} \leq \frac{t}{\sqrt{2} \sigma} \right) \\
 		&= 1 - Q_1 \left( \frac{d}{\sqrt{2} \sigma}, \frac{t}{\sqrt{2} \sigma} \right)
 	\end{align*}
 	
 	For $d = 0$ this simplifies a lot and we get
 	\begin{equation*}
-		\mathbb{P}(\tilde{d}^\pm(m, n) \leq t \mid d^\pm(m, n) = 0) = 1 - \exp \left( - \frac{t^2}{4 \sigma^2} \right)
+		\mathbb{P}(\tilde{d}^\pm(i, j) \leq t \mid d^\pm(i, j) = 0) = 1 - \exp \left( - \frac{t^2}{4 \sigma^2} \right)
 	\end{equation*}
 \end{frame}
 
+\subsubsection{Statistical significance}
+
 \begin{frame}
-	\subsubsection{Statistical significance}
-	We use $T = \tilde{d}(m, n) = \min \{ \tilde{d}^+(m, n), \tilde{d}^-(m, n) \}$ as our test statistic. Dropping $(m, n)$ in every term for readability, we get
+	Using this, we get an upper bound for the probability of a type I error:
 	\begin{equation*}
 		\mathbb{P}(T \geq t \mid H_0) \leq \exp \left( - \frac{t^2}{4 \sigma^2} \right)
 	\end{equation*}
+	
+	By taking $t = 2 \sigma \sqrt{- \log(\alpha)}$ we thus can assure a statistical significance of $\alpha$.
 \end{frame}
 
+\subsubsection{Power of the test}
+
 \begin{frame}
-	\subsubsection{Power of the test}
-	After having established an upper bound for the statistical significance, we aim to provide a lower and upper bound for the power of our test. Especially the upper bound will be quite loose.
+	We are also interested in bounds for the probability of a type II error.
 	
 	Using results and notations from the previous sections, we get the lower bound
 	\begin{equation*}
@@ -200,28 +213,34 @@
 	\end{equation*}
 \end{frame}
 
+\subsubsection{Numerical results}
+
 \begin{frame}
-	\subsubsection{Numerical results}
-	
-	In the case of a grayscale image, we assume $c = 127.5$. As we have seen $\mathbb{P}(T \geq t \mid H_0) \leq \exp \left( - \frac{t^2}{4 \sigma^2} \right)$. By taking $t = 2 \sigma \sqrt{- \log(\alpha)}$ we thus can assure a statistical significance of $\alpha$.
+	In the case of a grayscale image, we assume $c = 127.5$. For $t = 2 \sigma \sqrt{- \log(\alpha)}$ and $\alpha = 0.05$ we get the following bounds dependent on the standard deviation $\sigma$.
 	
 	\begin{figure}[h]
 		\includegraphics[width=0.6\linewidth]{Testing/Power_Bounds}
 		\caption[Power bounds]{For $\alpha = 0.05$ this graph shows the lower and upper bounds for the power of the test for $\sigma \in \{ 1, 2, \dots, 150 \}$.}
-		\label{fig:demo1comparison}
+		\label{fig:powerbounds}
 	\end{figure}
 \end{frame}
 
 \begin{frame}
-	As we can see in the graph, we can assure, that there are no type II errors for $\sigma \in \{ 1, 2, \dots, 8 \}$. Up until $\sigma = 21$ the power stays below $\alpha = 0.05$. The upper bound increases then very fast and starting at $\sigma = 41$ we can only use the trivial upper bound, i.e. $1$. The lower bound stays at $0$ until $\sigma = 23$ and increases slowly. At $\sigma = 115$ it becomes bigger than $0.5$.
+	\begin{itemize}
+		\item No type II errors for $\sigma \in \{ 1, 2, \dots, 8 \}$.
+		\item Until $\sigma = 21$ the probability of a type II error stays below $\alpha = 0.05$.
+		\item Starting at $\sigma = 41$ we can only use the trivial upper bound, i.e. $1$.
+		\item The lower bound stays at $0$ until $\sigma = 23$.
+		\item At $\sigma = 115$ the lower bound becomes bigger than $0.5$.
+	\end{itemize}
 \end{frame}
 
+\section{Morphological operations}
+
+\subsection{Opening and closing}
+
 \begin{frame}
-	\section{Morphological operations}
-	
-	\subsection{Opening and closing}
-	
-	To define opening and closing, we first need to define erosion and dilation of binary images.
+	We start by defining erosion and dilation of binary images.
 	
 	\begin{definition}
 		Let $A, B \subseteq \mathbb{R}^m$. The binary erosion of $A$ by $B$ is defined as
@@ -235,13 +254,6 @@
 			A \oplus_b B = \left\{ c \in \mathbb{R}^m \mid c = a + b \; \mathrm{for \; some} \; a \in A \; \mathrm{and} \; b \in B \right\}
 		\end{equation*}
 	\end{definition}
-	
-	This can be rewritten in a more implementation-friendly form:
-	\begin{align*}
-		(A \ominus_b B)_{(i, j)} &= \underset{m, n}{\mathrm{AND}} \left( \mathrm{OR} (A_{(i + m, j + n)}, (1 - B)_{(m, n)}) \right) \\
-		(A \oplus_b B)_{(i, j)} &= \underset{m, n}{\mathrm{OR}} \left( \mathrm{AND} (A_{(i - m, j - n)}, B_{(m, n)}) \right)
-	\end{align*}
-	Where $m, n$ go through the indices, where $B = 1$.
 \end{frame}
 
 \begin{frame}
@@ -262,14 +274,35 @@
 \end{frame}
 
 \begin{frame}
-	\subsection{Hypothesis testing and opening}
+	\begin{figure}[h]
+		\includegraphics[width=0.6\linewidth]{Morphology/StructuringElement}
+		\caption[Structuring Element]{A $3 \times 3$ structuring element.}
+		\label{fig:structuringelement}
+	\end{figure}
+\end{frame}
+
+\begin{frame}
+	\includegraphics[width=0.3\linewidth]{Morphology/OpeningBefore}
+	\includegraphics[width=0.3\linewidth]{Morphology/OpeningErode}
+	\includegraphics[width=0.3\linewidth]{Morphology/OpeningOpen}
 	
-	From now on, we assume $B$ to be a square of ones centered around our current pixel. Using the notation from above we can take a closer look at what opening really does. We have
-	\begin{equation*}
-		(A \circ B)_{(i, j)} = ((A \ominus B) \oplus B)_{(i, j)} = \underset{\tilde{m}, \tilde{n}}{\mathrm{OR}} \left( \underset{m, n}{\mathrm{AND}} ( A_{(i + m - \tilde{m}, j + n - \tilde{n})} ) \right)
-	\end{equation*}
+	Example of a binary image (black boxes represent 1). The second image is the erosion of the image by a $3 \times 3$ structuring element. The third image is the dilation of the erosion, i.e. the opening of the image.
+\end{frame}
+
+\begin{frame}
+	\includegraphics[width=0.3\linewidth]{Morphology/ClosingBefore}
+	\includegraphics[width=0.3\linewidth]{Morphology/ClosingDilate}
+	\includegraphics[width=0.3\linewidth]{Morphology/ClosingClosed}
 	
-	Now, we can see, that $A \circ B_{(i, j)} = 1$ if and only if $(i, j)$ is part of a square the size of $B$. In the above formula $(\tilde{m}, \tilde{n})$ determines the offset of the center of the square and thus loops through all possible positions of $(i, j)$ in the square. The inner part on the other hand assures, that there is actually a square of same size as $B$, that $(i, j)$ is part of.
+	Example of a binary image (black boxes represent 1). The second image is the dilation of the image by a $3 \times 3$ structuring element. The third image is the erosion of the dilation, i.e. the closing of the image.
+\end{frame}
+
+\subsection{Hypothesis testing and opening}
+
+\begin{frame}
+	\begin{beamercolorbox}[sep=8pt,center,shadow=true,rounded=true]{title}
+		Question: What is the effect of opening and closing on statistical significance and power?
+	\end{beamercolorbox}
 \end{frame}
 
 \begin{frame}
@@ -282,134 +315,119 @@
 		\end{equation*}
 		where $H_0(i, j)$ denotes the null hypothesis for the pixel $(i, j)$, which is, that it is a background pixel and thus should be set to zero.
 		
-		Let $k \in \mathbb{N}$ be odd and $B$ be a square structuring element with side length $k$. For $\tilde{m}, \tilde{n} \in \{ -\frac{k - 1}{2}, \dots, \frac{k - 1}{2} \}$ we denote by $\mathcal{G}_{(\tilde{m}, \tilde{n})}^k(i, j)$ the set of all possible ground truths in the square with side length $k$, where the pixel $(i, j)$ has offest $(\tilde{m}, \tilde{n})$ from the center of the square and assuming that the null hypothesis for the pixel $(i, j)$ is true.
-		Then the following inequality holds:
+		Let $k \in \mathbb{N}$ be odd and $B$ be a square structuring element with side length $k$. Then the following inequality holds:
 		\begin{equation*}
 			\mathbb{P}((f_{bin} \circ B)(i, j) = 1 \mid H_0(i, j)) \leq k^2 \alpha^k
 		\end{equation*}
 	\end{theorem}
 \end{frame}
 
-\begin{frame}
-	\subsection{Hypothesis testing and closing}
-	In a similar way as above, we can also see, what closing does. We have
-	\begin{equation*}
-		(A \bullet B)_{(i, j)} = ((A \oplus B) \ominus B)_{(i, j)} = \underset{\tilde{m}, \tilde{n}}{\mathrm{AND}} \left( \underset{m, n}{\mathrm{OR}} ( A_{(i - m + \tilde{m}, j - n + \tilde{n})} ) \right)
-	\end{equation*}
-\end{frame}
-
-\begin{frame}
-	\subsection{Convex hull}
-	
-	As we have seen in the section about multiple testing procedures, we defined the family-wise error rate as $\mathbb{P}(V \geq 1) = 1 - \mathbb{P}(V = 0)$.
-\end{frame}
-
-\begin{frame}
-	\section{Multiple testing procedures}
-	
-	Consider the following setup:
-	\begin{table}[h]
-		\tymax .3\textwidth
-		\begin{tabulary}{\textwidth}{|CCCC|}
-			\hline
-			& \textit{Declared non-significant} & \textit{Declared significant} & \textit{Total} \\
-			\hline
-			\textit{True null hypotheses} & $\mathbf{U}$ & $\mathbf{V}$ & $m_0$ \\
-			\textit{Non-true null hypotheses} & $\mathbf{T}$ & $\mathbf{S}$ & $m - m_0$ \\
-			& $m - \mathbf{R}$ & $\mathbf{R}$ & $m$ \\
-			\hline
-		\end{tabulary}
-	\end{table}
-\end{frame}
-
-\begin{frame}
-	\begin{itemize}
-		\item $m$ is the total number hypotheses tested
-		\item $m_0$ is the number of true null hypotheses, an unknown parameter
-		\item $m - m_0$ is the number of true alternative hypotheses
-		\item $V$ is the number of false positives (Type I error) (also called "false discoveries")
-		\item $S$ is the number of true positives
-		\item $T$ is the number of false negatives (Type II error)
-		\item $U$ is the number of true negatives
-		\item $R = V + S$ is the number of rejected null hypotheses (also called "discoveries", either true or false)
-	\end{itemize}
-	In $m$ hypothesis tests of which $m_0$ are true null hypotheses, $R$ is an observable random variable, and $S$, $T$, $U$, and $V$ are unobservable random variables.
-\end{frame}
-
-\begin{frame}
-	We define another random variable $Q = \frac{V}{V + S}$, which is the proportion of the rejected null hypotheses which are erroneously rejected. We set $Q = 0$, if $V + S = 0$. Based on this, we define the false discovery rate to be
-	\begin{equation*}
-		FDR = \mathbb{E}(Q) = \mathbb{E} \left( \frac{V}{V + S} \right)
-	\end{equation*}
-	
-	We also define the family-wise error rate to be
-	\begin{equation*}
-		FWER = \mathbb{P}( V \geq 1 ) = 1 - \mathbb{P}( V = 0 )
-	\end{equation*}
-	that is the probability of making one or more type I errors.
-\end{frame}
-
-\begin{frame}
-	Three of these multiple testing procedures are given in detail in the following. The first one controls the false discovery rate at level $\alpha$, i.e.
-	\begin{equation*}
-		FDR = \mathbb{E}(Q) \leq \alpha
-	\end{equation*}
-	
-	The other two procedures control the family-wise error rate at level $\alpha$, i.e.
-	\begin{equation*}
-		FWER = \mathbb{P}( V \geq 1 ) \leq \alpha
-	\end{equation*}
-\end{frame}
-
-\begin{frame}
-	First, we calculate for every pixel $(m, n) \in G$ the $p$-value
-	\begin{equation*}
-		p(m, n) = \exp \left( - \frac{\tilde{d}(m, n)^2}{4 \sigma^2} \right) \geq \mathbb{P}(T \geq \tilde{d}(m, n) \mid H_0)
-	\end{equation*}
-\end{frame}
-
-\begin{frame}
-	\subsection{FDR Thresholding}
-	
-	\begin{itemize}
-		\item Sort $p$-values in ascending order: $p_{(1)} \leq p_{(2)} \leq \dots \leq p_{(M \cdot N)}$
-		\item Calculate the maximal index $k$, such that $p_{(k)} \leq \frac{k \cdot \alpha}{M \cdot N}$
-		\item Calculate the threshold $\lambda_{k} = 2 \sigma \sqrt{- \log(p_{(k)})}$
-		\item Reject all hypotheses $H_{(i)}$ with $p_{(i)} \leq p_{(k)}$, i.e. all hypotheses with $$\tilde{d}_{(i)} \geq \tilde{d}_{(k)} = \lambda_{k} = 2 \sigma \sqrt{- \log(p_{(k)})}$$
-	\end{itemize}
-\end{frame}
-
-\begin{frame}
-	\subsection{Bonferroni Thresholding}
-	
-	\begin{itemize}
-		\item Reject all hypotheses $H_{i}$ with $p_{i} \leq \frac{\alpha}{M \cdot N}$, i.e. all hypotheses with $$\tilde{d}_{i} \geq \lambda_k = 2 \sigma \sqrt{- \log \left( \frac{\alpha}{M \cdot N} \right)}$$
-	\end{itemize}
-\end{frame}
-
-\begin{frame}
-	\subsection{Hochberg Thresholding}
-	
-	\begin{itemize}
-		\item Sort $p$-values in ascending order: $p_{(1)} \leq p_{(2)} \leq \dots \leq p_{(M \cdot N)}$
-		\item Calculate the maximal index $k$, such that $p_{(k)} \leq \frac{\alpha}{M \cdot N - k + 1}$
-		\item Reject all hypotheses $H_{(i)}$ with $p_{(i)} \leq p_{(k)}$, i.e. all hypotheses with $$\tilde{d}_{(i)} \geq \tilde{d}_{(k)} = \lambda_{k} = 2 \sigma \sqrt{- \log(p_{(k)})}$$
-	\end{itemize}
-\end{frame}
-
-\begin{frame}
-	All these methods are defined for actual $p$-values, i.e.
-	\begin{equation*}
-		p(m, n) = \mathbb{P}(T \geq \tilde{d}(m, n) \mid H_0)
-	\end{equation*}
-	In contrast to that, we have taken upper bounds for the $p$-values. This is not an issue though, since by taking upper bounds we might decrease the number of hypotheses we reject. Thus it will not increase the error rate.
-	
-	The threshold has the following interpretation:
-	\begin{itemize}
-		\item If $\tilde{d}(m, n) \geq \lambda_{k}$, then $(m, n)$ is part of the ROI.
-		\item If $\tilde{d}(m, n) < \lambda_{k}$, then $(m, n)$ is NOT part of the ROI.
-	\end{itemize}
-\end{frame}
+%\section{Multiple testing procedures}
+%
+%\begin{frame}
+%	Consider the following setup:
+%	\begin{table}[h]
+%		\tymax .3\textwidth
+%		\begin{tabulary}{\textwidth}{|CCCC|}
+%			\hline
+%			& \textit{Declared non-significant} & \textit{Declared significant} & \textit{Total} \\
+%			\hline
+%			\textit{True null hypotheses} & $\mathbf{U}$ & $\mathbf{V}$ & $m_0$ \\
+%			\textit{Non-true null hypotheses} & $\mathbf{T}$ & $\mathbf{S}$ & $m - m_0$ \\
+%			& $m - \mathbf{R}$ & $\mathbf{R}$ & $m$ \\
+%			\hline
+%		\end{tabulary}
+%	\end{table}
+%\end{frame}
+%
+%\begin{frame}
+%	\begin{itemize}
+%		\item $m$ is the total number hypotheses tested
+%		\item $m_0$ is the number of true null hypotheses, an unknown parameter
+%		\item $m - m_0$ is the number of true alternative hypotheses
+%		\item $V$ is the number of false positives (Type I error) (also called "false discoveries")
+%		\item $S$ is the number of true positives
+%		\item $T$ is the number of false negatives (Type II error)
+%		\item $U$ is the number of true negatives
+%		\item $R = V + S$ is the number of rejected null hypotheses (also called "discoveries", either true or false)
+%	\end{itemize}
+%	In $m$ hypothesis tests of which $m_0$ are true null hypotheses, $R$ is an observable random variable, and $S$, $T$, $U$, and $V$ are unobservable random variables.
+%\end{frame}
+%
+%\begin{frame}
+%	We define another random variable $Q = \frac{V}{V + S}$, which is the proportion of the rejected null hypotheses which are erroneously rejected. We set $Q = 0$, if $V + S = 0$. Based on this, we define the false discovery rate to be
+%	\begin{equation*}
+%		FDR = \mathbb{E}(Q) = \mathbb{E} \left( \frac{V}{V + S} \right)
+%	\end{equation*}
+%	
+%	We also define the family-wise error rate to be
+%	\begin{equation*}
+%		FWER = \mathbb{P}( V \geq 1 ) = 1 - \mathbb{P}( V = 0 )
+%	\end{equation*}
+%	that is the probability of making one or more type I errors.
+%\end{frame}
+%
+%\begin{frame}
+%	Three of these multiple testing procedures are given in detail in the following. The first one controls the false discovery rate at level $\alpha$, i.e.
+%	\begin{equation*}
+%		FDR = \mathbb{E}(Q) \leq \alpha
+%	\end{equation*}
+%	
+%	The other two procedures control the family-wise error rate at level $\alpha$, i.e.
+%	\begin{equation*}
+%		FWER = \mathbb{P}( V \geq 1 ) \leq \alpha
+%	\end{equation*}
+%\end{frame}
+%
+%\begin{frame}
+%	First, we calculate for every pixel $(m, n) \in G$ the $p$-value
+%	\begin{equation*}
+%		p(m, n) = \exp \left( - \frac{\tilde{d}(m, n)^2}{4 \sigma^2} \right) \geq \mathbb{P}(T \geq \tilde{d}(m, n) \mid H_0)
+%	\end{equation*}
+%\end{frame}
+%
+%\subsection{FDR Thresholding}
+%
+%\begin{frame}
+%	\begin{itemize}
+%		\item Sort $p$-values in ascending order: $p_{(1)} \leq p_{(2)} \leq \dots \leq p_{(M \cdot N)}$
+%		\item Calculate the maximal index $k$, such that $p_{(k)} \leq \frac{k \cdot \alpha}{M \cdot N}$
+%		\item Calculate the threshold $\lambda_{k} = 2 \sigma \sqrt{- \log(p_{(k)})}$
+%		\item Reject all hypotheses $H_{(i)}$ with $p_{(i)} \leq p_{(k)}$, i.e. all hypotheses with $$\tilde{d}_{(i)} \geq \tilde{d}_{(k)} = \lambda_{k} = 2 \sigma \sqrt{- \log(p_{(k)})}$$
+%	\end{itemize}
+%\end{frame}
+%
+%\subsection{Bonferroni Thresholding}
+%
+%\begin{frame}
+%	\begin{itemize}
+%		\item Reject all hypotheses $H_{i}$ with $p_{i} \leq \frac{\alpha}{M \cdot N}$, i.e. all hypotheses with $$\tilde{d}_{i} \geq \lambda_k = 2 \sigma \sqrt{- \log \left( \frac{\alpha}{M \cdot N} \right)}$$
+%	\end{itemize}
+%\end{frame}
+%
+%\subsection{Hochberg Thresholding}
+%
+%\begin{frame}
+%	\begin{itemize}
+%		\item Sort $p$-values in ascending order: $p_{(1)} \leq p_{(2)} \leq \dots \leq p_{(M \cdot N)}$
+%		\item Calculate the maximal index $k$, such that $p_{(k)} \leq \frac{\alpha}{M \cdot N - k + 1}$
+%		\item Reject all hypotheses $H_{(i)}$ with $p_{(i)} \leq p_{(k)}$, i.e. all hypotheses with $$\tilde{d}_{(i)} \geq \tilde{d}_{(k)} = \lambda_{k} = 2 \sigma \sqrt{- \log(p_{(k)})}$$
+%	\end{itemize}
+%\end{frame}
+%
+%\begin{frame}
+%	All these methods are defined for actual $p$-values, i.e.
+%	\begin{equation*}
+%		p(m, n) = \mathbb{P}(T \geq \tilde{d}(m, n) \mid H_0)
+%	\end{equation*}
+%	In contrast to that, we have taken upper bounds for the $p$-values. This is not an issue though, since by taking upper bounds we might decrease the number of hypotheses we reject. Thus it will not increase the error rate.
+%	
+%	The threshold has the following interpretation:
+%	\begin{itemize}
+%		\item If $\tilde{d}(m, n) \geq \lambda_{k}$, then $(m, n)$ is part of the ROI.
+%		\item If $\tilde{d}(m, n) < \lambda_{k}$, then $(m, n)$ is NOT part of the ROI.
+%	\end{itemize}
+%\end{frame}
 
 
 \end{document}
