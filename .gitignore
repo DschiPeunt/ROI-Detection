@@ -42,3 +42,6 @@
 *.snm
 *.synctex.gz
 *.toc
+
+# Large files
+simulation.mat
