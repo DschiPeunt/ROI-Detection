@@ -1,7 +1,17 @@
-function y = CDF(x, sigma)
-%PDF Summary of this function goes here
-%   Detailed explanation goes here
+function [t, alpha_real] = Threshold(alpha, increment)
+%THRESHOLD Calculate threshold based on target statistical significance
 
+t = 0;
+
+while CDF(t, 1) < 1 - alpha
+    t = t + increment;
+end
+
+alpha_real = CDF(t, 1);
+
+end
+
+function y = CDF(x, sigma)
 % Initialize output array:
 y = zeros(size(x));
 

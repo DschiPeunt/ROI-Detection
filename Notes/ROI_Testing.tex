@@ -120,9 +120,9 @@
 
 Let $M, N \in \mathbb{N}$ and $G = \left\{ 0, \dots, M-1 \right\} \times  \left\{ 0, \dots, N-1 \right\}$. Assume we are given data
 \begin{equation}\label{f}
-	f(i, j) = c_{bg} + v(i, j) + \varepsilon_{i, j}
+	f(m, n) = c_{bg} + v(m, n) + \varepsilon_{m, n}
 \end{equation}
-where $(i, j) \in G$, $c_{bg} \in \mathbb{R}$ is constant, $v: G \to \{ 0, \pm c_{bg} \}$ and $\varepsilon_{i, j} \sim \mathcal{N}(0, \sigma^2)$ are i.i.d. normal distributed random variables for some $\sigma > 0$ and for all $(i, j) \in G$.
+where $(m, n) \in G$, $c_{bg} \in \mathbb{R}$ is constant, $v: G \to \{ 0, \pm c_{bg} \}$ and $\varepsilon_{m, n} \sim \mathcal{N}(0, \sigma^2)$ are i.i.d. normal distributed random variables for some $\sigma > 0$ and for all $(m, n) \in G$.
 
 We treat $v$ as an image, that contains a rectangular, thus convex, region of interest. That means, that the pixels with value $\pm c_{bg}$ are arranged in a rectangular shape and all other pixels have value $0$.
 
@@ -130,34 +130,34 @@ We treat $v$ as an image, that contains a rectangular, thus convex, region of in
 
 \subsubsection{Preparations}
 
-For each pair $(i, j) \in G$ we define four values
+For each pair $(m, n) \in G$ we define four values
 \begin{align}
-	\tilde{d}^\pm_1(i, j) &= f(i \pm 1, j) - f(i, j) \label{d1} \\
-	\tilde{d}^\pm_2(i, j) &= f(i, j \pm 1) - f(i, j) \label{d2}
+	\tilde{d}^\pm_1(m, n) &= f(m \pm 1, n) - f(m, n) \label{d1} \\
+	\tilde{d}^\pm_2(m, n) &= f(m, n \pm 1) - f(m, n) \label{d2}
 \end{align}
 where we define
 \begin{align*}
-	f(i, -1) &= f(i, N-1) \\
-	f(-1, j) &= f(M-1, j) \\
-	f(i, N) &= f(i, 0) \\
-	f(M, j) &= f(0, j)
+	f(m, -1) &= f(m, N-1) \\
+	f(-1, n) &= f(M-1, n) \\
+	f(m, N) &= f(m, 0) \\
+	f(M, n) &= f(0, n)
 \end{align*}
-to adjust to boundary issues. We now combine these values into two new values and assign to each pair $(i, j) \in G$ the values
+to adjust to boundary issues. We now combine these values into two new values and assign to each pair $(m, n) \in G$ the values
 \begin{equation}\label{d_tilde}
-	\tilde{d}^\pm(i, j) = \sqrt{\tilde{d}_1^\pm(i, j)^2 + \tilde{d}_2^\pm(i, j)^2}
+	\tilde{d}^\pm(m, n) = \sqrt{\tilde{d}_1^\pm(m, n)^2 + \tilde{d}_2^\pm(m, n)^2}
 \end{equation}
 
-We now want to test if a pixel is part of the aforementioned region of interest (ROI). To do this, we define another two values for each pixel $(i, j) \in G$:
+We now want to test if a pixel is part of the aforementioned region of interest (ROI). To do this, we define another two values for each pixel $(m, n) \in G$:
 \begin{equation}\label{d}
-	d^\pm(i, j) = \sqrt{(v(i \pm 1, j) - v(i, j))^2 + (v(i, j \pm 1) - v(i, j))^2}
+	d^\pm(m, n) = \sqrt{(v(m \pm 1, n) - v(m, n))^2 + (v(m, n \pm 1) - v(m, n))^2}
 \end{equation}
-Although the definitions of $d^\pm(i, j)$ and $\tilde{d}^\pm(i, j)$ are quite similar, note, that we can only actually compute the values of the latter. The definition of $d^\pm(i, j)$ helps us define a null hypothesis for our testing procedure. Since we want to test for the ROI, our null hypothesis for a given pixel is, that it is a background pixel. That translates to $v(i, j) = 0$. If a pixel is background and since we assumed the ROI to be rectangular, that means, that its top and left neighbour pixels or bottom and right neighbour pixels are background as well. This leads to the null hypothesis
+Although the definitions of $d^\pm(m, n)$ and $\tilde{d}^\pm(m, n)$ are quite similar, note, that we can only actually compute the values of the latter. The definition of $d^\pm(m, n)$ helps us define a null hypothesis for our testing procedure. Since we want to test for the ROI, our null hypothesis for a given pixel is, that it is a background pixel. That translates to $v(m, n) = 0$. If a pixel is background and since we assumed the ROI to be rectangular, that means, that its top and left neighbour pixels or bottom and right neighbour pixels are background as well. This leads to the null hypothesis
 \begin{equation}
-	H_0 : \min\{ d^+(i, j), d^-(i, j) \} = 0
+	H_0 : \min\{ d^+(m, n), d^-(m, n) \} = 0
 \end{equation}
-Since by definition $d^\pm(i, j) \geq 0$, our alternative hypothesis becomes
+Since by definition $d^\pm(m, n) \geq 0$, our alternative hypothesis becomes
 \begin{equation}
-	H_1 : \min\{ d^+(i, j), d^-(i, j) \} > 0
+	H_1 : \min\{ d^+(m, n), d^-(m, n) \} > 0
 \end{equation}
 
 Since $v$ only takes values in $\{ 0, -c_{bg}, c_{bg} \}$, $d^\pm$ also can only attain values in
@@ -173,50 +173,50 @@ This means, that we can define two sets $\mathcal{D}_0$ and $\mathcal{D}_1$ as f
 \end{equation*}
 Now, if $(d^+, d^-) \in \mathcal{D}_0$ then the null hypothesis is true and if $(d^+, d^-) \in \mathcal{D}_1$, the alternative hypothesis is true.
 
-\subsubsection{Distribution of $\mathbb{P}(\tilde{d}^\pm(i, j) \leq t \mid d^\pm(i, j) = d)$}
+\subsubsection{Distribution of $\mathbb{P}(\tilde{d}^\pm(m, n) \leq t \mid d^\pm(m, n) = d)$}
 
-We want to determine the distribution of $\tilde{d}^\pm(i, j)$ conditioned on $d^\pm(i, j) = d$ for some $d \in \mathcal{D}$. We define
+We want to determine the distribution of $\tilde{d}^\pm(m, n)$ conditioned on $d^\pm(m, n) = d$ for some $d \in \mathcal{D}$. We define
 \begin{align*}
-	d_1^\pm(i, j) &= v(i \pm 1, j) - v(i, j) \\
-	d_2^\pm(i, j) &= v(i, j \pm 1) - v(i, j)
+	d_1^\pm(m, n) &= v(m \pm 1, n) - v(m, n) \\
+	d_2^\pm(m, n) &= v(m, n \pm 1) - v(m, n)
 \end{align*}
-Then $d^\pm(i, j) = \sqrt{d_1^\pm(i, j)^2 + d_2^\pm(i, j)^2}$. We note that the roles of $d_1^\pm(i, j)$ and $d_2^\pm(i, j)$ are symmetrical. Furthermore we can see, that for $d^\pm(i, j) = d$ given, we can determine, what $d_1^\pm(i, j)$ and $d_2^\pm(i, j)$ are.
+Then $d^\pm(m, n) = \sqrt{d_1^\pm(m, n)^2 + d_2^\pm(m, n)^2}$. We note that the roles of $d_1^\pm(m, n)$ and $d_2^\pm(m, n)$ are symmetrical. Furthermore we can see, that for $d^\pm(m, n) = d$ given, we can determine, what $d_1^\pm(m, n)$ and $d_2^\pm(m, n)$ are.
 
 \begin{center}
-	\begin{tabular}{c|c|c|c}
-		$d$ & $d_1^\pm$ & $d_2^\pm$ & Description \\
+	\begin{tabular}{c|c|c}
+		$d$ & $d_1^\pm$ & $d_2^\pm$ \\
 		\hline
-		$0$ & $0$ & $0$ & Background \\
+		$0$ & $0$ & $0$ \\
 		\hline
-		$c_{bg}$ & $\{ c_{bg}, 0 \}$ & $\{ 0, c_{bg} \}$ & Going from background to foreground \\
+		$c_{bg}$ & $\{ c_{bg}, 0 \}$ & $\{ 0, c_{bg} \}$ \\
 		\hline
-		$2 c_{bg}$ & $\{ 2 c_{bg}, 0 \}$ & $\{ 0, 2 c_{bg} \}$ & Only theoretical \\
+		$2 c_{bg}$ & $\{ 2 c_{bg}, 0 \}$ & $\{ 0, 2 c_{bg} \}$ \\
 		\hline
-		$\sqrt{2} c_{bg}$ & $c_{bg}$ & $c_{bg}$ & Only theoretical \\
+		$\sqrt{2} c_{bg}$ & $c_{bg}$ & $c_{bg}$ \\
 		\hline
-		$\sqrt{5} c_{bg}$ & $\{ 2 c_{bg}, c_{bg} \}$ & $\{ c_{bg}, 2 c_{bg} \}$ & Going from foreground to background \\
+		$\sqrt{5} c_{bg}$ & $\{ 2 c_{bg}, c_{bg} \}$ & $\{ c_{bg}, 2 c_{bg} \}$ \\
 		\hline
-		$\sqrt{8} c_{bg}$ & $2 c_{bg}$ & $2 c_{bg}$ & Foreground \\
+		$\sqrt{8} c_{bg}$ & $2 c_{bg}$ & $2 c_{bg}$ \\
 	\end{tabular}
 \end{center}
 
 Using this relation, we get
 \begin{align*}
-	&\mathbb{P}(\tilde{d}^\pm(i, j) \leq t \mid d^\pm(i, j) = d) \\
-	&= \mathbb{P}(( (c_{bg} + v(i \pm 1, j) + \varepsilon_{i \pm 1, j} - c_{bg} - v(i, j) - \varepsilon_{i, j})^2 \\
-	&+ (c_{bg} + v(i, j \pm 1) + \varepsilon_{i, j \pm 1} - c_{bg} - v(i, j) - \varepsilon_{i, j})^2 )^{\frac{1}{2}} \leq t \mid d^\pm(i, j) = d) \\
-	&= \mathbb{P}\left( \sqrt{(d_1^\pm(i, j) + \varepsilon_{i \pm 1, j} - \varepsilon_{i, j})^2 + (d_2^\pm(i, j) + \varepsilon_{i, j \pm 1} - \varepsilon_{i, j})^2} \leq t \right) \\
+	&\mathbb{P}(\tilde{d}^\pm(m, n) \leq t \mid d^\pm(m, n) = d) \\
+	&= \mathbb{P}(( (c_{bg} + v(m \pm 1, n) + \varepsilon_{m \pm 1, n} - c_{bg} - v(m, n) - \varepsilon_{m, n})^2 \\
+	&+ (c_{bg} + v(m, n \pm 1) + \varepsilon_{m, n \pm 1} - c_{bg} - v(m, n) - \varepsilon_{m, n})^2 )^{\frac{1}{2}} \leq t \mid d^\pm(m, n) = d) \\
+	&= \mathbb{P}\left( \sqrt{(d_1^\pm(m, n) + \varepsilon_{m \pm 1, n} - \varepsilon_{m, n})^2 + (d_2^\pm(m, n) + \varepsilon_{m, n \pm 1} - \varepsilon_{m, n})^2} \leq t \right) \\
 	&= \mathbb{P}\left( \sqrt{2} \sigma \sqrt{\left( \frac{X_1}{\sqrt{2} \sigma} \right)^2 + \left( \frac{X_2}{\sqrt{2} \sigma} \right)^2} \leq t \right)
 \end{align*}
 with
 \begin{align*}
-	X_1 &= d_1^\pm(i, j) + \varepsilon_{i \pm 1, j} - \varepsilon_{i, j} \sim \mathcal{N}(d_1^\pm(i, j), 2 \sigma^2) \\
-	X_2 &= d_2^\pm(i, j) + \varepsilon_{i, j \pm 1} - \varepsilon_{i, j} \sim \mathcal{N}(d_2^\pm(i, j), 2 \sigma^2)
+	X_1 &= d_1^\pm(m, n) + \varepsilon_{m \pm 1, n} - \varepsilon_{m, n} \sim \mathcal{N}(d_1^\pm(m, n), 2 \sigma^2) \\
+	X_2 &= d_2^\pm(m, n) + \varepsilon_{m, n \pm 1} - \varepsilon_{m, n} \sim \mathcal{N}(d_2^\pm(m, n), 2 \sigma^2)
 \end{align*}
 
 Then we can see, that the square root inside has non-central chi distribution with two degrees of freedom and parameter
 \begin{equation*}
-	\lambda = \sqrt{\left( \frac{d_1^\pm}{\sqrt{2} \sigma} \right)^2 + \left( \frac{d_2^\pm}{\sqrt{2} \sigma} \right)^2} = \frac{\sqrt{d_1^\pm(i, j)^2 + d_2^\pm(i, j)^2}}{\sqrt{2} \sigma} = \frac{d^\pm(i, j)}{\sqrt{2} \sigma}
+	\lambda = \sqrt{\left( \frac{d_1^\pm}{\sqrt{2} \sigma} \right)^2 + \left( \frac{d_2^\pm}{\sqrt{2} \sigma} \right)^2} = \frac{\sqrt{d_1^\pm(m, n)^2 + d_2^\pm(m, n)^2}}{\sqrt{2} \sigma} = \frac{d^\pm(m, n)}{\sqrt{2} \sigma}
 \end{equation*}
 
 The cumulative distribution function of the non-central chi distribution with parameter $\lambda$ and two degrees of freedom is $1 - Q_1(\lambda, x)$, where $Q_M(a, b)$ denotes the Marcum $Q$-function, which is defined as
@@ -227,91 +227,16 @@ with modified Bessel function $I_{M-1}$.
 
 Putting this together, we obtain
 \begin{align*}
-	\mathbb{P}(\tilde{d}^\pm(i, j) \leq t \mid d^\pm(i, j) = d) &= \mathbb{P}\left( \sqrt{2} \sigma \sqrt{\left( \frac{X_1}{\sqrt{2} \sigma} \right)^2 + \left( \frac{X_2}{\sqrt{2} \sigma} \right)^2} \leq t \right) \\
+	\mathbb{P}(\tilde{d}^\pm(m, n) \leq t \mid d^\pm(m, n) = d) &= \mathbb{P}\left( \sqrt{2} \sigma \sqrt{\left( \frac{X_1}{\sqrt{2} \sigma} \right)^2 + \left( \frac{X_2}{\sqrt{2} \sigma} \right)^2} \leq t \right) \\
 	&= \mathbb{P}\left( \sqrt{\left( \frac{X_1}{\sqrt{2} \sigma} \right)^2 + \left( \frac{X_2}{\sqrt{2} \sigma} \right)^2} \leq \frac{t}{\sqrt{2} \sigma} \right) \\
 	&= 1 - Q_1 \left( \frac{d}{\sqrt{2} \sigma}, \frac{t}{\sqrt{2} \sigma} \right)
 \end{align*}
 
 For $d = 0$ this simplifies a lot and we get
 \begin{align*}
-	\mathbb{P}(\tilde{d}^\pm(i, j) \leq t \mid d^\pm(i, j) = 0) &= 1 - Q_1 \left( 0, \frac{t}{\sqrt{2} \sigma} \right) \\
+	\mathbb{P}(\tilde{d}^\pm(m, n) \leq t \mid d^\pm(m, n) = 0) &= 1 - Q_1 \left( 0, \frac{t}{\sqrt{2} \sigma} \right) \\
 	&= 1 - \exp \left( - \frac{t^2}{4 \sigma^2} \right)
 \end{align*}
-
-\newpage
-
-For $\mathrm{Re} \ \nu > -1$, $\mathrm{Re} \ \alpha > 0$ we have
-\begin{equation*}
-	\int_0^\infty \exp \left( - \alpha x^2 \right) I_\nu ( \beta x ) dx = \frac{\sqrt{\pi}}{2 \sqrt{\alpha}} \exp \left( \frac{\beta^2}{8 \alpha} \right) I_{\frac{1}{2} \nu} \left( \frac{\beta^2}{8 \alpha} \right)
-\end{equation*}
-
-For $p \neq b$ and $s = \sqrt{p^2 - b^2}$, $u = \sqrt{a (p - s)}$ and $v = \sqrt{a (p + s)}$ we have
-\begin{equation*}
-	\int_0^a \exp(-p x) I_M ( b x ) dx = \frac{1}{s b^M} \left( (p - s)^M ( 1 - Q_M(u, v) ) - (p + s)^M ( 1 - Q_M(v, u) ) \right)
-\end{equation*}
-
-Note, that the Marcum $Q$-Function is only defined for $M \geq 1$. For $M = 1$ this simplifies to
-\begin{equation*}
-	\int_0^a \exp(-p x) I_1 ( b x ) dx = \frac{1}{s b} \left( (p - s) ( 1 - Q_1(u, v) ) - (p + s) ( 1 - Q_1(v, u) ) \right)
-\end{equation*}
-
-We get for fixed $\varepsilon_{i, j}$:
-\begin{align*}
-	&\mathbb{P}(\tilde{d}^\pm(i, j) \leq t \mid d^\pm(i, j) = d) \\
-	&= \mathbb{P}( (c_{bg} + v(i \pm 1, j) + \varepsilon_{i \pm 1, j} - c_{bg} - v(i, j) - \varepsilon_{i, j})^2 \\
-	&+ (c_{bg} + v(i, j \pm 1) + \varepsilon_{i, j \pm 1} - c_{bg} - v(i, j) - \varepsilon_{i, j})^2 \leq t^2 \mid d^\pm(i, j) = d) \\
-	&= \mathbb{P}\left( (d_1^\pm(i, j) + \varepsilon_{i \pm 1, j} - \varepsilon_{i, j})^2 + (d_2^\pm(i, j) + \varepsilon_{i, j \pm 1} - \varepsilon_{i, j})^2 \leq t^2 \right) \\
-	&= \mathbb{P}\left( \sqrt{\left( \frac{X_1}{\sigma} \right)^2 + \left( \frac{X_2}{\sigma} \right)^2} \leq \frac{t}{\sigma} \right)
-\end{align*}
-with
-\begin{align*}
-	X_1 &= d_1^\pm(i, j) + \varepsilon_{i \pm 1, j} - \varepsilon_{i, j} \sim \mathcal{N}(d_1^\pm(i, j) - \varepsilon_{i, j}, \sigma^2) \\
-	X_2 &= d_2^\pm(i, j) + \varepsilon_{i, j \pm 1} - \varepsilon_{i, j} \sim \mathcal{N}(d_2^\pm(i, j) - \varepsilon_{i, j}, \sigma^2)
-\end{align*}
-
-Then we can see, that the square root inside has non-central chi distribution with two degrees of freedom and non-centrality parameter
-\begin{equation*}
-	\lambda = \sqrt{\left( \frac{d_1^\pm - \varepsilon_{i, j}}{\sigma} \right)^2 + \left( \frac{d_2^\pm - \varepsilon_{i, j}}{\sigma} \right)^2} = \frac{\sqrt{(d_1^\pm(i, j) - \varepsilon_{i, j})^2 + (d_2^\pm(i, j) - \varepsilon_{i, j})^2}}{\sigma}
-\end{equation*}
-
-For $d^\pm = 0$ this becomes $\lambda = \frac{\sqrt{2} \abs{\varepsilon_{i, j}}}{\sigma}$ and thus we get
-\begin{equation*}
-	\sqrt{\left( \frac{X_1}{\sigma} \right)^2 + \left( \frac{X_2}{\sigma} \right)^2} \sim \chi_2 \left( \frac{\sqrt{2} \abs{\varepsilon_{i, j}}}{\sigma} \right)
-\end{equation*}
-
-So far we assumed $\varepsilon_{i, j}$ to be fixed, but it actually is a random variable itself with normal distribution: $\varepsilon_{i, j} \sim \mathcal{N}(0, \sigma^2)$. Thus, we have a compound probability distribution:
-\begin{align*}
-	&\mathbb{P}(\tilde{d}^\pm(i, j) \leq t \mid d^\pm(i, j) = 0) \\
-	&= \mathbb{P}\left( \sqrt{\left( \frac{X_1}{\sigma} \right)^2 + \left( \frac{X_2}{\sigma} \right)^2} \leq \frac{t}{\sigma} \right) \\
-	&= \int_0^\frac{t}{\sigma} \int_0^\infty \underbrace{x \exp \left( - \frac{x^2}{2} - \frac{\eta^2}{\sigma^2} \right) I_0 \left( \frac{\sqrt{2} \eta}{\sigma} x \right)}_{\textrm{pdf of} \ \chi_2 \left( \frac{\sqrt{2} \eta}{\sigma} \right) \ \textrm{for fixed} \ \eta} \underbrace{\frac{2}{\sqrt{2 \pi \sigma^2}} \exp \left( - \frac{\eta^2}{2 \sigma^2} \right)}_{\textrm{pdf of absolute value of} \ \mathcal{N}(0, \sigma^2)} d\eta dx \\
-	&= \frac{2}{\sqrt{2 \pi \sigma^2}} \int_0^\frac{t}{\sigma} x \exp \left( - \frac{x^2}{2} \right) \int_0^\infty \exp \left( - \frac{3}{2 \sigma^2} \eta^2 \right) I_0 \left( \frac{\sqrt{2} x}{\sigma} \eta \right) d\eta dx \\
-	&= \frac{2}{\sqrt{2 \pi \sigma^2}} \int_0^\frac{t}{\sigma} x \exp \left( - \frac{x^2}{2} \right) \frac{\sqrt{\pi}}{2 \sqrt{\frac{3}{2 \sigma^2}}} \exp \left( \frac{\frac{2 x^2}{\sigma^2}}{8 \frac{3}{2 \sigma^2}} \right) I_0 \left( \frac{\frac{2 x^2}{\sigma^2}}{8 \frac{3}{2 \sigma^2}} \right) dx \\
-	&= \frac{1}{\sqrt{3}} \int_0^\frac{t}{\sigma} x \exp \left( - \frac{x^2}{2} \right) \exp \left( \frac{x^2}{6} \right) I_0 \left( \frac{x^2}{6} \right) dx \\
-	&= \frac{1}{\sqrt{3}} \int_0^\frac{t}{\sigma} x \exp \left( - \frac{x^2}{3} \right) I_0 \left( \frac{x^2}{6} \right) dx \\
-	&= \frac{1}{\sqrt{3}} \left[ - \frac{3}{2} \exp \left( - \frac{x^2}{3} \right) I_0 \left( \frac{x^2}{6} \right) \right]_0^\frac{t}{\sigma} + \frac{1}{2 \sqrt{3}} \int_0^\frac{t}{\sigma} \exp \left( - \frac{x^2}{3} \right) x I_1 \left( \frac{x^2}{6} \right) dx \\
-	&= \frac{1}{\sqrt{3}} \left( \frac{3}{2} - \frac{3}{2} \exp \left( - \frac{\left( \frac{t}{\sigma} \right)^2}{3} \right) I_0 \left( \frac{\left( \frac{t}{\sigma} \right)^2}{6} \right) \right) + \frac{1}{2 \sqrt{3}} \int_0^\frac{t}{\sigma} \exp \left( - \frac{x^2}{3} \right) x I_1 \left( \frac{x^2}{6} \right) dx \\
-	&\overset{y = x^2}{=} \frac{1}{\sqrt{3}} \left( \frac{3}{2} - \frac{3}{2} \exp \left( - \frac{t^2}{3 \sigma^2} \right) I_0 \left( \frac{t^2}{6 \sigma^2} \right) \right) + \frac{1}{4 \sqrt{3}} \int_0^\frac{t}{\sigma} \exp \left( - \frac{y}{3} \right) I_1 \left( \frac{y}{6} \right) dy \\
-	&= \frac{1}{\sqrt{3}} \left( \frac{3}{2} - \frac{3}{2} \exp \left( - \frac{t^2}{3 \sigma^2} \right) I_0 \left( \frac{t^2}{6 \sigma^2} \right) \right) + \frac{1}{4 \sqrt{3}} \int_0^\frac{t}{\sigma} \exp \left( - \frac{y}{3} \right) I_1 \left( \frac{y}{6} \right) dy \\
-	&= \frac{1}{\sqrt{3}} \left( \frac{3}{2} - \frac{3}{2} \exp \left( - \frac{t^2}{3 \sigma^2} \right) I_0 \left( \frac{t^2}{6 \sigma^2} \right) \right) \\
-	&+ \frac{1}{4 \sqrt{3}} \frac{1}{\frac{1}{2 \sqrt{3}} \frac{1}{6}} \frac{2 - \sqrt{3}}{6} \left( 1 - Q_1 \left( \frac{2 - \sqrt{3}}{6} \sqrt{\frac{t}{\sigma}}, \frac{2 + \sqrt{3}}{6} \sqrt{\frac{t}{\sigma}} \right) \right) \\
-	&- \frac{1}{4 \sqrt{3}} \frac{1}{\frac{1}{2 \sqrt{3}} \frac{1}{6}} \frac{2 + \sqrt{3}}{6} \left( 1 - Q_1 \left( \frac{2 + \sqrt{3}}{6} \sqrt{\frac{t}{\sigma}}, \frac{2 - \sqrt{3}}{6} \sqrt{\frac{t}{\sigma}} \right) \right) \\
-	&= \frac{1}{\sqrt{3}} \left( \frac{3}{2} - \frac{3}{2} \exp \left( - \frac{t^2}{3 \sigma^2} \right) I_0 \left( \frac{t^2}{6 \sigma^2} \right) \right) - \sqrt{3} \\
-	&- \frac{2 - \sqrt{3}}{2} Q_1 \left( \frac{2 - \sqrt{3}}{6} \sqrt{\frac{t}{\sigma}}, \frac{2 + \sqrt{3}}{6} \sqrt{\frac{t}{\sigma}} \right) \\
-	&+ \frac{2 + \sqrt{3}}{2} Q_1 \left( \frac{2 + \sqrt{3}}{6} \sqrt{\frac{t}{\sigma}}, \frac{2 - \sqrt{3}}{6} \sqrt{\frac{t}{\sigma}} \right) \\
-\end{align*}
-
-
-
-
-
-
-
-
-
-
-
-
-\newpage
 
 \subsubsection{Statistical significance}
 
@@ -322,7 +247,7 @@ We aim to use the law of total probability in the following way. Let $B_n$ be a 
 	&= \sum_n \mathbb{P}(B_n \mid B) \cdot \mathbb{P}(A \mid B_n, B)
 \end{align*}
 
-We use $T = \tilde{d}(i, j) = \min \{ \tilde{d}^+(i, j), \tilde{d}^-(i, j) \}$ as our test statistic. Dropping $(i, j)$ in every term for readability, we get
+We use $T = \tilde{d}(m, n) = \min \{ \tilde{d}^+(m, n), \tilde{d}^-(m, n) \}$ as our test statistic. Dropping $(m, n)$ in every term for readability, we get
 \begin{align*}
 	&\mathbb{P}(T \geq t \mid H_0) \\
 	&= \sum_{(d_1, d_2) \in \mathcal{D}_0} \mathbb{P}(d^+ = d_1, d^- = d_2 \mid H_0) \cdot \mathbb{P}(T \geq t \mid d^+ = d_1, d^- = d_2, H_0) \\
@@ -424,8 +349,8 @@ To define opening and closing, we first need to define erosion and dilation of b
 
 This can be rewritten in a more implementation-friendly form:
 \begin{align*}
-	(A \ominus_b B)_{(i, j)} &= \underset{m, n}{\mathrm{AND}} \left( \mathrm{OR} (A_{(i + m, j + n)}, (1 - B)_{(i, j)}) \right) \\
-	(A \oplus_b B)_{(i, j)} &= \underset{m, n}{\mathrm{OR}} \left( \mathrm{AND} (A_{(i - m, j - n)}, B_{(i, j)}) \right)
+	(A \ominus_b B)_{(i, j)} &= \underset{m, n}{\mathrm{AND}} \left( \mathrm{OR} (A_{(i + m, j + n)}, (1 - B)_{(m, n)}) \right) \\
+	(A \oplus_b B)_{(i, j)} &= \underset{m, n}{\mathrm{OR}} \left( \mathrm{AND} (A_{(i - m, j - n)}, B_{(m, n)}) \right)
 \end{align*}
 
 Where $m, n$ go through the indices, where $B = 1$. Now we can define binary opening and closing.
@@ -448,9 +373,9 @@ Where $m, n$ go through the indices, where $B = 1$. Now we can define binary ope
 From now on, we assume $B$ to be a square of ones centered around our current pixel. Using the notation from above we can take a closer look at what opening really does. We have
 \begin{align*}
 	(A \circ B)_{(i, j)} &= ((A \ominus B) \oplus B)_{(i, j)} \\
-	&= \left( \underset{m, n}{\mathrm{AND}} \left( \mathrm{OR} (A_{(i + m, j + n)}, \underbrace{(1 - B)_{(i, j)}}_{= 0} ) \right) \right) \oplus B \\
+	&= \left( \underset{m, n}{\mathrm{AND}} \left( \mathrm{OR} (A_{(i + m, j + n)}, \underbrace{(1 - B)_{(m, n)}}_{= 0} ) \right) \right) \oplus B \\
 	&= \left( \underset{m, n}{\mathrm{AND}} ( A_{(i + m, j + n)} ) \right) \oplus B \\
-	&= \underset{\tilde{m}, \tilde{n}}{\mathrm{OR}} \left( \mathrm{AND} \left( \underset{m, n}{\mathrm{AND}} ( A_{(i + m - \tilde{m}, j + n - \tilde{n})} ), \underbrace{B_{(i, j)}}_{= 1} \right) \right) \\
+	&= \underset{\tilde{m}, \tilde{n}}{\mathrm{OR}} \left( \mathrm{AND} \left( \underset{m, n}{\mathrm{AND}} ( A_{(i + m - \tilde{m}, j + n - \tilde{n})} ), \underbrace{B_{(m, n)}}_{= 1} \right) \right) \\
 	&= \underset{\tilde{m}, \tilde{n}}{\mathrm{OR}} \left( \underset{m, n}{\mathrm{AND}} ( A_{(i + m - \tilde{m}, j + n - \tilde{n})} ) \right)
 \end{align*}
 
@@ -498,9 +423,9 @@ We will now take a look at the effect of opening on the significance level.
 In a similar way as above, we can also see, what closing does. We have
 \begin{align*}
 	(A \bullet B)_{(i, j)} &= ((A \oplus B) \ominus B)_{(i, j)} \\
-	&= \left( \underset{m, n}{\mathrm{OR}} \left( \mathrm{AND} (A_{(i - m, j - n)}, \underbrace{B_{(i, j)}}_{= 1} ) \right) \right) \ominus B \\
+	&= \left( \underset{m, n}{\mathrm{OR}} \left( \mathrm{AND} (A_{(i - m, j - n)}, \underbrace{B_{(m, n)}}_{= 1} ) \right) \right) \ominus B \\
 	&= \left( \underset{m, n}{\mathrm{OR}} ( A_{(i - m, j - n)} ) \right) \ominus B \\
-	&= \underset{\tilde{m}, \tilde{n}}{\mathrm{AND}} \left( \mathrm{OR} \left( \underset{m, n}{\mathrm{OR}} ( A_{(i - m + \tilde{m}, j - n + \tilde{n})} ), \underbrace{(1 - B)_{(i, j)}}_{= 0} \right) \right) \\
+	&= \underset{\tilde{m}, \tilde{n}}{\mathrm{AND}} \left( \mathrm{OR} \left( \underset{m, n}{\mathrm{OR}} ( A_{(i - m + \tilde{m}, j - n + \tilde{n})} ), \underbrace{(1 - B)_{(m, n)}}_{= 0} \right) \right) \\
 	&= \underset{\tilde{m}, \tilde{n}}{\mathrm{AND}} \left( \underset{m, n}{\mathrm{OR}} ( A_{(i - m + \tilde{m}, j - n + \tilde{n})} ) \right)
 \end{align*}
 
@@ -559,9 +484,9 @@ The other two procedures control the family-wise error rate at level $\alpha$, i
 	FWER = \mathbb{P}( V \geq 1 ) \leq \alpha
 \end{equation}
 
-First, we calculate for every pixel $(i, j) \in G$ the $p$-value
+First, we calculate for every pixel $(m, n) \in G$ the $p$-value
 \begin{equation}
-	p(i, j) = \exp \left( - \frac{\tilde{d}(i, j)^2}{4 \sigma^2} \right) \geq \mathbb{P}(T \geq \tilde{d}(i, j) \mid H_0)
+	p(m, n) = \exp \left( - \frac{\tilde{d}(m, n)^2}{4 \sigma^2} \right) \geq \mathbb{P}(T \geq \tilde{d}(m, n) \mid H_0)
 \end{equation}
 
 \subsection{FDR Thresholding}
@@ -587,7 +512,7 @@ First, we calculate for every pixel $(i, j) \in G$ the $p$-value
 \begin{remark}
 	All these methods are defined for actual $p$-values, i.e.
 	\begin{equation*}
-		p(i, j) = \mathbb{P}(T \geq \tilde{d}(i, j) \mid H_0)
+		p(m, n) = \mathbb{P}(T \geq \tilde{d}(m, n) \mid H_0)
 	\end{equation*}
 	In contrast to that, we have taken upper bounds for the $p$-values. This is not an issue though, since by taking upper bounds we might decrease the number of hypotheses we reject. Thus it will not increase the error rate.
 \end{remark}
@@ -595,8 +520,8 @@ First, we calculate for every pixel $(i, j) \in G$ the $p$-value
 \begin{remark}
 	The threshold has the following interpretation:
 	\begin{itemize}
-		\item If $\tilde{d}(i, j) \geq \lambda_{k}$, then $(i, j)$ is part of the ROI.
-		\item If $\tilde{d}(i, j) < \lambda_{k}$, then $(i, j)$ is NOT part of the ROI.
+		\item If $\tilde{d}(m, n) \geq \lambda_{k}$, then $(m, n)$ is part of the ROI.
+		\item If $\tilde{d}(m, n) < \lambda_{k}$, then $(m, n)$ is NOT part of the ROI.
 	\end{itemize}
 \end{remark}
 
