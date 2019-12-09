@@ -100,139 +100,138 @@
 	\end{beamercolorbox}
 \end{frame}
 
-\begin{frame}
-	\begin{beamercolorbox}[sep=8pt,center,shadow=true,rounded=true]{title}
-		Observation: If a pixel is background, its top and left neighbour pixels or bottom and right neighbour pixels are background as well.
-	\end{beamercolorbox}
-\end{frame}
-
-\subsubsection{Preparations}
+\subsubsection{The statistical test}
 
 \begin{frame}
-	For each pair $(i, j) \in G$ we define four non-observable values
+	For each pixel $(i, j) \in G$ we define four non-observable and four observable values
 	\begin{align*}
 		d_1^\pm(i, j) &= v(i \pm 1, j) - v(i, j) \\
-		d_2^\pm(i, j) &= v(i, j \pm 1) - v(i, j)
-	\end{align*}
-	and combine them to two new values
-	\begin{equation*}\label{d}
-		d^\pm(i, j) = \sqrt{(v(i \pm 1, j) - v(i, j))^2 + (v(i, j \pm 1) - v(i, j))^2}
-	\end{equation*}
-\end{frame}
-
-\begin{frame}
-	The definition of $d^\pm(i, j)$ helps us define the null hypothesis:
-	\begin{equation*}
-		H_0 : \min\{ d^+(i, j), d^-(i, j) \} = 0
-	\end{equation*}
-	Since by definition $d^\pm(i, j) \geq 0$, our alternative hypothesis becomes
-	\begin{equation*}
-		H_1 : \min\{ d^+(i, j), d^-(i, j) \} > 0
-	\end{equation*}
-\end{frame}
-
-\begin{frame}
-	We also define four observable values
-	\begin{align*}
+		d_2^\pm(i, j) &= v(i, j \pm 1) - v(i, j) \\
 		\tilde{d}^\pm_1(i, j) &= f(i \pm 1, j) - f(i, j) \\
 		\tilde{d}^\pm_2(i, j) &= f(i, j \pm 1) - f(i, j)
 	\end{align*}
-	and combine them to
-	\begin{equation*}\label{d_tilde}
-		\tilde{d}^\pm(i, j) = \sqrt{\tilde{d}_1^\pm(i, j)^2 + \tilde{d}_2^\pm(i, j)^2}
-	\end{equation*}
-	
-	We use $T = \min \{ \tilde{d}^+(i, j), \tilde{d}^-(i, j) \}$ as our test statistic.
-\end{frame}
-
-\subsubsection{Distribution of $\mathbb{P}(\tilde{d}^\pm(i, j) \leq t \mid d^\pm(i, j) = d)$}
-
-\begin{frame}
-	Since $v$ only takes values in $\{ 0, -c, c \}$, $d^\pm$ also can only attain values in
-	\begin{equation*}
-		\mathcal{D} = \{ 0, c, 2 c, \sqrt{2} c, \sqrt{5} c, \sqrt{8} c \}
-	\end{equation*}
-	
-	We want to determine the distribution of $\tilde{d}^\pm(i, j)$ conditioned on $d^\pm(i, j) = d$ for some $d \in \mathcal{D}$.
-\end{frame}
-
-\begin{frame}
-	We get
-	\begin{equation*}
-		\mathbb{P}(\tilde{d}^\pm(i, j) \leq t \mid d^\pm(i, j) = d) = \mathbb{P}\left( \sqrt{2} \sigma \sqrt{\left( \frac{X_1}{\sqrt{2} \sigma} \right)^2 + \left( \frac{X_2}{\sqrt{2} \sigma} \right)^2} \leq t \right)
-	\end{equation*}
-	with
-	\begin{align*}
-		X_1 &= d_1^\pm(i, j) + \varepsilon_{m \pm 1, n} - \varepsilon_{m, n} \sim \mathcal{N}(d_1^\pm(i, j), 2 \sigma^2) \\
-		X_2 &= d_2^\pm(i, j) + \varepsilon_{m, n \pm 1} - \varepsilon_{m, n} \sim \mathcal{N}(d_2^\pm(i, j), 2 \sigma^2)
+	and combine them to new values
+	\begin{align*}\label{d}
+		d^\pm(i, j) &= \sqrt{d_1^\pm(i, j)^2 + d_2^\pm(i, j)^2} \\
+		\tilde{d}^\pm(i, j) &= \sqrt{\tilde{d}_1^\pm(i, j)^2 + \tilde{d}_2^\pm(i, j)^2}
 	\end{align*}
 \end{frame}
 
 \begin{frame}
-	Using the cumulative distribution function of the non-central chi distribution, we obtain
-	\begin{align*}
-		\mathbb{P}(\tilde{d}^\pm(i, j) \leq t \mid d^\pm(i, j) = d) &= \mathbb{P}\left( \sqrt{\left( \frac{X_1}{\sqrt{2} \sigma} \right)^2 + \left( \frac{X_2}{\sqrt{2} \sigma} \right)^2} \leq \frac{t}{\sqrt{2} \sigma} \right) \\
-		&= 1 - Q_1 \left( \frac{d}{\sqrt{2} \sigma}, \frac{t}{\sqrt{2} \sigma} \right)
-	\end{align*}
-	
-	For $d = 0$ this simplifies a lot and we get
-	\begin{equation*}
-		\mathbb{P}(\tilde{d}^\pm(i, j) \leq t \mid d^\pm(i, j) = 0) = 1 - \exp \left( - \frac{t^2}{4 \sigma^2} \right)
-	\end{equation*}
+	\begin{figure}
+		\includegraphics[width=0.6\linewidth]{Testing/TestStatistic}
+		\caption[Test Statistic]{Pixel $(i, j)$ with its neigbour pixels. The blue neighbours are used to calculate $\tilde{d}^+(i, j)$ and the red neighbours are used to calculate $\tilde{d}^-(i, j)$.}
+		\label{fig:TestStatistic}
+	\end{figure}
+\end{frame}
+
+\begin{frame}
+	We now test the null hypothesis $$H_0 : \min\{ d^+(i, j), d^-(i, j) \} = 0$$ against the alternative hypothesis $$H_1 : \min\{ d^+(i, j), d^-(i, j) \} > 0$$ using the test statistic $$T = \min \{ \tilde{d}^+(i, j), \tilde{d}^-(i, j) \}$$
 \end{frame}
 
 \subsubsection{Statistical significance}
 
 \begin{frame}
-	Using this, we get an upper bound for the probability of a type I error:
+	\begin{beamercolorbox}[sep=8pt,center,shadow=true,rounded=true]{title}
+		Question: How do we ensure a given statistical significance?
+	\end{beamercolorbox}
+\end{frame}
+
+\begin{frame}
+	We observe that
 	\begin{equation*}
-		\mathbb{P}(T \geq t \mid H_0) \leq \exp \left( - \frac{t^2}{4 \sigma^2} \right)
+		\mathbb{P}(T \geq t \mid H_0) \leq \mathbb{P}(\tilde{d}^\pm(i, j) \geq t \mid d^\pm(i, j) = 0)
 	\end{equation*}
+	Thus, if we can find a threshold $t_\alpha$, s.t. $\mathbb{P}(\tilde{d}^\pm(i, j) \geq t_\alpha \mid d^\pm(i, j) = 0) \leq \alpha$ for a given $\alpha$, we have ensured a statistical significance of $\alpha$.
+\end{frame}
+
+\begin{frame}
+	Let $\varepsilon_{i, j}$ be fixed. Then
+	\begin{align*}
+		&\mathbb{P}(\tilde{d}^\pm(i, j) \leq t \mid d^\pm(i, j) = 0) \\
+		&= \mathbb{P}\left( (\varepsilon_{i \pm 1, j} - \varepsilon_{i, j})^2 + (\varepsilon_{i, j \pm 1} - \varepsilon_{i, j})^2 \leq t^2 \right) \\
+		&= \mathbb{P}\left( \sqrt{\left( \frac{X_1}{\sigma} \right)^2 + \left( \frac{X_2}{\sigma} \right)^2} \leq \frac{t}{\sigma} \right)
+	\end{align*}
+	with
+	\begin{align*}
+		X_1 &= \varepsilon_{i \pm 1, j} - \varepsilon_{i, j} \sim \mathcal{N}(- \varepsilon_{i, j}, \sigma^2) \\
+		X_2 &= \varepsilon_{i, j \pm 1} - \varepsilon_{i, j} \sim \mathcal{N}(- \varepsilon_{i, j}, \sigma^2)
+	\end{align*}
 	
-	By taking $t = 2 \sigma \sqrt{- \log(\alpha)}$ we thus can assure a statistical significance of $\alpha$.
+	Then we can see, that the square root inside has non-central chi distribution with two degrees of freedom and non-centrality parameter
+	\begin{equation*}
+		\lambda = \frac{\sqrt{2} \abs{\varepsilon_{i, j}}}{\sigma}
+	\end{equation*}
+\end{frame}
+
+\begin{frame}
+	So far we assumed $\varepsilon_{i, j}$ to be fixed, but it actually is a random variable itself with normal distribution: $\varepsilon_{i, j} \sim \mathcal{N}(0, \sigma^2)$. Thus, we have a compound probability distribution:
+	\begin{align*}
+		&\mathbb{P}(\tilde{d}^\pm(i, j) \leq t \mid d^\pm(i, j) = 0) \\
+		&= \int_0^\frac{t}{\sigma} \int_0^\infty \underbrace{x \exp \left( - \frac{x^2}{2} - \frac{\eta^2}{\sigma^2} \right) I_0 \left( \frac{\sqrt{2} \eta}{\sigma} x \right)}_{\textrm{pdf of} \ \chi_2 \left( \frac{\sqrt{2} \eta}{\sigma} \right) \ \textrm{for fixed} \ \eta} \underbrace{\frac{2}{\sqrt{2 \pi \sigma^2}} \exp \left( - \frac{\eta^2}{2 \sigma^2} \right)}_{\textrm{pdf of absolute value of} \ \mathcal{N}(0, \sigma^2)} d\eta dx \\
+		&= \frac{1}{\sqrt{3}} \left( \frac{3}{2} - \frac{3}{2} \exp \left( - \frac{t^2}{3 \sigma^2} \right) I_0 \left( \frac{t^2}{6 \sigma^2} \right) \right) - \sqrt{3} \\
+		&- \frac{2 - \sqrt{3}}{2} Q_1 \left( \frac{2 - \sqrt{3}}{6} \sqrt{\frac{t}{\sigma}}, \frac{2 + \sqrt{3}}{6} \sqrt{\frac{t}{\sigma}} \right) \\
+		&+ \frac{2 + \sqrt{3}}{2} Q_1 \left( \frac{2 + \sqrt{3}}{6} \sqrt{\frac{t}{\sigma}}, \frac{2 - \sqrt{3}}{6} \sqrt{\frac{t}{\sigma}} \right)
+	\end{align*}
+\end{frame}
+
+\begin{frame}
+	With an easy program the threshold for a given $\alpha$ can be calculated. As can be seen from the CDF, it is enough to calculate the threshold $t_\alpha$ for $\sigma = 1$ and multiply the outcome by $\sigma$.
+	\begin{figure}
+		\includegraphics[width=0.6\linewidth]{Testing/CDF}
+		\caption[CDF]{Cumulative distribution function of $\mathbb{P}(\tilde{d}^\pm(i, j) \leq t \mid d^\pm(i, j) = 0)$ with thresholds for $\alpha = 0.05$ and $\alpha = 0.01$. ($t_{0.05} = 3.2554$, $t_{0.01} = 4.2791$, $\sigma = 1$)}
+		\label{fig:CDF}
+	\end{figure}
 \end{frame}
 
 \subsubsection{Power of the test}
 
 \begin{frame}
-	We are also interested in bounds for the probability of a type II error.
+	We are also interested in bounds for the power of this test.
 	
-	Using results and notations from the previous sections, we get the lower bound
+	Using results and notations from the previous sections, we get the upper bound
 	\begin{equation*}
-		\beta = \mathbb{P}(T \leq t \mid H_1) \geq 1 - Q_1 \left( \frac{2 c}{\sigma}, \frac{t}{\sqrt{2} \sigma} \right)
+		1 - \beta = \mathbb{P}(T \geq t \mid H_1) \leq \mathbb{P}(\tilde{d}^+ \geq t \mid d^+ = \sqrt{8} c)
 	\end{equation*}
 	
-	On the other hand, we get the upper bound
+	On the other hand, we get the lower bound
 	\begin{equation*}
-		\beta = \mathbb{P}(T \leq t \mid H_1) \leq 2 \cdot \left( 1 - Q_1 \left( \frac{c}{\sqrt{2} \sigma}, \frac{t}{\sqrt{2} \sigma} \right) \right)
+		1 - \beta = \mathbb{P}(T \geq t \mid H_1) \geq 1 - 2 \cdot \mathbb{P}(\tilde{d}^+ \leq t \mid d^+ = c)
 	\end{equation*}
 	
 	Thus we can conclude, that
 	\begin{equation*}
-		\beta \in \left[ 1 - Q_1 \left( \frac{2 c}{\sigma}, \frac{t}{\sqrt{2} \sigma} \right), \min \left\{ 2 \cdot \left( 1 - Q_1 \left( \frac{c}{\sqrt{2} \sigma}, \frac{t}{\sqrt{2} \sigma} \right) \right), 1 \right\} \right]
+		1 - \beta \in \left[ \max \left\{ 1 - 2 \cdot \mathbb{P}(\tilde{d}^+ \leq t \mid d^+ = c), 0 \right\}, \mathbb{P}(\tilde{d}^+ \geq t \mid d^+ = \sqrt{8} c) \right]
 	\end{equation*}
 \end{frame}
 
 \subsubsection{Numerical results}
 
 \begin{frame}
-	In the case of a grayscale image, we assume $c = 127.5$. For $t = 2 \sigma \sqrt{- \log(\alpha)}$ and $\alpha = 0.05$ we get the following bounds dependent on the standard deviation $\sigma$.
+	In the case of a grayscale image, we assume $c = 127.5$. For $t_{0.05} = 3.2554$ and $10.000.000$ simulations of the noise terms, we get the following empirical bounds dependent on the standard deviation $\sigma$.
 	
 	\begin{figure}[h]
-		\includegraphics[width=0.6\linewidth]{Testing/Power_Bounds}
-		\caption[Power bounds]{For $\alpha = 0.05$ this graph shows the lower and upper bounds for the power of the test for $\sigma \in \{ 1, 2, \dots, 150 \}$.}
-		\label{fig:powerbounds}
+		\includegraphics[width=0.6\linewidth]{Testing/SimulatedPower}
+		\caption[Simulated power bounds]{For $\alpha = 0.05$ this graph shows the lower and upper bounds for the power of the test for $\sigma \in \{ 1, 2, \dots, 150 \}$.}
+		\label{fig:SimulatedPowerBounds}
 	\end{figure}
 \end{frame}
 
 \begin{frame}
-	\begin{itemize}
-		\item No type II errors for $\sigma \in \{ 1, 2, \dots, 8 \}$.
-		\item Until $\sigma = 21$ the probability of a type II error stays below $\alpha = 0.05$.
-		\item Starting at $\sigma = 41$ we can only use the trivial upper bound, i.e. $1$.
-		\item The lower bound stays at $0$ until $\sigma = 23$.
-		\item At $\sigma = 115$ the lower bound becomes bigger than $0.5$.
-	\end{itemize}
+	Since $d^\pm$ is the sum of dependent squared normal distributed random variables, it is not a simple Chi distributed random variable. If it were, we would get
+	\begin{equation*}
+		1 - \beta \in \left[ \max \left\{ 1 - 2 \cdot \left( 1 - Q_1 \left( \frac{c_{bg}}{\sqrt{2} \sigma}, \frac{t}{\sqrt{2} \sigma} \right) \right), 0 \right\}, Q_1 \left( \frac{2 c_{bg}}{\sigma}, \frac{t}{\sqrt{2} \sigma} \right) \right]
+	\end{equation*}
+\end{frame}
+
+\begin{frame}
+	In the independent case we would take $t = 2 \sigma \sqrt{- \log(\alpha)}$ and get the following bounds for the power dependet on $\sigma$. It is remarkable, how similar these bounds are to the empirical bounds.
+	
+	\begin{figure}[h]
+		\includegraphics[width=0.6\linewidth]{Testing/TheoreticalPower}
+		\caption[Theoretical power bounds]{For $\alpha = 0.05$ this graph shows the lower and upper bounds for the power of the test for $\sigma \in \{ 1, 2, \dots, 150 \}$, if the terms of $\tilde{d}^\pm$ were independent.}
+		\label{fig:TheoreticalPowerBounds}
+	\end{figure}
 \end{frame}
 
 \section{Morphological operations}
@@ -240,40 +239,8 @@
 \subsection{Opening and closing}
 
 \begin{frame}
-	We start by defining erosion and dilation of binary images.
+	Reminder: We always consider structuring elements with odd side length.
 	
-	\begin{definition}
-		Let $A, B \subseteq \mathbb{R}^m$. The binary erosion of $A$ by $B$ is defined as
-		\begin{equation*}
-			A \ominus_b B = \left\{ x \in \mathbb{R}^m \mid x + b \in A \; \mathrm{for \; every} \; b \in B \right\}
-		\end{equation*}
-	\end{definition}
-	\begin{definition}
-		Let $A, B \subseteq \mathbb{R}^m$. The binary dilation of $A$ by $B$ is defined as
-		\begin{equation*}
-			A \oplus_b B = \left\{ c \in \mathbb{R}^m \mid c = a + b \; \mathrm{for \; some} \; a \in A \; \mathrm{and} \; b \in B \right\}
-		\end{equation*}
-	\end{definition}
-\end{frame}
-
-\begin{frame}
-	Now we can define binary opening and closing.
-	
-	\begin{definition}
-		The opening of an image $A$ by a structuring element $B$ is defined as
-		\begin{equation*}
-			A \circ B = (A \ominus B) \oplus B
-		\end{equation*}
-	\end{definition}
-	\begin{definition}
-		The closing of an image $A$ by a structuring element $B$ is defined as
-		\begin{equation*}
-			A \bullet B = (A \oplus B) \ominus B
-		\end{equation*}
-	\end{definition}
-\end{frame}
-
-\begin{frame}
 	\begin{figure}[h]
 		\includegraphics[width=0.6\linewidth]{Morphology/StructuringElement}
 		\caption[Structuring Element]{A $3 \times 3$ structuring element.}
@@ -306,6 +273,14 @@
 \end{frame}
 
 \begin{frame}
+	\begin{figure}[h]
+		\includegraphics[width=0.6\linewidth]{Morphology/IndependentPoints}
+		\caption[Independent points]{If we consider only every second pixel in the column, these will be independent.}
+		\label{fig:IndependentPoints}
+	\end{figure}
+\end{frame}
+
+\begin{frame}
 	We will now take a look at the effect of opening on the significance level.
 	
 	\begin{theorem}
@@ -313,11 +288,11 @@
 		\begin{equation*}
 			\mathbb{P}(f_{bin}(i, j) = 1 \mid H_0(i, j)) \leq \alpha
 		\end{equation*}
-		where $H_0(i, j)$ denotes the null hypothesis for the pixel $(i, j)$, which is, that it is a background pixel and thus should be set to zero.
+		where $H_0(i, j)$ denotes the null hypothesis for the pixel $(i, j)$.
 		
 		Let $k \in \mathbb{N}$ be odd and $B$ be a square structuring element with side length $k$. Then the following inequality holds:
 		\begin{equation*}
-			\mathbb{P}((f_{bin} \circ B)(i, j) = 1 \mid H_0(i, j)) \leq k^2 \alpha^k
+			\mathbb{P}((f_{bin} \circ B)(i, j) = 1 \mid H_0(i, j)) \leq k^2 \alpha^\frac{k - 1}{2}
 		\end{equation*}
 	\end{theorem}
 \end{frame}
