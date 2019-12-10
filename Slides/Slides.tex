@@ -61,18 +61,18 @@
 \subsection{The statistical model}
 
 \begin{frame}
-	Let $M, N \in \mathbb{N}$ and $G = \left\{ 0, \dots, M-1 \right\} \times  \left\{ 0, \dots, N-1 \right\}$. Assume we are given data
-	\begin{equation*}\label{f}
-		f(i, j) = c + v(i, j) + \varepsilon_{i, j}
+	Let $M, N \in \mathbb{N}$ and $\Omega = \left\{ 0, \dots, M-1 \right\} \times  \left\{ 0, \dots, N-1 \right\}$. Assume we are given data
+	\begin{equation*}\label{model}
+		F(i, j) = c + V(i, j) + \varepsilon_{i, j}
 	\end{equation*}
 	\begin{itemize}
-		\item $(i, j) \in G$
+		\item $(i, j) \in \Omega$
 		\item $c \in \mathbb{R}$ is constant
-		\item $v: G \to \{ 0, \pm c \}$
+		\item $V(i, j) \in \{ 0, \pm c \}$
 		\item $\varepsilon_{m, n} \sim \mathcal{N}(0, \sigma^2)$ i.i.d. normal distributed random variables
 	\end{itemize}
 	
-	Assumption 1: The image $f$ contains a rectangular region of interest.
+	Assumption 1: The image $F$ contains a rectangular region of interest.
 	Assumption 2: The ROI has a checkerboard pattern.
 \end{frame}
 
@@ -103,72 +103,83 @@
 \subsubsection{The statistical test}
 
 \begin{frame}
-	For each pixel $(i, j) \in G$ we define four non-observable and four observable values
+	For each pixel $(i, j) \in \Omega$ we define four non-observable and four observable values
 	\begin{align*}
-		d_1^\pm(i, j) &= v(i \pm 1, j) - v(i, j) \\
-		d_2^\pm(i, j) &= v(i, j \pm 1) - v(i, j) \\
-		\tilde{d}^\pm_1(i, j) &= f(i \pm 1, j) - f(i, j) \\
-		\tilde{d}^\pm_2(i, j) &= f(i, j \pm 1) - f(i, j)
+		\textrm{non-observable}
+		&\begin{cases}
+			D_1^\pm(i, j) = V(i \pm 1, j) - V(i, j) \\
+			D_2^\pm(i, j) = V(i, j \pm 1) - V(i, j) \\
+		\end{cases} \\
+		\textrm{observable}
+		&\begin{cases}
+			\tilde{D}_1^\pm(i, j) = F(i \pm 1, j) - F(i, j) \\
+			\tilde{D}_2^\pm(i, j) = F(i, j \pm 1) - F(i, j)
+		\end{cases}
 	\end{align*}
 	and combine them to new values
 	\begin{align*}\label{d}
-		d^\pm(i, j) &= \sqrt{d_1^\pm(i, j)^2 + d_2^\pm(i, j)^2} \\
-		\tilde{d}^\pm(i, j) &= \sqrt{\tilde{d}_1^\pm(i, j)^2 + \tilde{d}_2^\pm(i, j)^2}
+		D^\pm(i, j) &= \sqrt{D_1^\pm(i, j)^2 + D_2^\pm(i, j)^2} \\
+		\tilde{D}^\pm(i, j) &= \sqrt{\tilde{D}_1^\pm(i, j)^2 + \tilde{D}_2^\pm(i, j)^2}
 	\end{align*}
 \end{frame}
 
 \begin{frame}
 	\begin{figure}
 		\includegraphics[width=0.6\linewidth]{Testing/TestStatistic}
-		\caption[Test Statistic]{Pixel $(i, j)$ with its neigbour pixels. The blue neighbours are used to calculate $\tilde{d}^+(i, j)$ and the red neighbours are used to calculate $\tilde{d}^-(i, j)$.}
+		\caption[Test Statistic]{Pixel $(i, j)$ with its neigbour pixels. The blue neighbours are used to calculate $\tilde{D}^+(i, j)$ and the red neighbours are used to calculate $\tilde{D}^-(i, j)$. The purple pixel is used for both $\tilde{D}^+(i, j)$ and $\tilde{D}^-(i, j)$.}
 		\label{fig:TestStatistic}
 	\end{figure}
 \end{frame}
 
 \begin{frame}
-	We now test the null hypothesis $$H_0 : \min\{ d^+(i, j), d^-(i, j) \} = 0$$ against the alternative hypothesis $$H_1 : \min\{ d^+(i, j), d^-(i, j) \} > 0$$ using the test statistic $$T = \min \{ \tilde{d}^+(i, j), \tilde{d}^-(i, j) \}$$
+	We now test the null hypothesis $$H_0 : \min\{ D^+(i, j), D^-(i, j) \} = 0$$ against the alternative hypothesis $$H_1 : \min\{ D^+(i, j), D^-(i, j) \} > 0$$ using the test statistic $$T = \min \{ \tilde{D}^+(i, j), \tilde{D}^-(i, j) \}$$
 \end{frame}
 
 \subsubsection{Statistical significance}
 
 \begin{frame}
 	\begin{beamercolorbox}[sep=8pt,center,shadow=true,rounded=true]{title}
-		Question: How do we ensure a given statistical significance?
+		Question: How do we determine the distribution of the test statistic $T$ under the null hypothesis $H_0$?
 	\end{beamercolorbox}
 \end{frame}
 
 \begin{frame}
 	We observe that
 	\begin{equation*}
-		\mathbb{P}(T \geq t \mid H_0) \leq \mathbb{P}(\tilde{d}^\pm(i, j) \geq t \mid d^\pm(i, j) = 0)
+		\mathbb{P}(T \geq t \mid H_0) \leq \mathbb{P}(\tilde{D}^\pm(i, j) \geq t \mid D^\pm(i, j) = 0)
 	\end{equation*}
-	Thus, if we can find a threshold $t_\alpha$, s.t. $\mathbb{P}(\tilde{d}^\pm(i, j) \geq t_\alpha \mid d^\pm(i, j) = 0) \leq \alpha$ for a given $\alpha$, we have ensured a statistical significance of $\alpha$.
+	Thus, if we can find a threshold $t_\alpha$, s.t.
+	\begin{equation*}
+		\mathbb{P}(\tilde{D}^\pm(i, j) \geq t_\alpha \mid D^\pm(i, j) = 0) \leq \alpha
+	\end{equation*}
+	for a given $\alpha$, we have ensured a statistical significance of $\alpha$.
 \end{frame}
 
 \begin{frame}
 	Let $\varepsilon_{i, j}$ be fixed. Then
 	\begin{align*}
-		&\mathbb{P}(\tilde{d}^\pm(i, j) \leq t \mid d^\pm(i, j) = 0) \\
+		&\mathbb{P}(\tilde{D}^\pm(i, j) \leq t \mid D^\pm(i, j) = 0) \\
 		&= \mathbb{P}\left( (\varepsilon_{i \pm 1, j} - \varepsilon_{i, j})^2 + (\varepsilon_{i, j \pm 1} - \varepsilon_{i, j})^2 \leq t^2 \right) \\
 		&= \mathbb{P}\left( \sqrt{\left( \frac{X_1}{\sigma} \right)^2 + \left( \frac{X_2}{\sigma} \right)^2} \leq \frac{t}{\sigma} \right)
 	\end{align*}
-	with
+	with $X_1 = \varepsilon_{i \pm 1, j} - \varepsilon_{i, j}$, $X_2 = \varepsilon_{i, j \pm 1} - \varepsilon_{i, j}$ and $Y = \varepsilon_{i, j}$. Then
 	\begin{align*}
-		X_1 &= \varepsilon_{i \pm 1, j} - \varepsilon_{i, j} \sim \mathcal{N}(- \varepsilon_{i, j}, \sigma^2) \\
-		X_2 &= \varepsilon_{i, j \pm 1} - \varepsilon_{i, j} \sim \mathcal{N}(- \varepsilon_{i, j}, \sigma^2)
+		X_1 &\sim \mathcal{N}(- Y, \sigma^2) \\
+		X_2 &\sim \mathcal{N}(- Y, \sigma^2) \\
+		Y &\sim \mathcal{N}(0, \sigma^2)
 	\end{align*}
 	
 	Then we can see, that the square root inside has non-central chi distribution with two degrees of freedom and non-centrality parameter
 	\begin{equation*}
-		\lambda = \frac{\sqrt{2} \abs{\varepsilon_{i, j}}}{\sigma}
+		\lambda = \frac{\sqrt{2} \abs{Y}}{\sigma}
 	\end{equation*}
 \end{frame}
 
 \begin{frame}
 	So far we assumed $\varepsilon_{i, j}$ to be fixed, but it actually is a random variable itself with normal distribution: $\varepsilon_{i, j} \sim \mathcal{N}(0, \sigma^2)$. Thus, we have a compound probability distribution:
 	\begin{align*}
-		&\mathbb{P}(\tilde{d}^\pm(i, j) \leq t \mid d^\pm(i, j) = 0) \\
-		&= \int_0^\frac{t}{\sigma} \int_0^\infty \underbrace{x \exp \left( - \frac{x^2}{2} - \frac{\eta^2}{\sigma^2} \right) I_0 \left( \frac{\sqrt{2} \eta}{\sigma} x \right)}_{\textrm{pdf of} \ \chi_2 \left( \frac{\sqrt{2} \eta}{\sigma} \right) \ \textrm{for fixed} \ \eta} \underbrace{\frac{2}{\sqrt{2 \pi \sigma^2}} \exp \left( - \frac{\eta^2}{2 \sigma^2} \right)}_{\textrm{pdf of absolute value of} \ \mathcal{N}(0, \sigma^2)} d\eta dx \\
+		&\mathbb{P}(\tilde{D}^\pm(i, j) \leq t \mid D^\pm(i, j) = 0) \\
+		&= \int_0^\frac{t}{\sigma} \int_0^\infty \underbrace{x \exp \left( - \frac{x^2}{2} - \frac{y^2}{\sigma^2} \right) I_0 \left( \frac{\sqrt{2} y}{\sigma} x \right)}_{\textrm{pdf of} \ \chi_2 \left( \frac{\sqrt{2} y}{\sigma} \right) \ \textrm{for fixed} \ y} \underbrace{\frac{2}{\sqrt{2 \pi \sigma^2}} \exp \left( - \frac{y^2}{2 \sigma^2} \right)}_{\textrm{pdf of absolute value of} \ \mathcal{N}(0, \sigma^2)} dy dx \\
 		&= \frac{1}{\sqrt{3}} \left( \frac{3}{2} - \frac{3}{2} \exp \left( - \frac{t^2}{3 \sigma^2} \right) I_0 \left( \frac{t^2}{6 \sigma^2} \right) \right) - \sqrt{3} \\
 		&- \frac{2 - \sqrt{3}}{2} Q_1 \left( \frac{2 - \sqrt{3}}{6} \sqrt{\frac{t}{\sigma}}, \frac{2 + \sqrt{3}}{6} \sqrt{\frac{t}{\sigma}} \right) \\
 		&+ \frac{2 + \sqrt{3}}{2} Q_1 \left( \frac{2 + \sqrt{3}}{6} \sqrt{\frac{t}{\sigma}}, \frac{2 - \sqrt{3}}{6} \sqrt{\frac{t}{\sigma}} \right)
@@ -179,7 +190,7 @@
 	With an easy program the threshold for a given $\alpha$ can be calculated. As can be seen from the CDF, it is enough to calculate the threshold $t_\alpha$ for $\sigma = 1$ and multiply the outcome by $\sigma$.
 	\begin{figure}
 		\includegraphics[width=0.6\linewidth]{Testing/CDF}
-		\caption[CDF]{Cumulative distribution function of $\mathbb{P}(\tilde{d}^\pm(i, j) \leq t \mid d^\pm(i, j) = 0)$ with thresholds for $\alpha = 0.05$ and $\alpha = 0.01$. ($t_{0.05} = 3.2554$, $t_{0.01} = 4.2791$, $\sigma = 1$)}
+		\caption[CDF]{Cumulative distribution function of $\mathbb{P}(\tilde{D}^\pm(i, j) \leq t \mid D^\pm(i, j) = 0)$ with thresholds for $\alpha = 0.05$ and $\alpha = 0.01$. ($t_{0.05} = 3.2554$, $t_{0.01} = 4.2791$, $\sigma = 1$)}
 		\label{fig:CDF}
 	\end{figure}
 \end{frame}
@@ -191,21 +202,38 @@
 	
 	Using results and notations from the previous sections, we get the upper bound
 	\begin{equation*}
-		1 - \beta = \mathbb{P}(T \geq t \mid H_1) \leq \mathbb{P}(\tilde{d}^+ \geq t \mid d^+ = \sqrt{8} c)
+		1 - \beta = \mathbb{P}(T \geq t \mid H_1) \leq \mathbb{P}(\tilde{D}^+(i, j) \geq t \mid D^+(i, j) = \sqrt{8} c)
 	\end{equation*}
 	
 	On the other hand, we get the lower bound
 	\begin{equation*}
-		1 - \beta = \mathbb{P}(T \geq t \mid H_1) \geq 1 - 2 \cdot \mathbb{P}(\tilde{d}^+ \leq t \mid d^+ = c)
+		1 - \beta = \mathbb{P}(T \geq t \mid H_1) \geq 2 \cdot \mathbb{P}(\tilde{D}^+(i, j) \geq t \mid D^+(i, j) = c) - 1
 	\end{equation*}
 	
 	Thus we can conclude, that
 	\begin{equation*}
-		1 - \beta \in \left[ \max \left\{ 1 - 2 \cdot \mathbb{P}(\tilde{d}^+ \leq t \mid d^+ = c), 0 \right\}, \mathbb{P}(\tilde{d}^+ \geq t \mid d^+ = \sqrt{8} c) \right]
+		1 - \beta \geq \max \left\{ 2 \cdot \mathbb{P}(\tilde{D}^+(i, j) \geq t \mid D^+(i, j) = c) - 1, 0 \right\}
 	\end{equation*}
 \end{frame}
 
 \subsubsection{Numerical results}
+
+\begin{frame}
+	By simulating the probabilities $\mathbb{P}(\tilde{D}^+(i, j) \geq t \mid D^+(i, j) = \sqrt{8} c)$ and $\mathbb{P}(\tilde{D}^+(i, j) \geq t \mid D^+(i, j) = c)$, we can get empirical bounds for the power of our test.
+	
+	We have the following relation
+	\begin{alignat*}{2}
+		D^+(i, j) &= \sqrt{8} c &&\Rightarrow D_1^+(i, j) = D_2^+(i, j) = 2 c \\
+		D^+(i, j) &= c &&\Rightarrow D_1^+(i, j) = D_2^+(i, j) = c
+	\end{alignat*}
+	
+	Simulation of the probabilities can be done by following these steps:
+	\begin{itemize}
+		\item Simulate $\mathcal{N}(0, \sigma^2)$ random variables.
+		\item Calculate $\tilde{D}^+(i, j)$ conditioned on either $D^+(i, j) = \sqrt{8} c$ or $D^+(i, j) = c$.
+		\item Count proportion of simulations where $D^+(i, j) \geq t_\alpha \sigma$.
+	\end{itemize}
+\end{frame}
 
 \begin{frame}
 	In the case of a grayscale image, we assume $c = 127.5$. For $t_{0.05} = 3.2554$ and $10.000.000$ simulations of the noise terms, we get the following empirical bounds dependent on the standard deviation $\sigma$.
@@ -218,18 +246,18 @@
 \end{frame}
 
 \begin{frame}
-	Since $d^\pm$ is the sum of dependent squared normal distributed random variables, it is not a simple Chi distributed random variable. If it were, we would get
+	Since $D^\pm(i, j)$ is the sum of dependent squared normal distributed random variables, it is not a simple Chi distributed random variable. If it were, we would get
 	\begin{equation*}
-		1 - \beta \in \left[ \max \left\{ 1 - 2 \cdot \left( 1 - Q_1 \left( \frac{c_{bg}}{\sqrt{2} \sigma}, \frac{t}{\sqrt{2} \sigma} \right) \right), 0 \right\}, Q_1 \left( \frac{2 c_{bg}}{\sigma}, \frac{t}{\sqrt{2} \sigma} \right) \right]
+		1 - \beta \in \left[ \max \left\{ 2 \cdot Q_1 \left( \frac{c}{\sqrt{2} \sigma}, \frac{t}{\sqrt{2} \sigma} \right) - 1, 0 \right\}, Q_1 \left( \frac{2 c}{\sigma}, \frac{t}{\sqrt{2} \sigma} \right) \right]
 	\end{equation*}
 \end{frame}
 
 \begin{frame}
-	In the independent case we would take $t = 2 \sigma \sqrt{- \log(\alpha)}$ and get the following bounds for the power dependet on $\sigma$. It is remarkable, how similar these bounds are to the empirical bounds.
+	In the independent case we would take $t = 2 \sigma \sqrt{- \log(\alpha)} \approx 3.3616 \sigma$ and get the following bounds for the power dependent on $\sigma$. It is remarkable, how similar these bounds are to the empirical bounds.
 	
 	\begin{figure}[h]
 		\includegraphics[width=0.6\linewidth]{Testing/TheoreticalPower}
-		\caption[Theoretical power bounds]{For $\alpha = 0.05$ this graph shows the lower and upper bounds for the power of the test for $\sigma \in \{ 1, 2, \dots, 150 \}$, if the terms of $\tilde{d}^\pm$ were independent.}
+		\caption[Theoretical power bounds]{For $\alpha = 0.05$ this graph shows the lower and upper bounds for the power of the test for $\sigma \in \{ 1, 2, \dots, 150 \}$, if the terms of $\tilde{D}^\pm(i, j)$ were independent.}
 		\label{fig:TheoreticalPowerBounds}
 	\end{figure}
 \end{frame}
@@ -284,15 +312,15 @@
 	We will now take a look at the effect of opening on the significance level.
 	
 	\begin{theorem}
-		Let $f$ be an image that contains a rectangular ROI. Assume that we are given a binarized image $f_{bin}$ with
+		Let $F$ be an image that contains a rectangular ROI. Assume that we are given a binarized image $F_{bin}$ with
 		\begin{equation*}
-			\mathbb{P}(f_{bin}(i, j) = 1 \mid H_0(i, j)) \leq \alpha
+			\mathbb{P}(F_{bin}(i, j) = 1 \mid H_0(i, j)) \leq \alpha
 		\end{equation*}
 		where $H_0(i, j)$ denotes the null hypothesis for the pixel $(i, j)$.
 		
 		Let $k \in \mathbb{N}$ be odd and $B$ be a square structuring element with side length $k$. Then the following inequality holds:
 		\begin{equation*}
-			\mathbb{P}((f_{bin} \circ B)(i, j) = 1 \mid H_0(i, j)) \leq k^2 \alpha^\frac{k - 1}{2}
+			\mathbb{P}((F_{bin} \circ B)(i, j) = 1 \mid H_0(i, j)) \leq k^2 \alpha^\frac{k - 1}{2}
 		\end{equation*}
 	\end{theorem}
 \end{frame}
@@ -355,9 +383,9 @@
 %\end{frame}
 %
 %\begin{frame}
-%	First, we calculate for every pixel $(m, n) \in G$ the $p$-value
+%	First, we calculate for every pixel $(m, n) \in \Omega$ the $p$-value
 %	\begin{equation*}
-%		p(m, n) = \exp \left( - \frac{\tilde{d}(m, n)^2}{4 \sigma^2} \right) \geq \mathbb{P}(T \geq \tilde{d}(m, n) \mid H_0)
+%		p(m, n) = \exp \left( - \frac{\tilde{D}(m, n)^2}{4 \sigma^2} \right) \geq \mathbb{P}(T \geq \tilde{D}(m, n) \mid H_0)
 %	\end{equation*}
 %\end{frame}
 %
@@ -368,7 +396,7 @@
 %		\item Sort $p$-values in ascending order: $p_{(1)} \leq p_{(2)} \leq \dots \leq p_{(M \cdot N)}$
 %		\item Calculate the maximal index $k$, such that $p_{(k)} \leq \frac{k \cdot \alpha}{M \cdot N}$
 %		\item Calculate the threshold $\lambda_{k} = 2 \sigma \sqrt{- \log(p_{(k)})}$
-%		\item Reject all hypotheses $H_{(i)}$ with $p_{(i)} \leq p_{(k)}$, i.e. all hypotheses with $$\tilde{d}_{(i)} \geq \tilde{d}_{(k)} = \lambda_{k} = 2 \sigma \sqrt{- \log(p_{(k)})}$$
+%		\item Reject all hypotheses $H_{(i)}$ with $p_{(i)} \leq p_{(k)}$, i.e. all hypotheses with $$\tilde{D}_{(i)} \geq \tilde{D}_{(k)} = \lambda_{k} = 2 \sigma \sqrt{- \log(p_{(k)})}$$
 %	\end{itemize}
 %\end{frame}
 %
@@ -376,7 +404,7 @@
 %
 %\begin{frame}
 %	\begin{itemize}
-%		\item Reject all hypotheses $H_{i}$ with $p_{i} \leq \frac{\alpha}{M \cdot N}$, i.e. all hypotheses with $$\tilde{d}_{i} \geq \lambda_k = 2 \sigma \sqrt{- \log \left( \frac{\alpha}{M \cdot N} \right)}$$
+%		\item Reject all hypotheses $H_{i}$ with $p_{i} \leq \frac{\alpha}{M \cdot N}$, i.e. all hypotheses with $$\tilde{D}_{i} \geq \lambda_k = 2 \sigma \sqrt{- \log \left( \frac{\alpha}{M \cdot N} \right)}$$
 %	\end{itemize}
 %\end{frame}
 %
@@ -386,21 +414,21 @@
 %	\begin{itemize}
 %		\item Sort $p$-values in ascending order: $p_{(1)} \leq p_{(2)} \leq \dots \leq p_{(M \cdot N)}$
 %		\item Calculate the maximal index $k$, such that $p_{(k)} \leq \frac{\alpha}{M \cdot N - k + 1}$
-%		\item Reject all hypotheses $H_{(i)}$ with $p_{(i)} \leq p_{(k)}$, i.e. all hypotheses with $$\tilde{d}_{(i)} \geq \tilde{d}_{(k)} = \lambda_{k} = 2 \sigma \sqrt{- \log(p_{(k)})}$$
+%		\item Reject all hypotheses $H_{(i)}$ with $p_{(i)} \leq p_{(k)}$, i.e. all hypotheses with $$\tilde{D}_{(i)} \geq \tilde{D}_{(k)} = \lambda_{k} = 2 \sigma \sqrt{- \log(p_{(k)})}$$
 %	\end{itemize}
 %\end{frame}
 %
 %\begin{frame}
 %	All these methods are defined for actual $p$-values, i.e.
 %	\begin{equation*}
-%		p(m, n) = \mathbb{P}(T \geq \tilde{d}(m, n) \mid H_0)
+%		p(m, n) = \mathbb{P}(T \geq \tilde{D}(m, n) \mid H_0)
 %	\end{equation*}
 %	In contrast to that, we have taken upper bounds for the $p$-values. This is not an issue though, since by taking upper bounds we might decrease the number of hypotheses we reject. Thus it will not increase the error rate.
 %	
 %	The threshold has the following interpretation:
 %	\begin{itemize}
-%		\item If $\tilde{d}(m, n) \geq \lambda_{k}$, then $(m, n)$ is part of the ROI.
-%		\item If $\tilde{d}(m, n) < \lambda_{k}$, then $(m, n)$ is NOT part of the ROI.
+%		\item If $\tilde{D}(m, n) \geq \lambda_{k}$, then $(m, n)$ is part of the ROI.
+%		\item If $\tilde{D}(m, n) < \lambda_{k}$, then $(m, n)$ is NOT part of the ROI.
 %	\end{itemize}
 %\end{frame}
 

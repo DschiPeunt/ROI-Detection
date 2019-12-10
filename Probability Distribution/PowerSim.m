@@ -50,3 +50,16 @@ function [] = histSim(RV, d1, d2, sigma)
 histogram(RV.strcat('d', d1, d2).strcat('sigma', num2str(sigma)))
 
 end
+
+function [] = plotBounds(max_sigma, lowerBound, upperBound)
+
+figure(1)
+hold on
+plot(1 : max_sigma, 1 - lowerBound, 'Linewidth', 2.0)
+plot(1 : max_sigma, 1 - upperBound, 'Linewidth', 2.0)
+hold off
+legend('Lower bound', 'Upper bound', 'Location', 'southeast')
+xlabel('sigma')
+ylabel('power')
+
+end
