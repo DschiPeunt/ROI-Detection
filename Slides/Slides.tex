@@ -301,14 +301,6 @@
 \end{frame}
 
 \begin{frame}
-	\begin{figure}[h]
-		\includegraphics[width=0.6\linewidth]{Morphology/IndependentPoints}
-		\caption[Independent points]{If we consider only every second pixel in the column, these will be independent.}
-		\label{fig:IndependentPoints}
-	\end{figure}
-\end{frame}
-
-\begin{frame}
 	We will now take a look at the effect of opening on the significance level.
 	
 	\begin{theorem}
@@ -320,9 +312,116 @@
 		
 		Let $k \in \mathbb{N}$ be odd and $B$ be a square structuring element with side length $k$. Then the following inequality holds:
 		\begin{equation*}
-			\mathbb{P}((F_{bin} \circ B)(i, j) = 1 \mid H_0(i, j)) \leq k^2 \alpha^\frac{k - 1}{2}
+			\mathbb{P}((F_{bin} \circ B)(i, j) = 1 \mid H_0(i, j)) \leq k \alpha^\frac{k - 1}{2}
 		\end{equation*}
 	\end{theorem}
+\end{frame}
+
+\begin{frame}
+	Outline of the proof:
+	\begin{itemize}
+		\item Note, that if $H_0$ is true for $(i, j)$, then $H_0$ is true for a whole row or column in the image.
+		\item With our notation from the test, this means, that $D^+ = 0$ or $D^+ = 0$ for the whole row/column.
+		\item If we only take every second pixel in the row/column, they will be independent, which yields the exponent $\frac{k - 1}{2}$.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\begin{figure}[h]
+		\includegraphics[width=0.6\linewidth]{Morphology/IndependentPoints}
+		\caption[Independent points]{If we consider only every second pixel in the column, these will be independent.}
+		\label{fig:IndependentPoints}
+	\end{figure}
+\end{frame}
+
+\subsection{Hypothesis testing and closing}
+
+\begin{frame}
+	We will also take a look at the effect of closing on the significance level.
+	
+	\begin{theorem}
+		Let $F$ be an image that contains a rectangular ROI. Assume that we are given a binarized image $F_{bin}$ with
+		\begin{equation*}
+			\mathbb{P}(F_{bin}(i, j) = 1 \mid H_0(i, j)) \leq \alpha
+		\end{equation*}
+		where $H_0(i, j)$ denotes the null hypothesis for the pixel $(i, j)$.
+		
+		Let $k \in \mathbb{N}$ be odd and $B$ be a square structuring element with side length $k$. Then the following inequality holds:
+		\begin{equation*}
+			\mathbb{P}((F_{bin} \bullet B)(i, j) = 1 \mid H_0(i, j)) \leq k^2 \alpha
+		\end{equation*}
+	\end{theorem}
+\end{frame}
+
+\begin{frame}
+	Outline of the proof:
+	\begin{itemize}
+		\item Note, that if $H_0$ is true for $(i, j)$, then there exists a square with side length $k$, such that $H_0$ is true for every pixel inside that square.
+		\item The square has $k^2$ pixels and for each pixel the null hypothesis holds, so each pixel has probability $\leq \alpha$ for a type I error.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	Putting both results together, one gets
+	\begin{equation*}
+		\mathbb{P}(((F_{bin} \circ B) \bullet B)(i, j) = 1 \mid H_0(i, j)) \leq k^3 \alpha^\frac{k - 1}{2}
+	\end{equation*}
+	
+	For $\alpha = 0.05$ one has the following statistical significance after opening and closing:
+	
+	\begin{tabular}{|c|c|c|c|c|c|}
+		\hline
+		$k$ & 3 & 5 & 7 & 9 & 11 \\
+		\hline
+		$k^3 \alpha^\frac{k - 1}{2}$ & $1.35$ & $0.3125$ & $0.042875$ & $0.00455625$ & $0.0004159375$ \\
+		\hline
+	\end{tabular}
+\end{frame}
+
+\section{Numerical results}
+
+\begin{frame}
+	Methodology
+	\begin{itemize}
+		\item Create 5 test images each for $128 \times 128$, $256 \times 256$ and $512 \times 512$ pixel.
+		\item Determine the correct region of interest.
+		\item Perform the following 50 times to even out outliers:
+		\begin{itemize}
+			\item Create standard normal distributed noise.
+			\item Loop over the standard deviation $\sigma \in \{ 1, \dots, 150 \}$ and add the noise multiplied by the standard deviation to the image.
+			\begin{itemize}
+				\item Binarize the image using the testing procedure from the first section with $\alpha = 0.05$ and $t_{0.05} = 3.2554 \sigma$.
+				\item Perform binary morphological opening.
+				\item Perform binary morphological closing.
+			\end{itemize}
+			\item In each step, count the number of type I and II errors for each $\sigma$ separately.
+		\end{itemize}
+		\item Add up all type I and II errors for all images and divide by the number of background/foreground pixel, respectively.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\begin{figure}[h]
+		\includegraphics[width=\linewidth]{Morphology/TestCases}
+		\caption[Test cases]{Test cases used to compute type I and II errors. Top row: 128x128 pixel. Middle row: 256x256 pixel. Bottom row: 512x512 pixel.}
+		\label{fig:TestCases}
+	\end{figure}
+\end{frame}
+
+\begin{frame}
+	\begin{figure}[h]
+		\includegraphics[width=0.6\linewidth]{Morphology/TypeIError}
+		\caption[Type I error]{Numerical results of the percentage of type I errors dependent on $\sigma$.}
+		\label{fig:TypeIError}
+	\end{figure}
+\end{frame}
+
+\begin{frame}
+	\begin{figure}[h]
+		\includegraphics[width=0.6\linewidth]{Morphology/TypeIIError}
+		\caption[Type II error]{Numerical results of the percentage of type II errors dependent on $\sigma$.}
+		\label{fig:TypeIIError}
+	\end{figure}
 \end{frame}
 
 %\section{Multiple testing procedures}
