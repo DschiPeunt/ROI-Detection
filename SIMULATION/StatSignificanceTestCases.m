@@ -1,7 +1,13 @@
 function cases = StatSignificanceTestCases(dims, nr_pictures, cases, alpha, max_nr_noise, max_sigma)
 
+% Define side length of structuring element:
+k = 3;
+
 % Define structuring element:
-SE = strel('square', 3);
+SE = strel('square', k);
+
+% Determine relaxed significance:
+alpha_rel = power(alpha / k, 2 / (k + 1));
 
 % Loop over dimensions:
 for i = 1 : size(dims, 2)
@@ -54,8 +60,11 @@ for i = 1 : size(dims, 2)
                 % Count type I and II errors:
                 err(sigma, :) = err(sigma, :) + [sum(sum(ROI == 0 & ROI_bin == 1)), sum(sum(ROI == 1 & ROI_bin == 0))];
                 
+                % Extract ROI with relaxed significance:
+                ROI_bin_rel = ROI_Detection(ROI_noisy, sigma, alpha_rel) / 255;
+                
                 % Perform binary opening:
-                ROI_FDR_o = imopen(ROI_bin, SE);
+                ROI_FDR_o = imopen(ROI_bin_rel, SE);
                 
                 % Count type I and II errors:
                 err_o(sigma, :) = err_o(sigma, :) + [sum(sum(ROI == 0 & ROI_FDR_o == 1)), sum(sum(ROI == 1 & ROI_FDR_o == 0))];

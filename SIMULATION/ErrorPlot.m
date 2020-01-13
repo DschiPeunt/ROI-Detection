@@ -1,5 +1,5 @@
 % Load results:
-load('simulation.mat');
+load('simulation_rel.mat');
 
 % ------------------------------------------------------------------------
 

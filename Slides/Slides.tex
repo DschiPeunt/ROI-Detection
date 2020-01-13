@@ -69,7 +69,7 @@
 		\item $(i, j) \in \Omega$
 		\item $c \in \mathbb{R}$ is constant
 		\item $V(i, j) \in \{ 0, \pm c \}$
-		\item $\varepsilon_{m, n} \sim \mathcal{N}(0, \sigma^2)$ i.i.d. normal distributed random variables
+		\item $\varepsilon_{i, j} \sim \mathcal{N}(0, \sigma^2)$ i.i.d. normal distributed random variables
 	\end{itemize}
 	
 	Assumption 1: The image $F$ contains a rectangular region of interest.
@@ -156,7 +156,7 @@
 \end{frame}
 
 \begin{frame}
-	Let $\varepsilon_{i, j}$ be fixed. Then
+	We have
 	\begin{align*}
 		&\mathbb{P}(\tilde{D}^\pm(i, j) \leq t \mid D^\pm(i, j) = 0) \\
 		&= \mathbb{P}\left( (\varepsilon_{i \pm 1, j} - \varepsilon_{i, j})^2 + (\varepsilon_{i, j \pm 1} - \varepsilon_{i, j})^2 \leq t^2 \right) \\
@@ -176,7 +176,7 @@
 \end{frame}
 
 \begin{frame}
-	So far we assumed $\varepsilon_{i, j}$ to be fixed, but it actually is a random variable itself with normal distribution: $\varepsilon_{i, j} \sim \mathcal{N}(0, \sigma^2)$. Thus, we have a compound probability distribution:
+	Thus, we have a compound probability distribution:
 	\begin{align*}
 		&\mathbb{P}(\tilde{D}^\pm(i, j) \leq t \mid D^\pm(i, j) = 0) \\
 		&= \int_0^\frac{t}{\sigma} \int_0^\infty \underbrace{x \exp \left( - \frac{x^2}{2} - \frac{y^2}{\sigma^2} \right) I_0 \left( \frac{\sqrt{2} y}{\sigma} x \right)}_{\textrm{pdf of} \ \chi_2 \left( \frac{\sqrt{2} y}{\sigma} \right) \ \textrm{for fixed} \ y} \underbrace{\frac{2}{\sqrt{2 \pi \sigma^2}} \exp \left( - \frac{y^2}{2 \sigma^2} \right)}_{\textrm{pdf of absolute value of} \ \mathcal{N}(0, \sigma^2)} dy dx \\
