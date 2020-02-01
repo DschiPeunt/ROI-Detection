@@ -7,7 +7,8 @@ k = 3;
 SE = strel('square', k);
 
 % Determine relaxed significance:
-alpha_rel = power(alpha / k, 2 / (k + 1));
+alpha_rel_o = power(alpha / k, 2 / (k + 1));
+alpha_rel_oc = power(alpha / k^3, 2 / (k + 1));
 
 % Loop over dimensions:
 for i = 1 : size(dims, 2)
@@ -60,14 +61,24 @@ for i = 1 : size(dims, 2)
                 % Count type I and II errors:
                 err(sigma, :) = err(sigma, :) + [sum(sum(ROI == 0 & ROI_bin == 1)), sum(sum(ROI == 1 & ROI_bin == 0))];
                 
+                %---------------------------------------------------------
+                
                 % Extract ROI with relaxed significance:
-                ROI_bin_rel = ROI_Detection(ROI_noisy, sigma, alpha_rel) / 255;
+                ROI_bin_rel_o = ROI_Detection(ROI_noisy, sigma, alpha_rel_o) / 255;
                 
                 % Perform binary opening:
-                ROI_FDR_o = imopen(ROI_bin_rel, SE);
+                ROI_FDR_o = imopen(ROI_bin_rel_o, SE);
                 
                 % Count type I and II errors:
                 err_o(sigma, :) = err_o(sigma, :) + [sum(sum(ROI == 0 & ROI_FDR_o == 1)), sum(sum(ROI == 1 & ROI_FDR_o == 0))];
+                
+                %---------------------------------------------------------
+                
+                % Extract ROI with relaxed significance:
+                ROI_bin_rel_oc = ROI_Detection(ROI_noisy, sigma, alpha_rel_oc) / 255;
+                
+                % Perform binary opening:
+                ROI_FDR_o = imopen(ROI_bin_rel_oc, SE);
                 
                 % Perform binary closing:
                 ROI_FDR_oc = imclose(ROI_FDR_o, SE);

@@ -42,3 +42,11 @@
 *.snm
 *.synctex.gz
 *.toc
+
+# Directories
+Code/
+Fingerprints/
+Literature/
+Misc/
+Notes/
+Wavelets/
