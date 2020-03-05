@@ -588,208 +588,220 @@ Morphological binary opening and closing are closely related operations. They ar
 As we can see, in binary morphology a binary image is a subset of $\mathbb{Z}^n$. This subset is the set of points at which the binary image is one. In contrast to that, we aim to study the influence of these morphological operations on the outcome of a statistical test for each individual pixel of an image. This outcome is best represented by a matrix $\varphi \in \{ 0, 1 \}^{M \times N}$. Hence, we need to translate the definition of binary opening and closing as operations on subsets of $\mathbb{Z}^n$ to operations on matrices $\varphi \in \{ 0, 1 \}^{M \times N}$. This gives rise to the following definition.
 
 \begin{definition}
-	Let $\varphi \in \{ 0, 1 \}^{M \times N}$. We extend the matrix $\varphi$ to all of $\mathbb{Z}^2$ by setting $\varphi(k, l) = 0$ for $(k, l) \notin \{ 1, \dots, M \} \times \{ 1, \dots, N \}$. Let $B \subseteq \mathbb{Z}^2$ be a structuring element.
+	Let $\varphi \in \{ 0, 1 \}^{M \times N}$. Let $B \subseteq \mathbb{Z}^2$ be a structuring element. We call
+	\begin{equation*}
+		A_\varphi \coloneqq \{ (i, j) \in \{ 1, \dots, M \} \times \{ 1, \dots, N \} \mid \varphi(i, j) = 1 \} \subseteq \mathbb{Z}^2
+	\end{equation*}
+	the \emph{index set of the binary matrix $\varphi$}.
 	\begin{enumerate}
-		\item The \emph{binary erosion of the matrix $\varphi$ by the structuring element $B$} is defined by
+		\item The \emph{erosion of the binary matrix $\varphi$ by the structuring element $B$} is defined by
 		\begin{equation}
-			(\varphi \ominus B)(i, j) = \prod_{(m, n) \in B} \varphi(i + m, j + n) \\
+			(\varphi \ominus B)(i, j) =
+			\begin{cases}
+				1, \textrm{ if } (i, j) \in A_\varphi \ominus B, \\
+				0, \textrm{ if } (i, j) \notin A_\varphi \ominus B,
+			\end{cases}
 		\end{equation}
 		for every $(i, j) \in \{ 1, \dots, M \} \times \{ 1, \dots, N \}$.
-		\item The \emph{binary dilation of the matrix $\varphi$ by the structuring element $B$} is defined by
+		\item The \emph{dilation of the binary matrix $\varphi$ by the structuring element $B$} is defined by
 		\begin{equation}
-			(\varphi \oplus B)(i, j) = 1 - \prod_{(m, n) \in B} ( 1 - \varphi(i - m, j - n) )
+			(\varphi \oplus B)(i, j) =
+			\begin{cases}
+				1, \textrm{ if } (i, j) \in A_\varphi \oplus B, \\
+				0, \textrm{ if } (i, j) \notin A_\varphi \oplus B,
+			\end{cases}
 		\end{equation}
 		for every $(i, j) \in \{ 1, \dots, M \} \times \{ 1, \dots, N \}$.
 	\end{enumerate}
 \end{definition}
 
-\begin{remark}
-	The extension of $\varphi$ to all of $\mathbb{Z}^2$ is necessary, because in the definition of binary erosion and dilation of a matrix, we might reach indices outside of $\{ 1, \dots, M \} \times \{ 1, \dots, N \}$.
-\end{remark}
+By definition, erosion and dilation of a binary matrix are binary matrices as well, i.e. $\varphi \ominus B, \varphi \oplus B \in \{ 0, 1 \}^{M \times N}$.
 
-By these definitions, the binary erosion and dilation of a matrix are binary matrices as well, i.e. $\varphi \ominus B, \varphi \oplus B \in \{ 0, 1 \}^{M \times N}$.
-
-There is a close connection between classical binary erosion and dilation for subsets of $\mathbb{Z}^2$ and binary erosion and dilation of a matrix. This connection is given in the following lemma.
+We want to express $\varphi \ominus B$ and $\varphi \oplus B$ in terms of $\varphi$. This is done in the following lemma.
 
 \begin{lemma}\label{lemerodil}
-	Let $\varphi \in \{ 0, 1 \}^{M \times N}$. Define the set
-	\begin{equation*}
-		A_\varphi \coloneqq \{ (i, j) \in \{ 1, \dots, M \} \times \{ 1, \dots, N \} \mid \varphi(i, j) = 1 \} \subseteq \mathbb{Z}^2
-	\end{equation*}
-	and let $B \subseteq \mathbb{Z}^2$. Then we have the following equivalences
+	Let $\varphi \in \{ 0, 1 \}^{M \times N}$ and $B \subseteq \mathbb{Z}^2$ be a structuring element. Let $(i, j) \in \{ 1, \dots, M \} \times \{ 1, \dots, N \}$. Then we have the following equalities:
 	\begin{align}
-		(\varphi \ominus B)(i, j) = 1 &\Leftrightarrow (i, j) \in A_\varphi \ominus B \label{eqero} \\
-		(\varphi \oplus B)(i, j) = 1 &\Leftrightarrow (i, j) \in A_\varphi \oplus B \label{eqdil}
+		(\varphi \ominus B)(i, j) &= \prod_{(m, n) \in B} \varphi(i + m, j + n) \label{eqero} \\
+		(\varphi \oplus B)(i, j) &= 1 - \prod_{(m, n) \in B} ( 1 - \varphi(i - m, j - n) ) \label{eqdil}
 	\end{align}
-	\begin{align}
-		\varphi_{A \ominus B}(i, j) &= \prod_{(m, n) \in \mathbb{Z}^2} ( 1 - ( 1 - \varphi_A(i + m, j + n) ) \cdot \varphi_B(m, n) ) \label{eqero2} \\
-		\varphi_{A \oplus B}(i, j) &= 1 - \prod_{(m, n) \in \mathbb{Z}^2} ( 1 - \varphi_A(i - m, j - n) \cdot \varphi_B(m, n) ) \label{eqdil2}
-	\end{align}
+	where we extend the matrix $\varphi$ to all of $\mathbb{Z}^2$ by setting $\varphi(k, l) = 0$ for $(k, l) \notin \{ 1, \dots, M \} \times \{ 1, \dots, N \}$.
 \end{lemma}
-
-
-
-
-
-
-
-
-
-
-
-
 \begin{proof}
-	We start with the first equality. By definition of binary erosion and using basic properties of set theory, we get the equivalence
+	Let $A_\varphi$ be the index set of the binary matrix $\varphi$. We start with the first equality. By definition of binary erosion and using basic properties of set theory, we get the equivalence
 	\begin{align*}
-		\varphi_{A \ominus B}(i, j) = 1 &\Leftrightarrow (i, j) \in A \ominus B \\
-		&\Leftrightarrow \forall (m, n) \in B: (i, j) + (m, n) \in A \\
-		&\Leftrightarrow (i, j) \in \bigcap_{(m, n) \in B} ( A - (m, n) )
+		(\varphi \ominus B)(i, j) = 1 &\Leftrightarrow (i, j) \in A_\varphi \ominus B \\
+		&\Leftrightarrow \forall (m, n) \in B: (i, j) + (m, n) \in A_\varphi \\
+		&\Leftrightarrow (i, j) \in \bigcap_{(m, n) \in B} ( A_\varphi - (m, n) )
 	\end{align*}
-	where we define the set $A - (m, n) \coloneqq \{ a - (m, n) \mid a \in A \}$ for any $(m, n) \in \mathbb{Z}^2$.
+	where we define the sets $A_\varphi - (m, n) \coloneqq \{ a - (m, n) \mid a \in A_\varphi \}$ for any $(m, n) \in \mathbb{Z}^2$.
 	
-	Let $\varphi_{A - (m, n)}$ be the binary image defined by the set $A - (m, n)$. Using the properties of $\varphi_{A - (m, n)}$ and the fact, that $\varphi_{A - (m, n)}(i, j) = \varphi_A(i + m, j + n)$, we get the equivalence
-	\begin{align*}
-		\varphi_{A \ominus B}(i, j) = 1 &\Leftrightarrow (i, j) \in \bigcap_{(m, n) \in B} ( A - (m, n) ) \\
-		&\Leftrightarrow \prod_{(m, n) \in B} \varphi_{A - (m, n)}(i, j) = 1 \\
-		&\Leftrightarrow \prod_{(m, n) \in B} \varphi_A(i + m, j + n) = 1
-	\end{align*}
-	
-	To proceed, we notice that for $(m, n) \in B$, we have $\varphi_B(m, n) = 1$ and thus
-	\begin{align*}
-		\varphi_A(i + m, j + n) &= 1 - ( 1 - \varphi_A(i + m, j + n)) \\
-		&= 1 - ( 1 - \varphi_A(i + m, j + n)) \cdot \varphi_B(m, n)
-	\end{align*}
-	
-	On the other hand, for $(m, n) \notin B$, we have $\varphi_B(m, n) = 0$, which yields
+	The sets $A_\varphi - (m, n)$ are related to the matrix $\varphi$ through the equivalence
 	\begin{equation*}
-		1 - ( 1 - \varphi_A(i + m, j + n)) \cdot \varphi_B(m, n) = 1
+		(i, j) \in ( A_\varphi - (m, n) ) \Leftrightarrow \varphi(i + m, j + n) = 1
 	\end{equation*}
 	
-	Using these two observations, we get the equality
+	Using this relation, we get the equivalence
 	\begin{align*}
-		\prod_{(m, n) \in B} \varphi_A(i + m, j + n) &= \prod_{(m, n) \in B} ( 1 - ( 1 - \varphi_A(i + m, j + n)) \cdot \varphi_B(m, n) ) \\
-		&= \prod_{(m, n) \in \mathbb{Z}^2} ( 1 - ( 1 - \varphi_A(i + m, j + n) ) \cdot \varphi_B(m, n) )
+		(\varphi \ominus B)(i, j) = 1 &\Leftrightarrow (i, j) \in \bigcap_{(m, n) \in B} ( A_\varphi - (m, n) ) \\
+		&\Leftrightarrow \prod_{(m, n) \in B} \varphi(i + m, j + n) = 1
 	\end{align*}
-	
-	Plugging this into the equivalence we derived above, we obtain
-	\begin{equation*}
-		\varphi_{A \ominus B}(i, j) = 1 \Leftrightarrow \prod_{(m, n) \in \mathbb{Z}^2} ( 1 - ( 1 - \varphi_A(i + m, j + n) ) \cdot \varphi_B(m, n) ) = 1
-	\end{equation*}
 	
 	The functions on both sides of this equivalence only take values in $\{ 0, 1 \}$. Thus, we get a full equality
 	\begin{equation*}
-		\varphi_{A \ominus B}(i, j) = \prod_{(m, n) \in \mathbb{Z}^2} ( 1 - ( 1 - \varphi_A(i + m, j + n) ) \cdot \varphi_B(m, n) )
+		(\varphi \ominus B)(i, j) = \prod_{(m, n) \in B} \varphi(i + m, j + n)
 	\end{equation*}
+	
+	This proves the first equality.
 	
 	The proof of the second equality is quite similar. First we use the definition of binary dilation and basic set theory properties to get the equivalence
 	\begin{align*}
-		\varphi_{A \oplus B}(i, j) = 1 &\Leftrightarrow (i, j) \in A \oplus B \\
-		&\Leftrightarrow \exists (m, n) \in B: (i, j) - (m, n) \in A \\
-		&\Leftrightarrow (i, j) \in \bigcup_{(m, n) \in B} ( A + (m, n) )
+		(\varphi \oplus B)(i, j) = 1 &\Leftrightarrow (i, j) \in A_\varphi \oplus B \\
+		&\Leftrightarrow \exists (m, n) \in B: (i, j) - (m, n) \in A_\varphi \\
+		&\Leftrightarrow (i, j) \in \bigcup_{(m, n) \in B} ( A_\varphi + (m, n) )
 	\end{align*}
 	
-	The property $(i, j) \in \bigcup_{(m, n) \in B} ( A + (m, n) )$ is fulfilled, if $\varphi_{A + (m, n)}(i, j) = 1$ for any $(m, n) \in B$. This yields the equivalence
+	The property $(i, j) \in \bigcup_{(m, n) \in B} ( A_\varphi + (m, n) )$ is fulfilled, if $\varphi(i - m, j - n) = 1$ for any $(m, n) \in B$. This observation yields the equivalence
 	\begin{align*}
-		\varphi_{A \oplus B}(i, j) = 1 &\Leftrightarrow (i, j) \in \bigcup_{(m, n) \in B} ( A + (m, n) ) \\
-		&\Leftrightarrow \prod_{(m, n) \in B} ( 1 - \varphi_{A + (m, n)}(i, j) ) = 0
+		(\varphi \oplus B)(i, j) = 1 &\Leftrightarrow (i, j) \in \bigcup_{(m, n) \in B} ( A_\varphi + (m, n) ) \\
+		&\Leftrightarrow \prod_{(m, n) \in B} ( 1 - \varphi(i - m, j - n) ) = 0
 	\end{align*}
 	
-	Using the properties of the functions $\varphi_{A + (m, n)}(i, j)$, we obtain
+	Since $\varphi$ is binary, $\prod_{(m, n) \in B} ( 1 - \varphi(i - m, j - n) )$ only takes values in $\{ 0, 1 \}$. Hence, we have the equivalence
 	\begin{align*}
-		\varphi_{A \oplus B}(i, j) = 1 &\Leftrightarrow \prod_{(m, n) \in B} ( 1 - \varphi_{A + (m, n)}(i, j) ) = 0 \\
-		&\Leftrightarrow \prod_{(m, n) \in B} ( 1 - \varphi_A(i - m, j - n) ) = 0 \\
-		&\Leftrightarrow 1 - \prod_{(m, n) \in B} ( 1 - \varphi_A(i - m, j - n) ) = 1
+		(\varphi \oplus B)(i, j) = 1 &\Leftrightarrow \prod_{(m, n) \in B} ( 1 - \varphi(i - m, j - n) ) = 0 \\
+		&\Leftrightarrow 1 - \prod_{(m, n) \in B} ( 1 - \varphi(i - m, j - n) ) = 1
 	\end{align*}
 	
-	As in the proof of the first equality, we notice again, that for $(m, n) \in B$, we have $\varphi_B(m, n) = 1$, which yields
+	Again, since both sides are binary, this yields a full equality
 	\begin{equation*}
-		1 - \varphi_A(i *- m, j - n) = 1 - \varphi_A(i - m, j - n) \cdot \varphi_B(m, n)
-	\end{equation*}
-	
-	For $(m, n) \notin B$, we have $\varphi_B(m, n) = 0$ and thus
-	\begin{equation*}
-		1 - \varphi_A(i - m, j - n) \cdot \varphi_B(m, n) = 1
-	\end{equation*}
-	
-	These observations can be used to obtain the equivalence
-	\begin{align*}
-		\varphi_{A \oplus B}(i, j) = 1 &\Leftrightarrow 1 - \prod_{(m, n) \in B} ( 1 - \varphi_A(i - m, j - n) ) = 1 \\
-		&\Leftrightarrow 1 - \prod_{(m, n) \in \mathbb{Z}^2} ( 1 - \varphi_A(i - m, j - n) \cdot \varphi_B(m, n) ) = 1
-	\end{align*}
-	
-	Again, this yields a full equality
-	\begin{equation*}
-		\varphi_{A \oplus B}(i, j) = 1 - \prod_{(m, n) \in \mathbb{Z}^2} ( 1 - \varphi_A(i - m, j - n) \cdot \varphi_B(m, n) )
+		(\varphi \oplus B)(i, j) = 1 - \prod_{(m, n) \in B} ( 1 - \varphi(i - m, j - n) )
 	\end{equation*}
 \end{proof}
 
-Now we can define binary opening and closing:
+\begin{remark}
+	The extension of $\varphi$ to all of $\mathbb{Z}^2$ is necessary, because in the product of the right hand side of equation \eqref{eqero} and \eqref{eqdil}, we might reach indices outside of $\{ 1, \dots, M \} \times \{ 1, \dots, N \}$.
+\end{remark}
+
+After having defined binary erosion and dilation, we now can define binary opening and closing. Again, we start by defining it for subsets of $\mathbb{Z}^n$ and then proceed to define it for binary matrices $\varphi \in \{ 0, 1 \}^{M \times N}$.
 \begin{definition}
 	Let $A, B \subseteq \mathbb{Z}^n$.
 	\begin{enumerate}
-		\item The \emph{binary opening} of an image $A$ by a structuring element $B$ is defined as
+		\item The \emph{binary opening} of $A$ by a structuring element $B$ is defined as
 		\begin{equation*}
 			A \circ B = (A \ominus B) \oplus B
 		\end{equation*}
-		\item The \emph{binary closing} of an image $A$ by a structuring element $B$ is defined as
+		\item The \emph{binary closing} of  $A$ by a structuring element $B$ is defined as
 		\begin{equation*}
 			A \bullet B = (A \oplus B) \ominus B
 		\end{equation*}
 	\end{enumerate}
 \end{definition}
 
-As we can see, binary opening and closing are concatenations of binary erosion and dilation. Using the equalites deduced in lemma \ref{lemerodil} for erosion and dilation, we can also derive similar equalities for opening and closing.
-\begin{corollary}
-	Let $A, B \subseteq \mathbb{Z}^2$. Then the following equalities hold
+As we can see, binary opening and closing are concatenations of binary erosion and dilation. The definitions for matrices are done the same way, as they were done for erosion and dilation of binary matrices.
+
+\begin{definition}
+	Let $\varphi \in \{ 0, 1 \}^{M \times N}$, $B \subseteq \mathbb{Z}^2$ be a structuring element and $A_\varphi$ be the index set of $\varphi$.
+	\begin{enumerate}
+		\item The \emph{opening of the binary matrix $\varphi$ by the structuring element $B$} is defined by
+		\begin{equation}
+			(\varphi \circ B)(i, j) =
+			\begin{cases}
+				1, \textrm{ if } (i, j) \in A_\varphi \circ B, \\
+				0, \textrm{ if } (i, j) \notin A_\varphi \circ B,
+			\end{cases}
+		\end{equation}
+		for every $(i, j) \in \{ 1, \dots, M \} \times \{ 1, \dots, N \}$.
+		\item The \emph{closing of the binary matrix $\varphi$ by the structuring element $B$} is defined by
+		\begin{equation}
+			(\varphi \bullet B)(i, j) =
+			\begin{cases}
+				1, \textrm{ if } (i, j) \in A_\varphi \bullet B, \\
+				0, \textrm{ if } (i, j) \notin A_\varphi \bullet B,
+			\end{cases}
+		\end{equation}
+		for every $(i, j) \in \{ 1, \dots, M \} \times \{ 1, \dots, N \}$.
+	\end{enumerate}
+\end{definition}
+
+While we defined binary opening and closing for subsets of $\mathbb{Z}^2$ as concatenations of binary erosion and dilation, we did not define opening and closing of a binary matrix as concatenations of erosion and dilation of binary matrices. The following lemma shows the connection between these operations.
+
+\begin{lemma}
+	Let $\varphi \in \{ 0, 1 \}^{M \times N}$ and $B \subseteq \mathbb{Z}^2$ be a structuring element. We have the following connections between opening and closing and erosion and dilation of binary matrices:
 	\begin{align}
-		\varphi_{A \circ B}(i, j) &= 1 - \prod_{(m, n) \in B} \left( 1 - \left( \prod_{(\tilde{m}, \tilde{n}) \in B} \varphi_A(i - m + \tilde{m}, j - n + \tilde{n}) \right) \right) \label{eqopening} \\
-		\varphi_{A \bullet B}(i, j) &= \prod_{(m, n) \in B} \left( 1 - \prod_{(\tilde{m}, \tilde{n}) \in B} ( 1 - \varphi_A(i + m - \tilde{m}, j + n - \tilde{n}) ) \right) \label{eqclosing}
+		(\varphi \circ B) = (\varphi \ominus B) \oplus B \\
+		(\varphi \bullet B) = (\varphi \oplus B) \ominus B
 	\end{align}
-\end{corollary}
+\end{lemma}
 \begin{proof}
-	We can use equation \eqref{eqero} after equation \eqref{eqdil} to obtain the first equality
+	To prove these relations, we first show, that $A_{\varphi \ominus B} = A_\varphi \ominus B$ and $A_{\varphi \oplus B} = A_\varphi \oplus B$. By defintion of the index set of a binary matrix, we have
 	\begin{align*}
-		&\varphi_{A \circ B}(i, j) \\
-		&= \varphi_{(A \ominus B) \oplus B}(i, j) \\
-		&= 1 - \prod_{(m, n) \in \mathbb{Z}^2} ( 1 - \varphi_{A \ominus B}(i - m, j - n) \cdot \varphi_B(m, n) ) \\
-		&= 1 - \prod_{(m, n) \in B} ( 1 - \varphi_{A \ominus B}(i - m, j - n) ) \\
-		&= 1 - \prod_{(m, n) \in B} \left( 1 - \left( \prod_{(\tilde{m}, \tilde{n}) \in \mathbb{Z}^2} ( 1 - ( 1 - \varphi_A(i - m + \tilde{m}, j - n + \tilde{n}) ) \cdot \varphi_B(\tilde{m}, \tilde{n}) ) \right) \right) \\
-		&= 1 - \prod_{(m, n) \in B} \left( 1 - \left( \prod_{(\tilde{m}, \tilde{n}) \in B} \varphi_A(i - m + \tilde{m}, j - n + \tilde{n}) \right) \right)
+		A_{\varphi \ominus B} &= \{ (i, j) \in \{ 1, \dots, M \} \times \{ 1, \dots, N \} \mid (\varphi \ominus B)(i, j) = 1 \} \\
+		&= \{ (i, j) \in \{ 1, \dots, M \} \times \{ 1, \dots, N \} \mid (i, j) \in A_\varphi \ominus B \} \\
+		&= A_\varphi \ominus B
 	\end{align*}
+	The second equality is proven similarly.
 	
-	Using these equations in reverse order also yields the second equality
+	Using this equality, we obtain
 	\begin{align*}
-		&\varphi_{A \bullet B}(i, j) \\
-		&= \varphi_{(A \oplus B) \ominus B}(i, j) \\
-		&= \prod_{(m, n) \in \mathbb{Z}^2} ( 1 - ( 1 - \varphi_{A \oplus B}(i + m, j + n) ) \cdot \varphi_B(m, n) ) \\
-		&= \prod_{(m, n) \in B} ( \varphi_{A \oplus B}(i + m, j + n) ) \\
-		&= \prod_{(m, n) \in B} \left( 1 - \prod_{(\tilde{m}, \tilde{n}) \in \mathbb{Z}^2} ( 1 - \varphi_A(i + m - \tilde{m}, j + n - \tilde{n}) \cdot \varphi_B(\tilde{m}, \tilde{n}) ) \right) \\
-		&= \prod_{(m, n) \in B} \left( 1 - \prod_{(\tilde{m}, \tilde{n}) \in B} ( 1 - \varphi_A(i + m - \tilde{m}, j + n - \tilde{n}) ) \right)
+		(\varphi \circ B)(i, j) = 1 &\Leftrightarrow (i, j) \in A_\varphi \circ B \\
+		&\Leftrightarrow (i, j) \in (A_\varphi \ominus B) \oplus B \\
+		&\Leftrightarrow (i, j) \in A_{\varphi \ominus B} \oplus B \\
+		&\Leftrightarrow ((\varphi \ominus B) \oplus B)(i, j) = 1
 	\end{align*}
+	and thus prove the first relation.
+	
+	The proof of the second relation is analogous.
 \end{proof}
 
-We now assume $\varphi_A(i, j)$ to be a random variable for all $(i, j) \in \{ 1, \dots, M \} \times \{ 1, \dots, N \}$. Equations \eqref{eqopening} and \eqref{eqclosing} show, that $\varphi_{A \circ B}(i, j)$ and $\varphi_{A \bullet B}(i, j)$ are random variables as well. We want to express the events $\{ \varphi_{A \circ B}(i, j) = 1 \}$ and $\{ \varphi_{A \bullet B}(i, j) = 1 \}$ as unions and intersections of the events $\{ \varphi_A(i, j) = 1 \}$. This is done in the following corollary.
+After we established this connection, we can use the equalites deduced in lemma \ref{lemerodil} for erosion and dilation to derive similar equalities for opening and closing of a binary matrix.
 
 \begin{corollary}
-	Let $M, N \in \mathbb{N}$ and $\varphi(i, j) \in \{ 0, 1 \}$ be a random variable for all $(i, j) \in \{ 1, \dots, M \} \times \{ 1, \dots, N \}$. Define the set
-	\begin{equation*}
-		A = \{ (i, j) \in \{ 1, \dots, M \} \times \{ 1, \dots, N \} \mid \varphi(i, j) = 1 \}
-	\end{equation*}
-	and let $B \subseteq \mathbb{Z}^2$.
+	Let $\varphi \in \{ 0, 1 \}^{M \times N}$ and $B \subseteq \mathbb{Z}^2$ be a structuring element. Let $(i, j) \in \{ 1, \dots, M \} \times \{ 1, \dots, N \}$. Then the following equalities hold:
 	\begin{align}
-		\{ \varphi_{A \circ B}(i, j) = 1 \} &\Leftrightarrow \bigcup_{(m, n) \in B} \bigcap_{(\tilde{m}, \tilde{n}) \in B} \{ \varphi(i - m + \tilde{m}, j - n + \tilde{n}) = 1 \} \\
-		\{ \varphi_{A \bullet B}(i, j) = 1 \} &\Leftrightarrow \bigcap_{(m, n) \in B} \bigcup_{(\tilde{m}, \tilde{n}) \in B} \{ \varphi(i + m - \tilde{m}, j + n - \tilde{n}) = 1 \}
+		(\varphi \circ B)(i, j) &= 1 - \prod_{(m, n) \in B} \left( 1 - \left( \prod_{(\tilde{m}, \tilde{n}) \in B} \varphi(i - m + \tilde{m}, j - n + \tilde{n}) \right) \right) \label{eqopening} \\
+		(\varphi \bullet B)(i, j) &= \prod_{(m, n) \in B} \left( 1 - \prod_{(\tilde{m}, \tilde{n}) \in B} ( 1 - \varphi(i + m - \tilde{m}, j + n - \tilde{n}) ) \right) \label{eqclosing}
+	\end{align}
+	where we extend the matrix $\varphi$ to all of $\mathbb{Z}^2$ by setting $\varphi(k, l) = 0$ for $(k, l) \notin \{ 1, \dots, M \} \times \{ 1, \dots, N \}$.
+\end{corollary}
+\begin{proof}
+	We can use the previous lemma, as well as equation \eqref{eqdil} and finally equation \eqref{eqero} to obtain the first equality
+	\begin{align*}
+		(\varphi \circ B)(i, j) &= ((\varphi \ominus B) \oplus B)(i, j) \\
+		&= 1 - \prod_{(m, n) \in B} ( 1 - (\varphi \ominus B)(i - m, j - n) ) \\
+		&= 1 - \prod_{(m, n) \in B} \left( 1 - \left( \prod_{(\tilde{m}, \tilde{n}) \in B} \varphi(i - m + \tilde{m}, j - n + \tilde{n}) \right) \right)
+	\end{align*}
+	
+	Using the same lemma and equations also yields the second equality
+	\begin{align*}
+		(\varphi \bullet B)(i, j) &= ((\varphi \oplus B) \ominus B)(i, j) \\
+		&= \prod_{(m, n) \in B} (\varphi \oplus B)(i + m, j + n) \\
+		&= \prod_{(m, n) \in B} \left( 1 - \prod_{(\tilde{m}, \tilde{n}) \in B} ( 1 - \varphi(i + m - \tilde{m}, j + n - \tilde{n}) ) \right)
+	\end{align*}
+	
+	This finishes the proof.
+\end{proof}
+
+We now assume $\varphi(i, j)$ to be a random variable for all $(i, j) \in \{ 1, \dots, M \} \times \{ 1, \dots, N \}$. Equations \eqref{eqopening} and \eqref{eqclosing} show, that $(\varphi \circ B)(i, j)$ and $(\varphi \bullet B)(i, j)$ are random variables as well.
+
+We want to express the events $\{ (\varphi \circ B)(i, j) = 1 \}$ and $\{ (\varphi \bullet B)(i, j) = 1 \}$ as unions and intersections of the events $\{ \varphi(i, j) = 1 \}$. This is done in the following corollary.
+
+\begin{corollary}
+	Let $M, N \in \mathbb{N}$ and $\varphi(i, j) \in \{ 0, 1 \}$ be a random variable for all $(i, j) \in \{ 1, \dots, M \} \times \{ 1, \dots, N \}$. Let $A$ be the index set of $\varphi$ and let $B \subseteq \mathbb{Z}^2$. Then we have the equivalences
+	\begin{align}
+		\{ (\varphi \circ B)(i, j) = 1 \} &\Leftrightarrow \bigcup_{(m, n) \in B} \bigcap_{(\tilde{m}, \tilde{n}) \in B} \{ \varphi(i - m + \tilde{m}, j - n + \tilde{n}) = 1 \} \label{eqeventopening} \\
+		\{ (\varphi \bullet B)(i, j) = 1 \} &\Leftrightarrow \bigcap_{(m, n) \in B} \bigcup_{(\tilde{m}, \tilde{n}) \in B} \{ \varphi(i + m - \tilde{m}, j + n - \tilde{n}) = 1 \} \label{eqeventclosing}
 	\end{align}
 \end{corollary}
 \begin{proof}
-	By definition of $A$, we have $\varphi_A = \varphi$. Using equation \eqref{eqopening}, we obtain the equivalences
+	Using equation \eqref{eqopening}, we obtain the equivalence
 	\begin{align*}
-		\{ \varphi_{A \circ B}(i, j) = 1 \} &\Leftrightarrow \left\{ 1 - \prod_{(m, n) \in B} \left( 1 - \left( \prod_{(\tilde{m}, \tilde{n}) \in B} \varphi(i - m + \tilde{m}, j - n + \tilde{n}) \right) \right) = 1 \right\} \\
+		\{ (\varphi \circ B)(i, j) = 1 \} &\Leftrightarrow \left\{ 1 - \prod_{(m, n) \in B} \left( 1 - \left( \prod_{(\tilde{m}, \tilde{n}) \in B} \varphi(i - m + \tilde{m}, j - n + \tilde{n}) \right) \right) = 1 \right\} \\
 		&\Leftrightarrow \left\{ \prod_{(m, n) \in B} \left( 1 - \left( \prod_{(\tilde{m}, \tilde{n}) \in B} \varphi(i - m + \tilde{m}, j - n + \tilde{n}) \right) \right) = 0 \right\}
 	\end{align*}
-	The event $\left\{ \prod_{(m, n) \in B} \left( 1 - \left( \prod_{(\tilde{m}, \tilde{n}) \in B} \varphi(i - m + \tilde{m}, j - n + \tilde{n}) \right) \right) = 0 \right\}$ occurs, if and only if any of the events $\left\{ 1 - \left( \prod_{(\tilde{m}, \tilde{n}) \in B} \varphi(i - m + \tilde{m}, j - n + \tilde{n}) \right) = 0 \right\}$ for $(m, n) \in B$ occurs. Thus, we get the equivalences
+	The event $\left\{ \prod_{(m, n) \in B} \left( 1 - \left( \prod_{(\tilde{m}, \tilde{n}) \in B} \varphi(i - m + \tilde{m}, j - n + \tilde{n}) \right) \right) = 0 \right\}$ occurs, if and only if any of the events $\left\{ 1 - \left( \prod_{(\tilde{m}, \tilde{n}) \in B} \varphi(i - m + \tilde{m}, j - n + \tilde{n}) \right) = 0 \right\}$ for $(m, n) \in B$ occurs. Thus, we get the equivalence
 	\begin{align*}
-		\{ \varphi_{A \circ B}(i, j) = 1 \} &\Leftrightarrow \left\{ \prod_{(m, n) \in B} \left( 1 - \left( \prod_{(\tilde{m}, \tilde{n}) \in B} \varphi(i - m + \tilde{m}, j - n + \tilde{n}) \right) \right) = 0 \right\} \\
+		\{ (\varphi \circ B)(i, j) = 1 \} &\Leftrightarrow \left\{ \prod_{(m, n) \in B} \left( 1 - \left( \prod_{(\tilde{m}, \tilde{n}) \in B} \varphi(i - m + \tilde{m}, j - n + \tilde{n}) \right) \right) = 0 \right\} \\
 		&\Leftrightarrow \bigcup_{(m, n) \in B} \left\{ 1 - \left( \prod_{(\tilde{m}, \tilde{n}) \in B} \varphi(i - m + \tilde{m}, j - n + \tilde{n}) \right) = 0 \right\} \\
 		&\Leftrightarrow \bigcup_{(m, n) \in B} \left\{ \prod_{(\tilde{m}, \tilde{n}) \in B} \varphi(i - m + \tilde{m}, j - n + \tilde{n}) = 1 \right\}
 	\end{align*}
@@ -799,7 +811,7 @@ We now assume $\varphi_A(i, j)$ to be a random variable for all $(i, j) \in \{ 1
 		&\Leftrightarrow \bigcup_{(m, n) \in B} \bigcap_{(\tilde{m}, \tilde{n}) \in B} \{ \varphi(i - m + \tilde{m}, j - n + \tilde{n}) = 1 \}
 	\end{align*}
 	
-	This finished the proof of first equivalence. The second equivalence can be proven similarly.
+	This finishes the proof of first equivalence. The proof of the second equivalence is analogous.
 \end{proof}
 
 \newpage
@@ -823,27 +835,26 @@ We now assume $\varphi_A(i, j)$ to be a random variable for all $(i, j) \in \{ 1
 	\begin{equation}
 		\varphi_\alpha(i, j) = \mathds{1}_{ \{ T(i, j) \geq t_\alpha \} }
 	\end{equation}
-	for all $(i, j) \in G$ and define the set
-	\begin{equation}
-		A_\alpha = \{ (i, j) \in \{ 1, \dots, M \} \times \{ 1, \dots, N \} \mid \varphi_\alpha(i, j) = 1 \}
-	\end{equation}
+	for all $(i, j) \in G$ and let $A_\alpha \coloneqq A_{\varphi_\alpha}$ be the index set of $\varphi_\alpha$.
 	
 	Let $k \in \mathbb{N}$ be odd. Let $K = \{ -\frac{k - 1}{2}, -\frac{k - 3}{2}, \dots, \frac{k - 3}{2}, \frac{k - 1}{2} \}$ and $B = K \times K$ be a structuring element.
-	Then the following inequality holds:
-	\begin{equation*}
-		\mathbb{P}((A_\alpha \circ B)(i, j) = 1 \mid H_0(i, j)) \leq k \alpha^{\frac{k+1}{2}}
-	\end{equation*}
+	Then the following inequalities hold:
+	\begin{align}
+		\mathbb{P}((\varphi_\alpha \circ B)(i, j) = 1 \mid H_0(i, j)) \leq k \alpha^{\frac{k+1}{2}} \label{ineqopening} \\
+		\mathbb{P}((\varphi_\alpha \bullet B)(i, j) = 1 \mid H_0(i, j)) \leq k^2 \alpha \label{ineqclosing}
+	\end{align}
 \end{theorem}
 \begin{proof}
-	We aim to find an upper bound for the probability
+	We start with the proof of inequality \eqref{ineqopening}. We aim to find an upper bound for the probability
 	\begin{equation*}
 		\mathbb{P}((\varphi_\alpha \circ B)(i, j) = 1 \mid H_0(i, j))
 	\end{equation*}
-	To do this, we first notice that $H_0(i, j)$ is equivalent to $V(i, j) = 0$, but since $V$ contains a rectangular region of interest, this means that $i < i_1$ or $i > i_2$ or $j < j_1$ or $j > j_2$. We need to differentiate cases here. These four cases are not mutually exclusive, but have different implications for the row/column of the index $(i, j)$ and a neighbouring row/column:\\
+	
+	Let $(i_1, j_1)$ be the top right corner and $(i_2, j_2)$ the bottom right corner of the rectangular region of interest contained in $V$. We first notice that $H_0(i, j)$ is equivalent to $V(i, j) = 0$. Since $V$ contains a rectangular region of interest, this means that $i < i_1$ or $i > i_2$ or $j < j_1$ or $j > j_2$. We need to differentiate cases here. These four cases are not mutually exclusive, but have different implications for the row/column of the index $(i, j)$ and a neighbouring row/column:\\
 	
 	\begin{tabular}{|c|c|c|}
 		\hline
-		case & row/column of $(i, j)$ & neighbouring row/column \\
+		\textbf{case} & \textbf{row/column of $(i, j)$} & \textbf{neighbouring row/column} \\
 		\hline
 		$i < i_1$ & $V(i, 1) = \dots = V(i, N) = 0$ & $V(i-1, 1) = \dots = V(i-1, N) = 0$ \\
 		\hline
@@ -855,32 +866,168 @@ We now assume $\varphi_A(i, j)$ to be a random variable for all $(i, j) \in \{ 1
 		\hline
 	\end{tabular}\\
 	
-	Without loss of generality we assume the first case. This means that the null hypotheses $H(i, 1), \dots, H(i, N)$ and $H(i-1, 1), \dots, H(i-1, N)$ are true.
+	Without loss of generality we assume the first case. This implies that
+	\begin{equation*}
+		D^-(i, 1) = \dots = D^-(i, N) = 0
+	\end{equation*}
 	
-	To be even more precise, it implies that $D^-(i, 1) = \dots = D^-(i, N) = 0$.
-	
-	We have assumed the side length $k$ of the structuring element $B$ to be odd.
-	
-	We define the two index sets $K = \{ -\frac{k - 1}{2}, -\frac{k - 3}{2}, \dots, \frac{k - 3}{2}, \frac{k - 1}{2} \}$ and $K_1 = \{ -\frac{k - 1}{2}, -\frac{k - 5}{2}, \dots, \frac{k - 5}{2}, \frac{k - 1}{2} \}$. This yields
+	In a first step, we use equivalence \eqref{eqeventopening} and the fact, that $B = K \times K$ to write this probability as
 	\begin{align*}
 		\mathbb{P}&( (\varphi_\alpha \circ B)(i, j) = 1 \mid H_0(i, j) ) \\
 		&= \mathbb{P}\left( \bigcup_{(m, n) \in B} \bigcap_{(\tilde{m}, \tilde{n}) \in B} \{ \varphi_\alpha(i - m + \tilde{m}, j - n + \tilde{n}) = 1 \} \mid H_0(i, j) \right) \\
+		&= \mathbb{P}\left( \bigcup_{m, n \in K} \bigcap_{\tilde{m}, \tilde{n} \in K} \{ \varphi_\alpha(i - m + \tilde{m}, j - n + \tilde{n}) = 1 \} \mid H_0(i, j) \right)
+	\end{align*}
+	
+	We now want to bound this from above by writing it as a sum over $n \in K$ and get
+	\begin{align*}
+		\mathbb{P}&( (\varphi_\alpha \circ B)(i, j) = 1 \mid H_0(i, j) ) \\
 		&= \mathbb{P}\left( \bigcup_{m, n \in K} \bigcap_{\tilde{m}, \tilde{n} \in K} \{ \varphi_\alpha(i - m + \tilde{m}, j - n + \tilde{n}) = 1 \} \mid H_0(i, j) \right) \\
+		&\leq \sum_{n \in K} \mathbb{P}\left( \bigcup_{m \in K} \bigcap_{\tilde{m}, \tilde{n} \in K} \{ \varphi_\alpha(i - m + \tilde{m}, j - n + \tilde{n}) = 1 \} \mid H_0(i, j) \right)
+	\end{align*}
+	
+	By dropping every term except for $\tilde{m} = m$ in the intersection inside, we get the upper bound
+	\begin{align*}
+		\mathbb{P}&( (\varphi_\alpha \circ B)(i, j) = 1 \mid H_0(i, j) ) \\
 		&\leq \sum_{n \in K} \mathbb{P}\left( \bigcup_{m \in K} \bigcap_{\tilde{m}, \tilde{n} \in K} \{ \varphi_\alpha(i - m + \tilde{m}, j - n + \tilde{n}) = 1 \} \mid H_0(i, j) \right) \\
 		&\leq \sum_{n \in K} \mathbb{P}\left( \bigcup_{m \in K} \bigcap_{\tilde{m} = m, \tilde{n} \in K} \{ \varphi_\alpha(i - m + \tilde{m}, j - n + \tilde{n}) = 1 \} \mid H_0(i, j) \right) \\
-		&= \sum_{n \in K} \mathbb{P}\left( \bigcup_{m \in K} \bigcap_{\tilde{n} \in K} \{ \varphi_\alpha(i, j - n + \tilde{n}) = 1 \} \mid H_0(i, j) \right) \\
-		&= \sum_{n \in K} \mathbb{P}\left( \bigcap_{\tilde{n} \in K} \{ \varphi_\alpha(i, j - n + \tilde{n}) = 1 \} \mid H_0(i, j) \right) \\
-		&\leq \sum_{n \in K} \mathbb{P}\left( \bigcap_{\tilde{n} \in K_1} \{ \varphi_\alpha(i, j - n + \tilde{n}) = 1 \} \mid H_0(i, j) \right) \\
-		&= \sum_{n \in K} \prod_{\tilde{n} \in K_1} \mathbb{P}( \{ \varphi_\alpha(i, j - n + \tilde{n}) = 1 \} \mid H_0(i, j) ) \\
-		&= \sum_{n \in K} \prod_{\tilde{n} \in K_1} \mathbb{P}( T(i, j - n + \tilde{n}) \geq t_\alpha \mid H_0(i, j) ) \\
-		&\leq \sum_{n \in K} \prod_{\tilde{n} \in K_1} \mathbb{P}( \tilde{D}^-(i, j - n + \tilde{n}) \geq t_\alpha \mid H_0(i, j) ) \\
-		&= \sum_{n \in K} \prod_{\tilde{n} \in K_1} \mathbb{P}( \tilde{D}^-(i, j - n + \tilde{n}) \geq t_\alpha \mid D^-(i, j - n + \tilde{n}) = 0 ) \\
+		&= \sum_{n \in K} \mathbb{P}\left( \bigcup_{m \in K} \bigcap_{\tilde{n} \in K} \{ \varphi_\alpha(i, j - n + \tilde{n}) = 1 \} \mid H_0(i, j) \right)
+	\end{align*}
+	
+	The events inside the probability do not depend on $m \in K$ anymore, which yields
+	\begin{equation*}
+		\bigcup_{m \in K} \bigcap_{\tilde{n} \in K} \{ \varphi_\alpha(i, j - n + \tilde{n}) = 1 \} = \bigcap_{\tilde{n} \in K} \{ \varphi_\alpha(i, j - n + \tilde{n}) = 1 \}
+	\end{equation*}
+	
+	By plugging this in, we obtain the upper bound
+	\begin{align*}
+		\mathbb{P}&( (\varphi_\alpha \circ B)(i, j) = 1 \mid H_0(i, j) ) \\
+		&\leq \sum_{n \in K} \mathbb{P}\left( \bigcup_{m \in K} \bigcap_{\tilde{n} \in K} \{ \varphi_\alpha(i, j - n + \tilde{n}) = 1 \} \mid H_0(i, j) \right) \\
+		&= \sum_{n \in K} \mathbb{P}\left( \bigcap_{\tilde{n} \in K} \{ \varphi_\alpha(i, j - n + \tilde{n}) = 1 \} \mid H_0(i, j) \right)
+	\end{align*}
+	
+	We have defined the binary $\varphi_\alpha$ by setting $\varphi_\alpha(i, j) = \mathds{1}_{ \{ T(i, j) \geq t_\alpha \} }$. Using this definition and the definition of $T(i, j)$ we can rewrite the upper bound as
+	\begin{align*}
+		&\sum_{n \in K} \mathbb{P}\left( \bigcap_{\tilde{n} \in K} \{ \varphi_\alpha(i, j - n + \tilde{n}) = 1 \} \mid H_0(i, j) \right) \\
+		&= \sum_{n \in K} \mathbb{P}\left( \bigcap_{\tilde{n} \in K} \{ T(i, j - n + \tilde{n}) \geq t_\alpha \} \mid H_0(i, j) \right) \\
+		&= \sum_{n \in K} \mathbb{P}\left( \bigcap_{\tilde{n} \in K} \left( \{ \tilde{D}^+(i, j - n + \tilde{n}) \geq t_\alpha \} \cap \{ \tilde{D}^-(i, j - n + \tilde{n}) \geq t_\alpha \} \right) \mid H_0(i, j) \right)
+	\end{align*}
+	
+	By dropping the events $\{ \tilde{D}^+(i, j - n + \tilde{n}) \geq t_\alpha \}$, we get
+	\begin{align*}
+		\mathbb{P}&( (\varphi_\alpha \circ B)(i, j) = 1 \mid H_0(i, j) ) \\
+		&\leq \sum_{n \in K} \mathbb{P}\left( \bigcap_{\tilde{n} \in K} \left( \{ \tilde{D}^+(i, j - n + \tilde{n}) \geq t_\alpha \} \cap \{ \tilde{D}^-(i, j - n + \tilde{n}) \geq t_\alpha \} \right) \mid H_0(i, j) \right) \\
+		&\leq \sum_{n \in K} \mathbb{P}\left( \bigcap_{\tilde{n} \in K} \{ \tilde{D}^-(i, j - n + \tilde{n}) \geq t_\alpha \} \mid H_0(i, j) \right)
+	\end{align*}
+	
+	We now define a second set $K_1 = \{ -\frac{k - 1}{2}, -\frac{k - 5}{2}, \dots, \frac{k - 5}{2}, \frac{k - 1}{2} \}$. We have $K_1 \subseteq K$. Since $\tilde{D}^-(i, j)$ only depends on the pixels $(i, j), (i - 1, j), (i, j - 1)$, we see, that for fixed $n \in K$ the set $\{ \tilde{D}^-(i, j - n + \tilde{n}) \mid \tilde{n} \in K_1 \}$ is a set of independent random variables. We drop the terms in $K \setminus K_1$ and use the independence to obtain
+	\begin{align*}
+		\mathbb{P}&( (\varphi_\alpha \circ B)(i, j) = 1 \mid H_0(i, j) ) \\
+		&\leq \sum_{n \in K} \mathbb{P}\left( \bigcap_{\tilde{n} \in K} \{ \tilde{D}^-(i, j - n + \tilde{n}) \geq t_\alpha \} \mid H_0(i, j) \right) \\
+		&\leq \sum_{n \in K} \mathbb{P}\left( \bigcap_{\tilde{n} \in K_1} \{ \tilde{D}^-(i, j - n + \tilde{n}) \geq t_\alpha \} \mid H_0(i, j) \right) \\
+		&= \sum_{n \in K} \prod_{\tilde{n} \in K_1} \mathbb{P}\left( \tilde{D}^-(i, j - n + \tilde{n}) \geq t_\alpha \mid H_0(i, j) \right)
+	\end{align*}
+	
+	At the start of this proof, we have observed that $H_0(i, j)$ implies one of the four cases listed in the table above. On the other hand, any of the cases implies $H_0(i, j)$. This equivalence is obtained through the prior knowledge, that $V$ contains a rectangular region of interest. We have assumed the first case and thus get
+	\begin{align*}
+		\mathbb{P}&( (\varphi_\alpha \circ B)(i, j) = 1 \mid H_0(i, j) ) \\
+		&\leq \sum_{n \in K} \prod_{\tilde{n} \in K_1} \mathbb{P}\left( \tilde{D}^-(i, j - n + \tilde{n}) \geq t_\alpha \mid H_0(i, j) \right) \\
+		&= \sum_{n \in K} \prod_{\tilde{n} \in K_1} \mathbb{P}\left( \tilde{D}^-(i, j - n + \tilde{n}) \geq t_\alpha \mid D^-(i, 1) = \dots = D^-(i, N) = 0 \right) \\
+		&= \sum_{n \in K} \prod_{\tilde{n} \in K_1} \mathbb{P}\left( \tilde{D}^-(i, j - n + \tilde{n}) \geq t_\alpha \mid D^-(i, j - n + \tilde{n}) = 0 \right)
+	\end{align*}
+	
+	By assumption, $t_\alpha$, such that a statistical significance of $\alpha$ was assured in the testing procedure. This is done by using lemma \ref{lemtypeIbound} and theorem \ref{thmeqcdf} by bounding the probability $\mathbb{P}(\tilde{D}^+(i, j) \geq t \mid D^+(i, j) = 0)$ by $\alpha$. This yields
+	\begin{align*}
+		\mathbb{P}&( (\varphi_\alpha \circ B)(i, j) = 1 \mid H_0(i, j) ) \\
+		&\leq \sum_{n \in K} \prod_{\tilde{n} \in K_1} \mathbb{P}\left( \tilde{D}^-(i, j - n + \tilde{n}) \geq t_\alpha \mid D^-(i, j - n + \tilde{n}) = 0 \right) \\
 		&\leq \sum_{n \in K} \prod_{\tilde{n} \in K_1} \alpha \\
 		&= \abs{K} \alpha^{\abs{K_1}} \\
 		&= k \alpha^{\frac{k+1}{2}}
 	\end{align*}
 	
-	The other three cases can be proven in a similar way by swapping the roles of $m$ or $\tilde{m}$ with $n$ or $\tilde{n}$, respectively and/or by replacing $D^-$ by $D^+$.
+	This proves the first inequality for the first case. The other three cases can be proven analogously by swapping the roles of $m$ or $\tilde{m}$ with $n$ or $\tilde{n}$, respectively and/or by replacing $D^-$ by $D^+$. This finishes the proof of the first inequality.\\
+	
+	
+	For the proof of the second inequality, we want to exploit our prior knowledge on $V$ again. As already stated in the proof of the first inequlity, we see, that $H_0(i, j)$ is equivalent to $V(i, j) = 0$, which is equivalent to at least one of the cases $i < i_1$ or $i > i_2$ or $j < j_1$ or $j > j_2$ being true.
+	
+	By differentiating cases, we can observe implications for other rows or columns of $V$ depending on the case:\\
+	
+	\begin{tabular}{|c|c|}
+		\hline
+		\textbf{case} & \textbf{other rows/columns of $V$} \\
+		\hline
+		$i < i_1$ & $\forall r \in \{ 1, \dots, i \}: V(r, 1) = \dots = V(r, N) = 0$ \\
+		\hline
+		$i > i_2$ & $\forall r \in \{ i, \dots, M \}: V(r, 1) = \dots = V(r, N) = 0$ \\
+		\hline
+		$j < j_1$ & $\forall s \in \{ 1, \dots, j \}: V(1, s) = \dots = V(M, s) = 0$ \\
+		\hline
+		$j > j_2$ & $\forall s \in \{ j, \dots, N \}: V(1, s) = \dots = V(M, s) = 0$ \\
+		\hline
+	\end{tabular}\\
+	
+	Without loss of generality we assume the first case. This implies that
+	\begin{equation*}
+		\forall r \in \{ 1, \dots, i \}: D^-(r, 1) = \dots = D^-(r, N) = 0
+	\end{equation*}
+	and thus, that the null hypotheses $H_0(r, 1), \dots, H_0(r, N)$ are true for all $r \in \{ 1, \dots, i \}$.
+	
+	Set $m_0 = -\frac{k - 1}{2}$ and $n_0 = 0$. Then $(m_0, n_0) \in B$ and we get that the null hypotheses $H_0(i + m_0 - \tilde{m}, j + n_0 - \tilde{n})$ are true for all $\tilde{m}, \tilde{n} \in K$. Moreover, we have $D^-(i + m_0 - \tilde{m}, j + n_0 - \tilde{n}) = 0$ for all $\tilde{m}, \tilde{n} \in K$.
+	
+	We use equivalence \eqref{eqeventclosing} and $B = K \times K$ to write the left hand side of inequality \eqref{ineqclosing} as
+	\begin{align*}
+		\mathbb{P}&( (\varphi_\alpha \bullet B)(i, j) = 1 \mid H_0(i, j) ) \\
+		&= \mathbb{P}\left( \bigcap_{(m, n) \in B} \bigcup_{(\tilde{m}, \tilde{n}) \in B} \{ \varphi_\alpha(i + m - \tilde{m}, j + n - \tilde{n}) = 1 \} \mid H_0(i, j) \right) \\
+		&= \mathbb{P}\left( \bigcap_{m, n \in K} \bigcup_{\tilde{m}, \tilde{n} \in K} \{ \varphi_\alpha(i + m - \tilde{m}, j + n - \tilde{n}) = 1 \} \mid H_0(i, j) \right)
+	\end{align*}
+	
+	By dropping every term in the intersection except for $m = m_0$ and $n = n_0$ we can bound this from above
+	\begin{align*}
+		\mathbb{P}&( (\varphi_\alpha \bullet B)(i, j) = 1 \mid H_0(i, j) ) \\
+		&= \mathbb{P}\left( \bigcap_{m, n \in K} \bigcup_{\tilde{m}, \tilde{n} \in K} \{ \varphi_\alpha(i + m - \tilde{m}, j + n - \tilde{n}) = 1 \} \mid H_0(i, j) \right) \\
+		&\leq \mathbb{P}\left( \bigcup_{\tilde{m}, \tilde{n} \in K} \{ \varphi_\alpha(i + m_0 - \tilde{m}, j + n_0 - \tilde{n}) = 1 \} \mid H_0(i, j) \right) \\
+		&= \mathbb{P}\left( \bigcup_{\tilde{m}, \tilde{n} \in K} \{ \varphi_\alpha(i + m_0 - \tilde{m}, j - \tilde{n}) = 1 \} \mid H_0(i, j) \right)
+	\end{align*}
+	
+	Writing this as the sum over all $\tilde{m}, \tilde{n} \in K$ yields
+	\begin{align*}
+		\mathbb{P}&( (\varphi_\alpha \bullet B)(i, j) = 1 \mid H_0(i, j) ) \\
+		&\leq \mathbb{P}\left( \bigcup_{\tilde{m}, \tilde{n} \in K} \{ \varphi_\alpha(i + m_0 - \tilde{m}, j - \tilde{n}) = 1 \} \mid H_0(i, j) \right) \\
+		&\leq \sum_{\tilde{m}, \tilde{n} \in K} \mathbb{P}\left( \varphi_\alpha(i + m_0 - \tilde{m}, j - \tilde{n}) = 1 \mid H_0(i, j) \right)
+	\end{align*}
+	
+	By definition of $\varphi_\alpha$ and $T$ this can be written as
+	\begin{align*}
+		\mathbb{P}&( (\varphi_\alpha \bullet B)(i, j) = 1 \mid H_0(i, j) ) \\
+		&\leq \sum_{\tilde{m}, \tilde{n} \in K} \mathbb{P}\left( \varphi_\alpha(i + m_0 - \tilde{m}, j - \tilde{n}) = 1 \mid H_0(i, j) \right) \\
+		&= \sum_{\tilde{m}, \tilde{n} \in K} \mathbb{P}\left( T(i + m_0 - \tilde{m}, j - \tilde{n}) \geq t_\alpha \mid H_0(i, j) \right) \\
+		&= \sum_{\tilde{m}, \tilde{n} \in K} \mathbb{P}\left( \{ \tilde{D}^+(i + m_0 - \tilde{m}, j - \tilde{n}) \geq t_\alpha \} \cap \{ \tilde{D}^-(i + m_0 - \tilde{m}, j - \tilde{n}) \geq t_\alpha \} \mid H_0(i, j) \right)
+	\end{align*}
+	
+	Dropping the term for $\tilde{D}^+$, we get an upper bound
+	\begin{align*}
+		\mathbb{P}&( (\varphi_\alpha \bullet B)(i, j) = 1 \mid H_0(i, j) ) \\
+		&\leq \sum_{\tilde{m}, \tilde{n} \in K} \mathbb{P}\left( \{ \tilde{D}^+(i + m_0 - \tilde{m}, j - \tilde{n}) \geq t_\alpha \} \cap \{ \tilde{D}^-(i + m_0 - \tilde{m}, j - \tilde{n}) \geq t_\alpha \} \mid H_0(i, j) \right) \\
+		&\leq \sum_{\tilde{m}, \tilde{n} \in K} \mathbb{P}\left( \tilde{D}^-(i + m_0 - \tilde{m}, j - \tilde{n}) \geq t_\alpha \mid H_0(i, j) \right)
+	\end{align*}
+	
+	As we have seen, $H_0(i, j)$ implies one of the cases above. On the other hand, any of four cases implies $H_0(i, j)$. Thus, $H_0(i, j)$ is equivalent to any of the cases being true. We have chosen the first one without loss of generality. This yields
+	\begin{align*}
+		\mathbb{P}&( (\varphi_\alpha \bullet B)(i, j) = 1 \mid H_0(i, j) ) \\
+		&\leq \sum_{\tilde{m}, \tilde{n} \in K} \mathbb{P}\left( \tilde{D}^-(i + m_0 - \tilde{m}, j - \tilde{n}) \geq t_\alpha \mid H_0(i, j) \right) \\
+		&= \sum_{\tilde{m}, \tilde{n} \in K} \mathbb{P}\left( \tilde{D}^-(i + m_0 - \tilde{m}, j - \tilde{n}) \geq t_\alpha \mid \bigcap_{\tilde{m}, \tilde{n} \in K} \{ D^-(i + m_0 - \tilde{m}, j - \tilde{n}) = 0 \} \right) \\
+		&= \sum_{\tilde{m}, \tilde{n} \in K} \mathbb{P}\left( \tilde{D}^-(i + m_0 - \tilde{m}, j - \tilde{n}) \geq t_\alpha \mid D^-(i + m_0 - \tilde{m}, j - \tilde{n}) = 0 \right)
+	\end{align*}
+	
+	By the choice of $t_\alpha$ we obtain
+	\begin{align*}
+		\mathbb{P}&( (\varphi_\alpha \bullet B)(i, j) = 1 \mid H_0(i, j) ) \\
+		&\leq \sum_{\tilde{m}, \tilde{n} \in K} \mathbb{P}\left( \tilde{D}^-(i + m_0 - \tilde{m}, j - \tilde{n}) \geq t_\alpha \mid D^-(i + m_0 - \tilde{m}, j - \tilde{n}) = 0 \right) \\
+		&\leq \sum_{\tilde{m}, \tilde{n} \in K} \alpha \\
+		&= \abs{K}^2 \alpha \\
+		&= k^2 \alpha
+	\end{align*}
+	
+	This proves the inequality in the first case. The other cases are proven analogously by taking $m_0 = \frac{k - 1}{2}, n_0 = 0$ in the second case, $m_0 = 0, n_0 = -\frac{k - 1}{2}$ in the third case and $m_0 = 0, n_0 = \frac{k - 1}{2}$ in the fourth case. In the third and fourth case, the roles of $\tilde{D}^+$ and $\tilde{D}^-$ as well as the roles of $D^+$ and $D^-$ are swapped. This finishes the proof of second inequality and thus the proof of the theorem.
 \end{proof}
 
 \newpage
@@ -919,57 +1066,6 @@ We now assume $\varphi_A(i, j)$ to be a random variable for all $(i, j) \in \{ 1
 }
 
 \lstinputlisting{ROI-Detection/ProbabilityDistribution/Threshold.m}
-
-
-
-\newpage
-
-
-
-\begin{equation}
-	\{ \varphi_{A \circ B}(i, j) = 1 \} \Leftrightarrow \bigcup_{(m, n) \in B} \bigcap_{(\tilde{m}, \tilde{n}) \in B} \{ \varphi(i - m + \tilde{m}, j - n + \tilde{n}) = 1 \}
-\end{equation}
-
-\begin{align*}
-	\mathbb{P}&( (\varphi_\alpha \circ B)(i, j) = 1 \mid H_0(i, j) ) \\
-	&= \mathbb{P}\left( \bigcup_{(m, n) \in B} \bigcap_{(\tilde{m}, \tilde{n}) \in B} \{ \varphi(i - m + \tilde{m}, j - n + \tilde{n}) = 1 \} \mid H_0(i, j) \right) \\
-	&= \mathbb{P}\left( \bigcup_{m, n \in K} \bigcap_{\tilde{m}, \tilde{n} \in K} \{ \varphi(i - m + \tilde{m}, j - n + \tilde{n}) = 1 \} \mid H_0(i, j) \right) \\
-	&\leq \sum_{n \in K} \mathbb{P}\left( \bigcup_{m \in K} \bigcap_{\tilde{m}, \tilde{n} \in K} \{ \varphi(i - m + \tilde{m}, j - n + \tilde{n}) = 1 \} \mid H_0(i, j) \right) \\
-	&\leq \sum_{n \in K} \mathbb{P}\left( \bigcup_{m \in K} \bigcap_{\tilde{m} = m, \tilde{n} \in K} \{ \varphi(i - m + \tilde{m}, j - n + \tilde{n}) = 1 \} \mid H_0(i, j) \right) \\
-	&= \sum_{n \in K} \mathbb{P}\left( \bigcup_{m \in K} \bigcap_{\tilde{n} \in K} \{ \varphi(i, j - n + \tilde{n}) = 1 \} \mid H_0(i, j) \right) \\
-	&= \sum_{n \in K} \mathbb{P}\left( \bigcap_{\tilde{n} \in K} \{ \varphi(i, j - n + \tilde{n}) = 1 \} \mid H_0(i, j) \right) \\
-	&\leq \sum_{n \in K} \mathbb{P}\left( \bigcap_{\tilde{n} \in K_1} \{ \varphi(i, j - n + \tilde{n}) = 1 \} \mid H_0(i, j) \right) \\
-	&= \sum_{n \in K} \prod_{\tilde{n} \in K_1} \mathbb{P}( \{ \varphi(i, j - n + \tilde{n}) = 1 \} \mid H_0(i, j) ) \\
-	&= \sum_{n \in K} \prod_{\tilde{n} \in K_1} \mathbb{P}( T(i, j - n + \tilde{n}) \geq t_\alpha \mid H_0(i, j) ) \\
-	&\leq \sum_{n \in K} \prod_{\tilde{n} \in K_1} \mathbb{P}( \tilde{D}^-(i, j - n + \tilde{n}) \geq t_\alpha \mid H_0(i, j) ) \\
-	&= \sum_{n \in K} \prod_{\tilde{n} \in K_1} \mathbb{P}( \tilde{D}^-(i, j - n + \tilde{n}) \geq t_\alpha \mid D^-(i, j - n + \tilde{n}) = 0 ) \\
-	&\leq \sum_{n \in K} \prod_{\tilde{n} \in K_1} \alpha \\
-	&= \abs{K} \alpha^{\abs{K_1}} \\
-	&= k \alpha^{\frac{k+1}{2}}
-\end{align*}
-
-
-\begin{equation}
-	\{ \varphi_{A \bullet B}(i, j) = 1 \} \Leftrightarrow \bigcap_{(m, n) \in B} \bigcup_{(\tilde{m}, \tilde{n}) \in B} \{ \varphi(i + m - \tilde{m}, j + n - \tilde{n}) = 1 \}
-\end{equation}
-
-\begin{align*}
-	\mathbb{P}&( (\varphi_\alpha \bullet B)(i, j) = 1 \mid H_0(i, j) ) \\
-	&= \mathbb{P}\left( \bigcap_{(m, n) \in B} \bigcup_{(\tilde{m}, \tilde{n}) \in B} \{ \varphi(i + m - \tilde{m}, j + n - \tilde{n}) = 1 \} \mid H_0(i, j) \right) \\
-	&= \mathbb{P}\left( \bigcap_{m, n \in K} \bigcup_{\tilde{m}, \tilde{n} \in K} \{ \varphi(i + m - \tilde{m}, j + n - \tilde{n}) = 1 \} \mid H_0(i, j) \right) \\
-	&\leq \mathbb{P}\left( \bigcup_{\tilde{m}, \tilde{n} \in K} \{ \varphi(i + m_0 - \tilde{m}, j + n_0 - \tilde{n}) = 1 \} \mid H_0(i, j) \right) \\
-	&\leq \sum_{\tilde{m}, \tilde{n} \in K} \mathbb{P}( \{ \varphi(i + m_0 - \tilde{m}, j + n_0 - \tilde{n}) = 1 \} \mid H_0(i, j) ) \\
-	&= \sum_{\tilde{m}, \tilde{n} \in K} \mathbb{P}( T(i + m_0 - \tilde{m}, j + n_0 - \tilde{n}) \geq t_\alpha \mid H_0(i, j) ) \\
-	&\leq \sum_{\tilde{m}, \tilde{n} \in K} \mathbb{P}( \tilde{D}^-(i + m_0 - \tilde{m}, j + n_0 - \tilde{n}) \geq t_\alpha \mid H_0(i, j) ) \\
-	&= \sum_{\tilde{m}, \tilde{n} \in K} \mathbb{P}( \tilde{D}^-(i + m_0 - \tilde{m}, j + n_0 - \tilde{n}) \geq t_\alpha \mid D^-(i + m_0 - \tilde{m}, j + n_0 - \tilde{n}) = 0 ) \\
-	&\leq \sum_{\tilde{m}, \tilde{n} \in K} \alpha \\
-	&= \abs{K}^2 \alpha \\
-	&= k^2 \alpha
-\end{align*}
-
-
-
-
 
 
 \end{document}
