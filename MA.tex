@@ -17,6 +17,8 @@
 \usepackage{paralist}
 \usepackage{stmaryrd}
 \usepackage{tikz}
+\usepackage{pgffor}
+\usepackage{pgfplots}
 \usepackage{graphicx}
 \usepackage{setspace}
 \usepackage{fancyhdr}
@@ -1066,6 +1068,162 @@ We want to express the events $\{ (\varphi \circ B)(i, j) = 1 \}$ and $\{ (\varp
 }
 
 \lstinputlisting{ROI-Detection/ProbabilityDistribution/Threshold.m}
+
+\newpage
+
+% ------------------------------------------------------------------------
+
+%\begin{tikzpicture}
+%	\draw[red, dashed, very thick, rotate=30] (1,0) -- (0,0) -- (0,1);
+%	\draw[help lines] (0,0) grid (2,3);
+%	\draw[step=0.5, gray, very thin] (-1.4,-1.4) grid (1.4,1.4);
+%	\draw (0,0) parabola (1,1.5) parabola[bend at end] (2,0);
+%	\draw (0,0) sin (1,1) cos (2,0) sin (3,-1) cos (4,0) sin (5,1);
+%	\fill[black] (0,0) -- (0,1) -- (1,1) -- (1,0);
+%\end{tikzpicture}
+
+% ------------------------------------------------------------------------
+
+% Draw opening example before any morphological operations:
+\begin{figure}
+	\centering
+	\begin{tikzpicture}
+		\draw[help lines, step=1] (-4.5, -4.5) grid (4.5, 4.5);
+		\foreach \x in {(-3, -1), (-2, -1), (-2, 0), (-2, 1), (-1, -2), (-1, -1), (-1, 0), (-1, 1), (-1, 2), (0, -2), (0, -1), (0, 0), (0, 1), (2, -3), (2, -2), (3, -3), (3, -2)}
+			\filldraw[black] \x rectangle + (1, 1);
+	\end{tikzpicture}
+	\caption{Binary image, where the pixels with value one are black.}
+\end{figure}
+
+% Draw opening example after binary erosion:
+\begin{figure}
+	\centering
+	\begin{tikzpicture}
+		\draw[help lines, step=1] (-4.5, -4.5) grid (4.5, 4.5);
+		\foreach \x in {(-3, -1), (-2, -1), (-2, 0), (-2, 1), (-1, -2), (-1, -1), (-1, 0), (-1, 1), (-1, 2), (0, -2), (0, -1), (0, 0), (0, 1), (2, -3), (2, -2), (3, -3), (3, -2)}
+			\filldraw[black, opacity=0.3] \x rectangle + (1, 1);
+		\foreach \x in {(-1, 0)}
+			\filldraw[black] \x rectangle + (1, 1);
+	\end{tikzpicture}
+	\caption{Binary image after binary erosion with a $3 \times 3$ pixel structuring element. The transparent pixels are now set to zero.}
+\end{figure}
+
+% Draw opening example after binary opening:
+\begin{figure}
+	\centering
+	\begin{tikzpicture}
+		\draw[help lines, step=1] (-4.5, -4.5) grid (4.5, 4.5);
+		\foreach \x in {(-3, -1), (-2, -1), (-2, 0), (-2, 1), (-1, -2), (-1, -1), (-1, 0), (-1, 1), (-1, 2), (0, -2), (0, -1), (0, 0), (0, 1), (2, -3), (2, -2), (3, -3), (3, -2)}
+			\filldraw[black, opacity=0.3] \x rectangle + (1, 1);
+		\foreach \x in {(-2, -1), (-2, 0), (-2, 1), (-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 0), (0, 1)}
+			\filldraw[black] \x rectangle + (1, 1);
+	\end{tikzpicture}
+	\caption{Binary image after binary opening, i.e. erosion and dilation. Outliers have been eliminated and edges have been smoothed.}
+\end{figure}
+
+% ------------------------------------------------------------------------
+
+% Draw closing example before any morphological operations:
+\begin{figure}
+	\centering
+	\begin{tikzpicture}
+		\draw[help lines, step=1] (-4.5, -4.5) grid (4.5, 4.5);
+		\foreach \x in {(-2, 0), (-2, 2), (1, 1), (1, -2)}
+			\filldraw[black] \x rectangle + (1, 1);
+	\end{tikzpicture}
+	\caption{Binary image, where the pixels with value one are black.}
+\end{figure}
+
+% Draw closing example after binary dilation:
+\begin{figure}
+	\centering
+	\begin{tikzpicture}
+		\draw[help lines, step=1] (-4.5, -4.5) grid (4.5, 4.5);
+		\foreach \x in {(-3, -1), (-3, 0), (-3, 1), (-3, 2), (-3, 3), (-2, -1), (-2, 0), (-2, 1), (-2, 2), (-2, 3), (-1, -1), (-1, 0), (-1, 1), (-1, 2), (-1, 3), (0, -3), (0, -2), (0, -1), (0, 0), (0, 1), (0, 2), (1, -3), (1, -2), (1, -1), (1, 0), (1, 1), (1, 2), (2, -3), (2, -2), (2, -1), (2, 0), (2, 1), (2, 2)}
+			\filldraw[gray] \x rectangle + (1, 1);
+		\foreach \x in {(-2, 0), (-2, 2), (1, 1), (1, -2)}
+			\filldraw[black] \x rectangle + (1, 1);
+	\end{tikzpicture}
+	\caption{Binary image after binary dilation with a $3 \times 3$ pixel structuring element. The gray pixels are now set to one.}
+\end{figure}
+
+% Draw closing example after binary closing:
+\begin{figure}
+	\centering
+	\begin{tikzpicture}
+		\draw[help lines, step=1] (-4.5, -4.5) grid (4.5, 4.5);
+		\foreach \x in {(-2, 0), (-2, 1), (-2, 2), (-1, 0), (-1, 1), (0, 0), (0, 1), (1, -2), (1, -1), (1, 0), (1, 1)}
+			\filldraw[gray] \x rectangle + (1, 1);
+		\foreach \x in {(-2, 0), (-2, 2), (1, 1), (1, -2)}
+			\filldraw[black] \x rectangle + (1, 1);
+	\end{tikzpicture}
+	\caption{Binary image after binary closing, i.e. dilation and erosion. Gaps have been filled.}
+\end{figure}
+
+% ------------------------------------------------------------------------
+
+\begin{figure}
+	\centering
+	\begin{tikzpicture}
+		\begin{axis}[
+			xlabel=$x$ (-),
+			ylabel=$f(x)$ (-),
+			title={Measured transfer function of analogue filter},
+			grid=both,
+			minor grid style={gray!25},
+			major grid style={gray!25},
+			width=0.75\linewidth,
+			no marks,
+			legend pos=south east]
+			\addplot[line width=1pt,solid,color=blue] table[x=x,y=y,col sep=comma]{Resources/CDF.csv};
+			\draw (axis cs: 3.2554, 0) -- (axis cs: 3.2554, 0.95);
+			\draw (axis cs: 0, 0.95) -- (axis cs: 3.2554, 0.95);
+			\draw (axis cs: 4.2791, 0) -- (axis cs: 4.2791, 0.99);
+			\draw (axis cs: 0, 0.99) -- (axis cs: 4.2791, 0.99);
+			\filldraw (axis cs: 3.2554, 0.95) circle (2pt);
+			\filldraw (axis cs: 4.2791, 0.99) circle (2pt);
+			\addlegendentry{CDF};
+		\end{axis}
+	\end{tikzpicture}
+	\caption{Cumulative distribution function}
+\end{figure}
+
+% ------------------------------------------------------------------------
+
+% Draw closing example after binary dilation:
+\begin{figure}
+	\centering
+	\begin{tikzpicture}
+		\draw[help lines, step=1] (-6, -6) grid (6, 6);
+		\foreach \i in {0, ..., 5}
+			\foreach \j in {-4, ..., 5}
+				\filldraw[black] (\i, \j) rectangle + (1, 1);
+		\foreach \x in {(-1, 1), (-2, 0), (-1, 3), (-2, 2), ((-1, -1), (-2, -2)}
+			\filldraw[red] \x rectangle + (1, 1);
+		\filldraw[blue] (-1, 2) rectangle + (1, 1) node[pos=.5, color=white] {$(i - 2, j)$};
+		\filldraw[blue] (-1, 0) rectangle + (1, 1) node[pos=.5, color=white] {$(i, j)$};
+		\filldraw[blue] (-1, -2) rectangle + (1, 1) node[pos=.5, color=white] {$(i + 2, j)$};
+		\draw[<-, line width=1mm] (-0.5, 6) -- (-0.5, 7) node[above] {column of $(i, j)$};
+		\node[color=white] at (3, 1) {rROI $R$};
+	\end{tikzpicture}
+	\caption{The test statistics are independet for every second pixel in the column.}
+\end{figure}
+
+% ------------------------------------------------------------------------
+
+% Set boxes to be marked for structuring element:
+%markedStructuringElement = {(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 0), (0, 1), (1, -1), (1, 0), (1, 1)}
+
+% ------------------------------------------------------------------------
+
+% Label points:
+text(-1.2, 0, '(i, j)', 'color', 'w', 'Fontsize', 10)
+text(-1.4, 2, '(i - 2, j)', 'color', 'w', 'Fontsize', 10)
+text(-1.4, -2, '(i + 2, j)', 'color', 'w', 'Fontsize', 10)
+
+% title('Test statistic')
+
+% ------------------------------------------------------------------------
 
 
 \end{document}
