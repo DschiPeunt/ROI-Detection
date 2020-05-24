@@ -1,0 +1,50 @@
+\begin{thebibliography}{1}
+
+\bibitem{BazenGerez}
+Asker Bazen and Sabih Gerez.
+\newblock Segmentation of fingerprint images.
+\newblock 12, 12 2001.
+
+\bibitem{TISP}
+I.S. Gradshteyn and I.M. Ryzhik.
+\newblock {\em Table of Integrals, Series, and Products}, page 699.
+\newblock Academic Press, 7th edition, 2007.
+
+\bibitem{Kittler}
+J.~Kittler and J.~Illingworth.
+\newblock Minimum error thresholding.
+\newblock {\em Pattern Recognition}, 19(1):41 -- 47, 1986.
+
+\bibitem{adaboost}
+Eryun Liu, Heng Zhao, Fangfei Guo, Jimin Liang, and Jie Tian.
+\newblock Fingerprint segmentation based on an adaboost classifier.
+\newblock {\em Frontiers of Computer Science in China}, 5:148--157, 06 2011.
+
+\bibitem{handbookfipri}
+Davide Maltoni, Dario Maio, Anil~K Jain, and Salil Prabhakar.
+\newblock {\em Handbook of fingerprint recognition}.
+\newblock Springer Science \& Business Media, 2009.
+
+\bibitem{IntQFunction}
+Albert~H. Nuttall.
+\newblock Some integrals involving the {$Q_M$}-function.
+\newblock 1974.
+
+\bibitem{imageprocessing}
+Frank~Y Shih.
+\newblock {\em Image processing and pattern recognition: fundamentals and
+  techniques}.
+\newblock John Wiley \& Sons, 2010.
+
+\bibitem{FDB}
+Duy~Hoang Thai, Stephan Huckemann, and Carsten Gottschlich.
+\newblock Filter design and performance evaluation for fingerprint image
+  segmentation.
+\newblock {\em PLOS ONE}, 11(5):1--31, 05 2016.
+
+\bibitem{XueTitterington}
+J.~{Xue} and D.~M. {Titterington}.
+\newblock $t$ -tests, $f$ -tests and otsu's methods for image thresholding.
+\newblock {\em IEEE Transactions on Image Processing}, 20(8):2392--2396, 2011.
+
+\end{thebibliography}
