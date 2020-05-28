@@ -1,4 +1,13 @@
 function cases = ErrorTestCases(dims, nr_pictures, cases, alpha, max_nr_noise, max_sigma)
+%ERRORTESTCASES Determine errors in predetermined test cases
+% INPUT
+% -----
+% dims: vector with different sizes of the test cases
+% nr_pictures: number of pictures for each entry in dims
+% cases: structure with test cases
+% alpha: statistical significance
+% max_nr_noise: amount of noises to test
+% max_sigma: up to which standard deviation to test the errors
 
 % Define side length of structuring element:
 phi = 3;
@@ -9,12 +18,12 @@ SE = strel('square', phi);
 % Set increment size for threshold algorithm:
 increment = 0.0001;
 
-% Calculate threshold based on alpha:
-t_alpha = Threshold(alpha, increment);
-
 % Determine relaxed significance:
 % alpha_rel_o = power(alpha / phi, 2 / (phi - 1));
 % alpha_rel_oc = power(alpha / phi^3, 2 / (phi - 1));
+
+% Calculate threshold based on alpha:
+[t_alpha, alpha_real] = Threshold(alpha, increment);
 
 % Loop over dimensions:
 for i = 1 : size(dims, 2)
@@ -41,8 +50,8 @@ for i = 1 : size(dims, 2)
         R = zeros(dims(i), dims(i));
         R(tlc(1) : brc(1), tlc(2) : brc(2)) = 1;
         
-        % Count total number of foreground and background pixels:
-        total = [sum(sum(R == 1)), sum(sum(R == 0))];
+        % Count total number of background and foreground pixels:
+        total = [sum(sum(R == 0)), sum(sum(R == 1))];
         
         % Initialize counters for type I and II errors:
         err = zeros(max_sigma, 2);
@@ -79,7 +88,7 @@ for i = 1 : size(dims, 2)
         end
         
         % Save results:
-        cases.(dim_name).(strcat('total', num2str(j))) = total * nr_noise;
+        cases.(dim_name).(strcat('total', num2str(j))) = total * max_nr_noise;
         cases.(dim_name).(strcat('err', num2str(j))) = err;
         cases.(dim_name).(strcat('err_o', num2str(j))) = err_o;
         cases.(dim_name).(strcat('err_oc', num2str(j))) = err_oc;

@@ -1,5 +1,9 @@
 function [t, alpha_real] = Threshold(alpha, increment)
 %THRESHOLD Calculate threshold based on target statistical significance
+% INPUT
+% -----
+% alpha: target statistical significance
+% increment: step size to continuously increase threshold
 
 t = 0;
 alpha_real = 1;
