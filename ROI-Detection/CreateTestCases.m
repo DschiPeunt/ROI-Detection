@@ -15,7 +15,7 @@ end
 cases = createTestCases(dims, nr_pictures, min_size);
 
 % Plot generated ROI images:
-showTestCases(dims, nr_pictures, cases, 'f', 1);
+showTestCases(dims, nr_pictures, cases, 'F', 1);
 
 end
 
@@ -33,7 +33,7 @@ for i = 1 : size(dims, 2)
     for j = 1 : nr_pictures
         
         % Generate names of the image and coordinates:
-        fname = strcat('f', num2str(j));
+        fname = strcat('F', num2str(j));
         tlcname = strcat('tlc', num2str(j));
         brcname = strcat('brc', num2str(j));
         

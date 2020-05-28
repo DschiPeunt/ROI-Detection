@@ -2,12 +2,12 @@ function [t, alpha_real] = Threshold(alpha, increment)
 %THRESHOLD Calculate threshold based on target statistical significance
 
 t = 0;
+alpha_real = 1;
 
-while CDF(t, 1) < 1 - alpha
+while alpha_real >= alpha
     t = t + increment;
+    alpha_real = 1 - CDF(t, 1);
 end
-
-alpha_real = CDF(t, 1);
 
 end
 

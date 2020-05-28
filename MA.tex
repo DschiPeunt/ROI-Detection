@@ -144,15 +144,17 @@ Dr. Robin \textsc{Richter}
 
 \section{Introduction}\label{sectionintroduction}
 
-Fingerprint analysis has played an important role in biometric identification for more than a century with a variety of applications ranging from border control to smartphone development. By comparing the minutiae of two fingerprints it can be determined, if it is likely, that they have originated from the same individual. Besides the study of algorithms that compare two fingerprint images, the usage of image preprocessing techniques to improve the performance of these algorithms has also become a beneficial field of study. One important preprocessing step of many automated fingerprint identification/verification protocols is the extraction of the so-called \emph{region of interest} (ROI) of the fingerprint aiming at dividing a given fingerprint image into the ROI or foreground, that contains the ridges and thus the minutiae and features of the fingerprint, and the background, that contains no information about the fingerprint, [\citen{handbookfipri}].
+Fingerprint analysis has played an important role in biometric identification for more than a century [\citen{Henry}] with a variety of applications ranging from border control to smartphone development. By comparing the characteristic features of two fingerprints, called minutiae, it can be determined, if it is likely, that they have originated from the same individual. Complementary to the study of matching algorithms, the usage of image preprocessing techniques to improve the performance of these matching algorithms has become a beneficial field of study. One important preprocessing step of many automated matching algorithms is the extraction of the so-called \emph{region of interest} (ROI) of the fingerprint aiming at dividing a given fingerprint image into the ROI or foreground, that contains the features and thus the minutiae and ridges of the fingerprint, and the background, that contains no information about the fingerprint, see [\citen{handbookfipri}].
 
 Automated extraction of the ROI is often achieved by the use of thresholding methods, see [\citen{FDB}], and morphological operators, see [\citen{FDB, BazenGerez, adaboost}]. While the thresholding methods provide a binarization of the image to categorize pixels into ROI and background, the use of morphological operators aims at minimizing errors such as falsely classifying a background pixel as ROI or vice versa. The construction of these morphological operators relies on prior information of the fingerprint image, such as convexity and oscillatory behaviour within the ROI.
 
-The thresholding techniques can be interpreted via statistical testing since a false classification of a pixel has similarities to an error in a hypothesis test. This connection serves at times as the heuristic for thresholding techniques, see [\citen{Kittler, XueTitterington}]. In the sense of statistical testing, the probablities of a background pixel being falsely classified as a foreground pixel or a foreground pixel as a background pixel can be described as a statistical significance and power, respectively. The application of morphological operators then can be seen as an attempt at improving the statistical significance or power.
+We interpret the thresholding techniques via statistical testing. In this sense, falsely classifying a background pixel as a foreground pixel and vice versa can be seen as a type I and II error in a statistical test. The application of morphological operators is an attempt to lower the amount of the errors in this testing procedure.
 
-The interplay of thresholding techniques with post-processing via morphological operators, mainly incorporating the prior knowledge of convexity, has, to the best of the author's knowledge, not been addressed. This thesis aims at providing a first step towards understanding this interplay.
+The interplay of thresholding techniques with post-processing via morphological operators, mainly incorporating the prior knowledge of convexity, has, to the best of the author's knowledge, not been addressed. This thesis aims at providing a first step towards understanding this interplay by quantifying the change of the probabilities of type I and II errors through application of morphological operators.
 
-While we have some prior knowledge about the global properties of fingerprint images, such as convexity, we do not have any prior knowledge about the local properties of fingerprints. Since our goal is the study of the improvements of the error probabilities for a specific pixel, we will limit our research to a simplified model, that does exhibit priorly known local properties. This model will assume a rectangular region of interest with a checkerboard pattern surrounded by a constanst gray background. For the same reason we will only analyze the impact of morphological opening and closing, since these operators only rely on a neighbourhood of the specific pixel we are considering. The model still exhibits convexity of the ROI and an oscillatory pattern within the ROI, as in a fingerprint image.
+Our goal is the study of the improvements of the error probabilities for a specific pixel. We limit our research to a simplified model, for which we can bound the probability of a type I error after thresholding. This model assumes a rectangular region of interest with a checkerboard pattern surrounded by a constanst gray background, see figure \ref{examplerROI}. We analyze the impact of morphological opening and closing, since these operators only rely on a neighbourhood of the specific pixel we are considering. The model still exhibits convexity of the ROI and an oscillatory pattern within the ROI, as in a fingerprint image.
+
+Since we are interested in the change of the error probabilities for a specific pixel, we do not consider methods to test for the whole rectangle, but develop a test for each pixel to decide whether or not it is part of the rectangular region of interest.
 
 \begin{figure}[h]
 	\centering
@@ -179,33 +181,33 @@ Let $m, n \in \mathbb{N}$ and $c \in \mathbb{R} \setminus \{ 0 \}$. We assume we
 \begin{equation}\label{introductionstatmodel}
 	F(i, j) = c + V(i, j) + \varepsilon_{i, j}
 \end{equation}
-for all $(i, j) \in \Omega \coloneqq \left\{ 1, \dots, m \right\} \times \left\{ 1, \dots, n \right\}$. For a grayscale image we take $c = 127.5$. We assume, that $V$ contains a rectangular region of interest with a checkerboard pattern, see figure \ref{examplerROI} for an example. This means, that the values of $V$ alternate between $c$ and $-c$ along the rows and columns of the region of interest. We call the set of all such images $\mathcal{V}_c^{m, n}$. We assume the noise terms $\varepsilon_{i, j} \sim \mathcal{N}(0, \sigma^2)$ to be i.i.d. normal distributed random variables for some $\sigma > 0$.
+for all $(i, j) \in \Omega \coloneqq \left\{ 1, \dots, m \right\} \times \left\{ 1, \dots, n \right\}$. In this paper, we consider grayscale images, that takes values in $\{ 0, \dots, 255 \}$ and set $c$ to be $127.5$. We assume, that the values of $V$ alternate between $c$ and $-c$ along the rows and columns of the region of interest, see figure \ref{examplerROI} for an example. We call the set of all such images $\mathcal{V}_c^{m, n}$. We assume the noise terms $\varepsilon_{i, j} \sim \mathcal{N}(0, \sigma^2)$ to be i.i.d. normal distributed random variables for some $\sigma > 0$.
 
 Notably, we make two simplifications. First, we assume the variance $\sigma$ of the noise terms to be known beforehand. Second, we ignore the limitations of grayscale images and let the images in our model take all values in the real numbers.
 
 The image $F$ is the observed data we are given. The goal is to develop a statistical test for every pixel to determine whether or not the pixel belongs to the region of interest of $V$ and as such reconstructing the unknown $V$ from the noisy data. The pixel $(i, j)$ belonging to the ROI is equivalent to $\min \{ \norm{\Delta^+ V(i, j)}, \norm{\Delta^- V(i, j)} \} \neq 0$, where $\Delta^+$ and $\Delta^-$ denote the forward and backward discrete derivative operator, respectively. Thus, we get the null and alternative hypotheses
 \begin{align*}
-	H_0(i, j)&: \min \{ \norm{\Delta^+ V(i, j)}, \norm{\Delta^- V(i, j)} \} = 0 \\
-	H_1(i, j)&: \min \{ \norm{\Delta^+ V(i, j)}, \norm{\Delta^- V(i, j)} \} \neq 0
+	H_0(i, j)&: \min \{ \norm{\Delta^+ V(i, j)}, \norm{\Delta^- V(i, j)} \} = 0, \\
+	H_1(i, j)&: \min \{ \norm{\Delta^+ V(i, j)}, \norm{\Delta^- V(i, j)} \} \neq 0.
 \end{align*}
-and the test statistic
+We use
 \begin{equation*}
 	T(i, j) \coloneqq \min \{ \norm{\Delta^+ F(i, j)}, \norm{\Delta^- F(i, j)} \}
 \end{equation*}
-for each pixel $(i, j) \in \Omega$. Based on these null hypotheses, we define the sets
+as a test statistic for each pixel $(i, j) \in \Omega$. Based on the null hypotheses, we define the sets
 \begin{equation*}
-	\mathcal{H}_0(i, j) \coloneqq \left\{ V \in \mathcal{V}_c^{m, n} \mid \min \{ \norm{\Delta^+ V(i, j)}, \norm{\Delta^- V(i, j)} \} = 0 \right\}
+	\mathcal{H}_0(i, j) \coloneqq \left\{ V \in \mathcal{V}_c^{m, n} \mid \min \{ \norm{\Delta^+ V(i, j)}, \norm{\Delta^- V(i, j)} \} = 0 \right\}.
 \end{equation*}
 
-Then $H_0(i, j)$ is true, if and only if $V \in \mathcal{H}_0(i, j)$. We use the notation $\mathbb{P}_V( \ldots )$ for the probability of an event for some \emph{fixed} image $V$ to analyze the error probabilities of the statistical test.
+Then $H_0(i, j)$ is true, if and only if $V \in \mathcal{H}_0(i, j)$. In the following, we denote by $\mathbb{P}_V( \ldots )$ the probability of an event given a \emph{fixed} image $V$.
 
-Let $V \in \mathcal{H}_0(i, j)$. Then $\norm{\Delta^+ V(i, j)} = $ or $\norm{\Delta^- V(i, j)} = 0$ and we can bound the statistical significance in the first case by
+Let $V \in \mathcal{H}_0(i, j)$. Then we have $\norm{\Delta^+ V(i, j)} = $ or $\norm{\Delta^- V(i, j)} = 0$ and we can bound the probability of a type I error in the first case by
 \begin{equation*}
 	\mathbb{P}_V( T(i, j) \geq t ) \leq \mathbb{P}_V( \norm{\Delta^+ F(i, j)} \geq t )
 \end{equation*}
 and in the second case by
 \begin{equation*}
-	\mathbb{P}_V( T(i, j) \geq t ) \leq \mathbb{P}_V( \norm{\Delta^- F(i, j)} \geq t )
+	\mathbb{P}_V( T(i, j) \geq t ) \leq \mathbb{P}_V( \norm{\Delta^- F(i, j)} \geq t ).
 \end{equation*}
 
 The right hand side of both inequalities is the same function, which can be computed explicitly. Using a trial and error algorithm, we can find a threshold $t_\alpha$ for a given statistical significance $\alpha \in ( 0, 1 )$, such that
@@ -218,11 +220,11 @@ Since this is independent of the specific $V$, it holds for all images $V$ under
 
 \paragraph{Main results}
 
-After having established that we can ensure a given statistical significance in the statistical test, we aim at researching the changes of the statistical significance under morphological opening and closing.
+After having established our statistical testing procedure and how a suitable threshold can be computed, we aim at researching the changes of the error probabilities under morphological opening and closing.
 
-To this end, let $\mathfrak{I} \in \{ 0, 1 \}^{m \times n}$ be a binary matrix and $\Psi \subseteq \mathbb{Z}^2$ be a structuring element. We denote by $\mathfrak{I} \circ \Psi$ the opening of the binary matrix $\mathfrak{I}$ by $\Psi$ and by $\mathfrak{I} \bullet \Psi$ the closing of the binary matrix $\mathfrak{I}$ by $\Psi$.
+To this end, let $\mathfrak{I} \in \{ 0, 1 \}^{m \times n}$ be a binary matrix and $\Psi \subseteq \mathbb{Z}^2$ be a \emph{structuring element} [\citen{imageprocessing}]. We denote by $\mathfrak{I} \circ \Psi$ the opening of the binary matrix $\mathfrak{I}$ by $\Psi$ and by $\mathfrak{I} \bullet \Psi$ the closing of the binary matrix $\mathfrak{I}$ by $\Psi$.
 
-This notation allows us to write the main results of this paper. As the region of interest in our case is rectangular, it is natural to use a square structuring element. Using such a square structuring element yields an exponential improvement of the statistical significance after morphological opening. Applying morphological closing after opening will worsen the statistical significance, but only by a multiple. This yields an overall improvement of the statistical significance, when applying morphological opening and closing. These results are given in the following theorem.
+As the region of interest in our case is rectangular, we use a square structuring element. Using such a square structuring element yields an exponential improvement of probability of a type I error after morphological opening compared to the probability before opening is applied. Applying morphological closing after opening will worsen this probability, but only polynomially. This yields an overall improvement of the probability of a type I error, when applying morphological opening and closing. This result is formalized in the following theorem.
 \begin{theorem}
 	Let $m, n \in \mathbb{N}$, $c \in \mathbb{R} \setminus \{ 0 \}$ and $\Omega = \left\{ 1, \dots, m \right\} \times \left\{ 1, \dots, m \right\}$. Assume we are given data
 	\begin{equation*}
@@ -230,25 +232,57 @@ This notation allows us to write the main results of this paper. As the region o
 	\end{equation*}
 	for all $(i, j) \in \Omega$, where the unknown $V$ contains a rectangular region of interest with a checkerboard pattern and $\varepsilon_{i, j} \sim \mathcal{N}(0, \sigma^2)$ are i.i.d. normal distributed random variables for some $\sigma > 0$.
 	
-	Let $\alpha \in (0, 1)$ and $t_\alpha$ be the threshold to ensure a statistical significance of $\alpha$ in the single pixel statistical test. Let $\mathfrak{I}_\alpha$ be the binary image defined by
+	Let $\alpha \in (0, 1)$ and $t_\alpha$ a threshold, such that
+	\begin{equation*}
+		\max \left\{ \mathbb{P}_V\left( \norm{\Delta^+ F(i, j)} \geq t_\alpha \right), \mathbb{P}_V\left( \norm{\Delta^- F(i, j)} \geq t_\alpha \right) \right\} \leq \alpha
+	\end{equation*}
+	for all $V \in \mathcal{H}_0(i, j)$. Let $\mathfrak{I}_\alpha$ be the binary image defined by
 	\begin{equation*}
 		\mathfrak{I}_\alpha(i, j) = \mathds{1}_{ \{ T(i, j) \geq t_\alpha \} }
 	\end{equation*}
 	for all $(i, j) \in \Omega$.
 	
-	Let $k \in \mathbb{N}$ be odd. Let $\Phi_k = \{ -\frac{k - 1}{2}, -\frac{k - 3}{2}, \dots, \frac{k - 3}{2}, \frac{k - 1}{2} \}$ and $\Psi_k = \Phi_k \times \Phi_k$ be a structuring element. Let $(i, j) \in \Omega$ and $V \in \mathcal{H}_0(i, j)$.
+	Let $\varphi \in \mathbb{N}$ be odd. Let $\Phi_\varphi = \{ -\frac{\varphi - 1}{2}, -\frac{\varphi - 3}{2}, \dots, \frac{\varphi - 3}{2}, \frac{\varphi - 1}{2} \}$ and $\Psi_\varphi = \Phi_\varphi \times \Phi_\varphi$ be a structuring element. Let $(i, j) \in \Omega$ and $V \in \mathcal{H}_0(i, j)$.
+	Then the following inequalities hold:
 	Then the following inequalities hold:
 	\begin{align}
-		\mathbb{P}_V( (\mathfrak{I}_\alpha \circ \Psi_k)(i, j) = 1 ) &\leq k \alpha^{\frac{k+1}{2}} \\
-		\mathbb{P}_V( ( (\mathfrak{I}_\alpha \circ \Psi_k) \bullet \Psi_k)(i, j) = 1 ) &\leq k^3 \alpha^{\frac{k+1}{2}}
+		\mathbb{P}_V( (\mathfrak{I}_\alpha \circ \Psi_\varphi)(i, j) = 1 ) &\leq \varphi \alpha^{\frac{\varphi + 1}{2}} \\
+		\mathbb{P}_V( ((\mathfrak{I}_\alpha \circ \Psi_\varphi) \bullet \Psi_\varphi)(i, j) = 1 ) &\leq \varphi^3 \alpha^{\frac{\varphi + 1}{2}}
 	\end{align}
 \end{theorem}
 
-While these results hold only in our simplified model, it is worth noting, that our model and statistical test exhibit high similarities to widely used techniques in automated fingerprint recognition.
+We are also interested in the change of the probability of a type II error, when morphological opening and closing are applied. Morphological opening increases this probability polynomially. The application of morphological closing, when applied after opening, does not lower the probability, since the pixels are not independent anymore. This is formalized in the following theorem.
+
+\begin{theorem}
+	Let $m, n \in \mathbb{N}$, $c \in \mathbb{R} \setminus \{ 0 \}$ and $\Omega = \left\{ 1, \dots, m \right\} \times \left\{ 1, \dots, m \right\}$. Assume we are given data
+	\begin{equation*}
+		F(i, j) = c + V(i, j) + \varepsilon_{i, j}
+	\end{equation*}
+	for all $(i, j) \in \Omega$, where the unknown $V$ contains a rectangular region of interest with a checkerboard pattern and $\varepsilon_{i, j} \sim \mathcal{N}(0, \sigma^2)$ are i.i.d. normal distributed random variables for some $\sigma > 0$.
+	
+	Let $t$ be a threshold, such that
+	\begin{equation*}
+		\mathbb{P}_V\left( T(i, j) \leq t \right) \leq \beta
+	\end{equation*}
+	for all $V \in \mathcal{H}_1(i, j)$. Let $\mathfrak{I}$ be the binary image defined by
+	\begin{equation}
+		\mathfrak{I}(i, j) = \mathds{1}_{ \{ T(i, j) \geq t \} }
+	\end{equation}
+	for all $(i, j) \in \Omega$.
+	
+	Let $\varphi \in \mathbb{N}$ be odd. Let $\Phi_\varphi = \{ -\frac{\varphi - 1}{2}, -\frac{\varphi - 3}{2}, \dots, \frac{\varphi - 3}{2}, \frac{\varphi - 1}{2} \}$ and $\Psi_\varphi = \Phi_\varphi \times \Phi_\varphi$ be a structuring element. Let $(i, j) \in \Omega$ and $V \in \mathcal{H}_1(i, j)$.
+	
+	Denote by $\varLambda = \{ \kappa_1, \dots, \kappa_2 \} \times \{ \lambda_1, \dots, \lambda_2 \}$ the rROI contained in $V$. Let $\min \{ \kappa_2 - \kappa_1 + 1, \lambda_2 - \lambda_1 + 1 \} \geq \varphi$.
+	Then the following inequalities hold:
+	\begin{align}
+		\mathbb{P}_V( (\mathfrak{I} \circ \Psi_\varphi)(i, j) = 0 ) &\leq \varphi^2 \beta \\
+		\mathbb{P}_V( ((\mathfrak{I} \circ \Psi_\varphi) \bullet \Psi_\varphi)(i, j) = 0 ) &\leq \varphi^2 \beta
+	\end{align}
+\end{theorem}
 
 \paragraph{Outline of the paper}
 
-In section \ref{sectiondefinitions} we will introduce mathematical definitions of the aforementioned images and properties. With the introduced terminology we develop a statistical test for every pixel to determine whether or not it is part of the region of interest in section \ref{sectionstatisticalmodel}. After having established the statistical test, we proof in section \ref{sectionstatisticalsignificance} that we can ensure a given statistical significance and analyze the power of the statistical test in section \ref{sectionpower}. Afterwards, in section \ref{sectionmorphologicaloperations} we introduce the two morphological operators, that we study in this paper, along with some examples of their application. From there, we proceed to proof the main theorems of this paper in section \ref{sectionmainresults}.
+In Section \ref{sectiondefinitions} we introduce definitions and notation of the aforementioned images and properties. With the introduced terminology we develop a statistical test for every pixel determining whether or not it is part of the region of interest in Section \ref{sectionstatisticalmodel}. After having established the statistical test, we proof in Section \ref{sectionstatisticalsignificance} that we can bound the probability of a type I error by a given statistical significance and analyze the power of the statistical test in Section \ref{sectionpower}. Afterwards, in Section \ref{sectionmorphologicaloperations} the two morphological operators, that we study in this paper, are introduced, along with some examples of their application. From there, we proceed to proof the main theorems of this paper in Section \ref{sectionmainresults}.
 
 \newpage
 
@@ -256,10 +290,10 @@ In section \ref{sectiondefinitions} we will introduce mathematical definitions o
 
 \subsection{Definitions}\label{sectiondefinitions}
 
-As discussed before, we limit our research to a simplified model. We assume that the noise-free image $V$ in our statistical model has a rectangular region of interest with a checkerboard pattern, cp. equation \eqref{introductionstatmodel} and figure \ref{examplerROI}. In the following we give mathematical definitions of these properties.
+We consider a simplified model. Assume that the noise-free image $V$ in our statistical model has a rectangular region of interest with a checkerboard pattern, cf. equation \eqref{introductionstatmodel} and figure \ref{examplerROI}. In the following we give formal definitions of these properties.
 
 \begin{definition}
-	Let $m, n \in \mathbb{N}$ and $V \in \mathbb{R}^{m \times n}$. Let $(\kappa_1, \lambda_1), (\kappa_2, \lambda_2)$ be two pairs of indices with $1 \leq \kappa_1 \leq \kappa_2 \leq m$ and $1 \leq \lambda_1 \leq \lambda_2 \leq m$, such that
+	Let $m, n \in \mathbb{N}$ and $V \in \mathbb{R}^{m \times n}$. Let $(\kappa_1, \lambda_1), (\kappa_2, \lambda_2) \in \mathbb{N}^2$ be two pairs of indices with $1 \leq \kappa_1 \leq \kappa_2 \leq m$ and $1 \leq \lambda_1 \leq \lambda_2 \leq m$, such that
 	\begin{equation}\label{eqrROI}
 		V(i, j) \neq 0 \textrm{ if and only if } (i, j) \in \{ \kappa_1, \dots, \kappa_2 \} \times \{ \lambda_1, \dots, \lambda_2 \}
 	\end{equation}
@@ -1567,7 +1601,7 @@ The next theorem states the change of the probability of a type I error after op
 \begin{appendix}
 	\section{Algorithms}
 	
-	\lstinputlisting[caption=\emph{MATLAB} implementation of a trial and error algorithm to find a threshold for the statistical test.]{ROI-Detection/ProbabilityDistribution/Threshold.m}
+	\lstinputlisting[caption=\emph{MATLAB} implementation of a trial and error algorithm to find a threshold for the statistical test.]{ROI-Detection/CDFThreshold/Threshold.m}
 \end{appendix}
 
 
