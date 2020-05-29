@@ -8,7 +8,7 @@ function [err, err_o, err_oc, total] = ErrorFull(m, n, alpha, max_nr_noise, max_
 % max_nr_noise: amount of noises to test
 % max_sigma: up to which standard deviation to test the errors
 % min_size: minimal size of the ROI (optional)
-% c_bg: greyscale value for the image background (optional)
+% c_bg: grayscale value for the image background (optional)
 
 % Define side length of structuring element:
 phi = 3;

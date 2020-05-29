@@ -5,14 +5,14 @@ function [ROI_Picture, tlc, brc] = ROI_Generator(M, N, min_size, c_bg)
 % M: height/vertical size of the output matrix
 % N: width/horizontal size of the output matrix
 % min_size: minimal size of the ROI (optional)
-% c_bg: greyscale value for the image background (optional)
+% c_bg: grayscale value for the image background (optional)
 
 % Check whether a minimal size was given:
 if (~exist('min_size', 'var'))
     min_size = 0;
 end
 
-% Check whether an alternative background greyvalue was given:
+% Check whether an alternative background grayvalue was given:
 if (~exist('c_bg', 'var'))
     c_bg = 127.5;
 end
