@@ -18,3 +18,9 @@ legend('Lower bound', 'Upper bound', 'Location', 'southeast')
 title('Power bounds')
 xlabel('sigma')
 ylabel('power')
+
+% ------------------------------------------------------------------------
+
+% Write to .csv file:
+% csvwrite('resultsPowerSimLowerBound.csv', [sigma_range' lowerBound'])
+% csvwrite('resultsPowerSimUpperBound.csv', [sigma_range' upperBound'])

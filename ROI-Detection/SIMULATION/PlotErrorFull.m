@@ -33,3 +33,13 @@ xlabel('sigma')
 ylabel('% of type II errors')
 axis([0 max_sigma 0 1])
 hold off
+
+% ------------------------------------------------------------------------
+
+% Write to .csv file:
+% csvwrite('resultsErrorFullTypeI.csv', [sigma_range' (err(:, 1) / total(1))])
+% csvwrite('resultsErrorFullTypeI_o.csv', [sigma_range' (err_o(:, 1) / total(1))])
+% csvwrite('resultsErrorFullTypeI_oc.csv', [sigma_range' (err_oc(:, 1) / total(1))])
+% csvwrite('resultsErrorFullTypeII.csv', [sigma_range' (err(:, 2) / total(2))])
+% csvwrite('resultsErrorFullTypeII_o.csv', [sigma_range' (err_o(:, 2) / total(2))])
+% csvwrite('resultsErrorFullTypeII_oc.csv', [sigma_range' (err_oc(:, 2) / total(2))])
