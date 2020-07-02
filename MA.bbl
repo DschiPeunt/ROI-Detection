@@ -1,4 +1,4 @@
-\begin{thebibliography}{10}
+\begin{thebibliography}{1}
 
 \bibitem{BazenGerez}
 Asker Bazen and Sabih Gerez.
@@ -14,11 +14,6 @@ I.S. Gradshteyn and I.M. Ryzhik.
 E.~R. Henry.
 \newblock Classification and uses of finger prints.
 \newblock 1900.
-
-\bibitem{Kittler}
-J.~Kittler and J.~Illingworth.
-\newblock Minimum error thresholding.
-\newblock {\em Pattern Recognition}, 19(1):41 -- 47, 1986.
 
 \bibitem{adaboost}
 Eryun Liu, Heng Zhao, Fangfei Guo, Jimin Liang, and Jie Tian.
@@ -46,10 +41,5 @@ Duy~Hoang Thai, Stephan Huckemann, and Carsten Gottschlich.
 \newblock Filter design and performance evaluation for fingerprint image
   segmentation.
 \newblock {\em PLOS ONE}, 11(5):1--31, 05 2016.
-
-\bibitem{XueTitterington}
-J.~{Xue} and D.~M. {Titterington}.
-\newblock $t$ -tests, $f$ -tests and otsu's methods for image thresholding.
-\newblock {\em IEEE Transactions on Image Processing}, 20(8):2392--2396, 2011.
 
 \end{thebibliography}

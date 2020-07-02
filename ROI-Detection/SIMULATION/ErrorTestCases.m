@@ -19,11 +19,11 @@ SE = strel('square', phi);
 increment = 0.0001;
 
 % Determine relaxed significance:
-% alpha_rel_o = power(alpha / phi, 2 / (phi - 1));
-% alpha_rel_oc = power(alpha / phi^3, 2 / (phi - 1));
+alpha_rel_o = power(alpha / phi, 2 / (phi + 1));
+% alpha_rel_oc = power(alpha / phi^3, 2 / (phi + 1));
 
 % Calculate threshold based on alpha:
-[t_alpha, alpha_real] = Threshold(alpha, increment);
+[t_alpha, alpha_real] = Threshold(alpha_rel_o, increment);
 
 % Loop over dimensions:
 for i = 1 : size(dims, 2)

@@ -21,8 +21,11 @@
 \usepackage{pgffor}
 \usepackage{pgfplots}
 \usepackage{graphicx}
+\usepackage{caption}
+\usepackage{subcaption}
 \usepackage{setspace}
 \usepackage{fancyhdr}
+\usepackage{float}
 % \usepackage[colorlinks=true,linkcolor=blue]{hyperref}				% Blue hyperlinks look better than red boxed ones
 
 % Header
@@ -142,7 +145,7 @@ Dr. Robin \textsc{Richter}
 
 \newpage
 
-\section{Introduction}\label{sectionintroduction}
+\section{Introduction}\label{section: introduction}
 
 Fingerprint analysis has played an important role in biometric identification for more than a century [\citen{Henry}] with a variety of applications ranging from border control to smartphone development. By comparing the characteristic features of two fingerprints, called minutiae, it can be determined, if it is likely, that they have originated from the same individual. Complementary to the study of matching algorithms, the usage of image preprocessing techniques to improve the performance of these matching algorithms has become a beneficial field of study. One important preprocessing step of many automated matching algorithms is the extraction of the so-called \emph{region of interest} (ROI) of the fingerprint aiming at dividing a given fingerprint image into the ROI or foreground, that contains the features and thus the minutiae and ridges of the fingerprint, and the background, that contains no information about the fingerprint, see [\citen{handbookfipri}].
 
@@ -150,9 +153,9 @@ Automated extraction of the ROI is often achieved by the use of thresholding met
 
 We interpret the thresholding techniques via statistical testing. In this sense, falsely classifying a background pixel as a foreground pixel and vice versa can be seen as a type I and II error in a statistical test. The application of morphological operators is an attempt to lower the amount of the errors in this testing procedure.
 
-The interplay of thresholding techniques with post-processing via morphological operators, mainly incorporating the prior knowledge of convexity, has, to the best of the author's knowledge, not been addressed. This thesis aims at providing a first step towards understanding this interplay by quantifying the change of the probabilities of type I and II errors through application of morphological operators.
+The interplay of thresholding techniques with post-processing via morphological operators, incorporating prior knowledge, has, to the best of the author's knowledge, not been addressed. This thesis aims at providing a first step towards understanding this interplay by quantifying the change of the probabilities of type I and II errors through application of morphological operators.
 
-Our goal is the study of the improvements of the error probabilities for a specific pixel. We limit our research to a simplified model, for which we can bound the probability of a type I error after thresholding. This model assumes a rectangular region of interest with a checkerboard pattern surrounded by a constanst gray background, see figure \ref{examplerROI}. We analyze the impact of morphological opening and closing, since these operators only rely on a neighbourhood of the specific pixel we are considering. The model still exhibits convexity of the ROI and an oscillatory pattern within the ROI, as in a fingerprint image.
+Our goal is the study of the improvements of the error probabilities for a specific pixel. We limit our research to a simplified model, for which we can bound the probability of a type I error after thresholding. This model assumes a rectangular region of interest with a checkerboard pattern surrounded by a constanst gray background, see figure \ref{fig: exampleV}. We analyze the impact of morphological opening and closing, since these operators only rely on a neighbourhood of the specific pixel we are considering. The model still exhibits convexity of the ROI and an oscillatory pattern within the ROI, as in a fingerprint image.
 
 Since we are interested in the change of the error probabilities for a specific pixel, we do not consider methods to test for the whole rectangle, but develop a test for each pixel to decide whether or not it is part of the rectangular region of interest.
 
@@ -172,18 +175,20 @@ Since we are interested in the change of the error probabilities for a specific 
 		\draw[step=1] (-6, -6) grid (6, 6);
 	\end{tikzpicture}
 	\caption{Example of an image, that contains a rectangular region of interest with a checkerboard pattern.}
-	\label{examplerROI}
+	\label{fig: exampleV}
 \end{figure}
 
 \paragraph{The statistical model}
 
 Let $m, n \in \mathbb{N}$ and $c \in \mathbb{R} \setminus \{ 0 \}$. We assume we are given a noisy image following the statistical model
-\begin{equation}\label{introductionstatmodel}
-	F(i, j) = c + V(i, j) + \varepsilon_{i, j}
+\begin{equation}\label{statmodel}
+	F(i, j) = \underbrace{c + V(i, j)}_{\eqqcolon \tilde{V}(i, j)} + \varepsilon_{i, j}
 \end{equation}
-for all $(i, j) \in \Omega \coloneqq \left\{ 1, \dots, m \right\} \times \left\{ 1, \dots, n \right\}$. In this paper, we consider grayscale images, that takes values in $\{ 0, \dots, 255 \}$ and set $c$ to be $127.5$. We assume, that the values of $V$ alternate between $c$ and $-c$ along the rows and columns of the region of interest, see figure \ref{examplerROI} for an example. We call the set of all such images $\mathcal{V}_c^{m, n}$. We assume the noise terms $\varepsilon_{i, j} \sim \mathcal{N}(0, \sigma^2)$ to be i.i.d. normal distributed random variables for some $\sigma > 0$.
+for all $(i, j) \in \Omega \coloneqq \left\{ 1, \dots, m \right\} \times \left\{ 1, \dots, n \right\}$. We assume, that the values of $V$ alternate between $c$ and $-c$ along the rows and columns of the region of interest, and call the set of all such images $\mathcal{V}_c^{m, n}$. We assume the noise terms $\varepsilon_{i, j} \sim \mathcal{N}(0, \sigma^2)$ to be i.i.d. normally distributed random variables for some $\sigma > 0$.
 
-Notably, we make two simplifications. First, we assume the variance $\sigma$ of the noise terms to be known beforehand. Second, we ignore the limitations of grayscale images and let the images in our model take all values in the real numbers.
+For visualization we use grayscale images and take $c = 127.5$. Then the values of the image $\tilde{V}$ alternate between $0$ and $255$ along the region of interest, which translates to black and white in a grayscale image. This gives the region of interest of $\tilde{V}$ a classical checkerboard pattern, see figure \ref{fig: exampleV} for an example.
+
+Notably, we make two simplifications in our statistical model. First, we assume the variance $\sigma$ of the noise terms to be known beforehand. Second, we ignore the limitations of grayscale images and let the images in our model take all values in the real numbers.
 
 The image $F$ is the observed data we are given. The goal is to develop a statistical test for every pixel to determine whether or not the pixel belongs to the region of interest of $V$ and as such reconstructing the unknown $V$ from the noisy data. The pixel $(i, j)$ belonging to the ROI is equivalent to $\min \{ \norm{\Delta^+ V(i, j)}, \norm{\Delta^- V(i, j)} \} \neq 0$, where $\Delta^+$ and $\Delta^-$ denote the forward and backward discrete derivative operator, respectively. Thus, we get the null and alternative hypotheses
 \begin{align*}
@@ -201,11 +206,18 @@ as a test statistic for each pixel $(i, j) \in \Omega$. Based on the null hypoth
 
 Then $H_0(i, j)$ is true, if and only if $V \in \mathcal{H}_0(i, j)$. In the following, we denote by $\mathbb{P}_V( \ldots )$ the probability of an event given a \emph{fixed} image $V$.
 
-Let $V \in \mathcal{H}_0(i, j)$. Then we have $\norm{\Delta^+ V(i, j)} = $ or $\norm{\Delta^- V(i, j)} = 0$ and we can bound the probability of a type I error in the first case by
+Let $V \in \mathcal{H}_0(i, j)$. Then we have $\norm{\Delta^+ V(i, j)} = 0$ or $\norm{\Delta^- V(i, j)} = 0$. Based on this fact, we define two subsets of $\mathcal{H}_0(i, j)$ by
+\begin{align*}
+	\mathcal{H}_0^+(i, j) &\coloneqq \left\{ V \in \mathcal{V}_c^{m, n} \mid \norm{\Delta^+ V(i, j)} = 0 \right\}, \\
+	\mathcal{H}_0^-(i, j) &\coloneqq \left\{ V \in \mathcal{V}_c^{m, n} \mid \norm{\Delta^- V(i, j)} = 0 \right\}
+\end{align*}
+and get $\mathcal{H}_0(i, j) = \mathcal{H}_0^+(i, j) \cup \mathcal{H}_0^-(i, j)$. The union is not necessarily disjoint.
+
+For $V \in \mathcal{H}_0^+(i, j)$ we can bound the probability of a type I error by
 \begin{equation*}
 	\mathbb{P}_V( T(i, j) \geq t ) \leq \mathbb{P}_V( \norm{\Delta^+ F(i, j)} \geq t )
 \end{equation*}
-and in the second case by
+and for $V \in \mathcal{H}_0^-(i, j)$ by
 \begin{equation*}
 	\mathbb{P}_V( T(i, j) \geq t ) \leq \mathbb{P}_V( \norm{\Delta^- F(i, j)} \geq t ).
 \end{equation*}
@@ -222,7 +234,7 @@ Since this is independent of the specific $V$, it holds for all images $V$ under
 
 After having established our statistical testing procedure and how a suitable threshold can be computed, we aim at researching the changes of the error probabilities under morphological opening and closing.
 
-To this end, let $\mathfrak{I} \in \{ 0, 1 \}^{m \times n}$ be a binary matrix and $\Psi \subseteq \mathbb{Z}^2$ be a \emph{structuring element} [\citen{imageprocessing}]. We denote by $\mathfrak{I} \circ \Psi$ the opening of the binary matrix $\mathfrak{I}$ by $\Psi$ and by $\mathfrak{I} \bullet \Psi$ the closing of the binary matrix $\mathfrak{I}$ by $\Psi$.
+To this end, let $\mathfrak{I} \in \{ 0, 1 \}^{m \times n}$ be a binary matrix and $\Psi \subseteq \mathbb{Z}^2$ be a \emph{structuring element}, see [\citen{imageprocessing}]. We denote by $\mathfrak{I} \circ \Psi$ the opening of the binary matrix $\mathfrak{I}$ by $\Psi$ and by $\mathfrak{I} \bullet \Psi$ the closing of the binary matrix $\mathfrak{I}$ by $\Psi$.
 
 As the region of interest in our case is rectangular, we use a square structuring element. Using such a square structuring element yields an exponential improvement of probability of a type I error after morphological opening compared to the probability before opening is applied. Applying morphological closing after opening will worsen this probability, but only polynomially. This yields an overall improvement of the probability of a type I error, when applying morphological opening and closing. This result is formalized in the following theorem.
 \begin{theorem}
@@ -232,11 +244,9 @@ As the region of interest in our case is rectangular, we use a square structurin
 	\end{equation*}
 	for all $(i, j) \in \Omega$, where the unknown $V$ contains a rectangular region of interest with a checkerboard pattern and $\varepsilon_{i, j} \sim \mathcal{N}(0, \sigma^2)$ are i.i.d. normal distributed random variables for some $\sigma > 0$.
 	
-	Let $\alpha \in (0, 1)$ and $t_\alpha$ a threshold, such that
-	\begin{equation*}
-		\max \left\{ \mathbb{P}_V\left( \norm{\Delta^+ F(i, j)} \geq t_\alpha \right), \mathbb{P}_V\left( \norm{\Delta^- F(i, j)} \geq t_\alpha \right) \right\} \leq \alpha
-	\end{equation*}
-	for all $V \in \mathcal{H}_0(i, j)$. Let $\mathfrak{I}_\alpha$ be the binary image defined by
+	Let $\alpha \in (0, 1)$ and $t_\alpha$ a threshold, such that $\mathbb{P}_V( \norm{\Delta^+ F(i, j)} \geq t_\alpha ) \leq \alpha$ for every $V \in \mathcal{H}_0^+(i, j)$ and $\mathbb{P}_V( \norm{\Delta^- F(i, j)} \geq t_\alpha ) \leq \alpha$ for every $V \in \mathcal{H}_0^-(i, j)$.
+	
+	Let $\mathfrak{I}_\alpha$ be the binary image defined by
 	\begin{equation*}
 		\mathfrak{I}_\alpha(i, j) = \mathds{1}_{ \{ T(i, j) \geq t_\alpha \} }
 	\end{equation*}
@@ -244,10 +254,9 @@ As the region of interest in our case is rectangular, we use a square structurin
 	
 	Let $\varphi \in \mathbb{N}$ be odd. Let $\Phi_\varphi = \{ -\frac{\varphi - 1}{2}, -\frac{\varphi - 3}{2}, \dots, \frac{\varphi - 3}{2}, \frac{\varphi - 1}{2} \}$ and $\Psi_\varphi = \Phi_\varphi \times \Phi_\varphi$ be a structuring element. Let $(i, j) \in \Omega$ and $V \in \mathcal{H}_0(i, j)$.
 	Then the following inequalities hold:
-	Then the following inequalities hold:
 	\begin{align}
-		\mathbb{P}_V( (\mathfrak{I}_\alpha \circ \Psi_\varphi)(i, j) = 1 ) &\leq \varphi \alpha^{\frac{\varphi + 1}{2}} \\
-		\mathbb{P}_V( ((\mathfrak{I}_\alpha \circ \Psi_\varphi) \bullet \Psi_\varphi)(i, j) = 1 ) &\leq \varphi^3 \alpha^{\frac{\varphi + 1}{2}}
+		\mathbb{P}_V\left( (\mathfrak{I}_\alpha \circ \Psi_\varphi)(i, j) = 1 \right) &\leq \varphi \alpha^{\frac{\varphi + 1}{2}} \\
+		\mathbb{P}_V\left( ((\mathfrak{I}_\alpha \circ \Psi_\varphi) \bullet \Psi_\varphi)(i, j) = 1 \right) &\leq \varphi^3 \alpha^{\frac{\varphi + 1}{2}}
 	\end{align}
 \end{theorem}
 
@@ -275,27 +284,27 @@ We are also interested in the change of the probability of a type II error, when
 	Denote by $\varLambda = \{ \kappa_1, \dots, \kappa_2 \} \times \{ \lambda_1, \dots, \lambda_2 \}$ the rROI contained in $V$. Let $\min \{ \kappa_2 - \kappa_1 + 1, \lambda_2 - \lambda_1 + 1 \} \geq \varphi$.
 	Then the following inequalities hold:
 	\begin{align}
-		\mathbb{P}_V( (\mathfrak{I} \circ \Psi_\varphi)(i, j) = 0 ) &\leq \varphi^2 \beta \\
-		\mathbb{P}_V( ((\mathfrak{I} \circ \Psi_\varphi) \bullet \Psi_\varphi)(i, j) = 0 ) &\leq \varphi^2 \beta
+		\mathbb{P}_V\left( (\mathfrak{I} \circ \Psi_\varphi)(i, j) = 0 \right) &\leq \varphi^2 \beta \\
+		\mathbb{P}_V\left( ((\mathfrak{I} \circ \Psi_\varphi) \bullet \Psi_\varphi)(i, j) = 0 \right) &\leq \varphi^2 \beta
 	\end{align}
 \end{theorem}
 
 \paragraph{Outline of the paper}
 
-In Section \ref{sectiondefinitions} we introduce definitions and notation of the aforementioned images and properties. With the introduced terminology we develop a statistical test for every pixel determining whether or not it is part of the region of interest in Section \ref{sectionstatisticalmodel}. After having established the statistical test, we proof in Section \ref{sectionstatisticalsignificance} that we can bound the probability of a type I error by a given statistical significance and analyze the power of the statistical test in Section \ref{sectionpower}. Afterwards, in Section \ref{sectionmorphologicaloperations} the two morphological operators, that we study in this paper, are introduced, along with some examples of their application. From there, we proceed to proof the main theorems of this paper in Section \ref{sectionmainresults}.
+In Section \ref{section: definitions} we introduce definitions and notation of the aforementioned images and properties. With the introduced terminology we develop a statistical test for every pixel determining whether or not it is part of the region of interest in Section \ref{section: statisticalmodel}. After having established the statistical test, we proof in Section \ref{section: boundtypeIerror} that we can bound the probability of a type I error by a given statistical significance and analyze the probability of a type II error in the statistical test in Section \ref{section: analyzetypeIIerror}. In Section \ref{section: morphologicaloperations} the two morphological operators, that we study in this paper, are introduced, along with some examples of their application. From there, we proceed to proof the main theorems of this paper in Section \ref{section: mainresults}. We compare our theoretical results to simulations in Section \ref{section: simulationresults} and discuss possible further research in Section \ref{section: conclusion}.
 
 \newpage
 
 \section{Testing for a rectangular region of interest}
 
-\subsection{Definitions}\label{sectiondefinitions}
+\subsection{Definitions}\label{section: definitions}
 
-We consider a simplified model. Assume that the noise-free image $V$ in our statistical model has a rectangular region of interest with a checkerboard pattern, cf. equation \eqref{introductionstatmodel} and figure \ref{examplerROI}. In the following we give formal definitions of these properties.
+We consider a simplified model. Assume that the noise-free image $V$ in our statistical model has a rectangular region of interest with a checkerboard pattern, cf. equation \eqref{statmodel} and figure \ref{fig: exampleV}. In the following we give formal definitions of these properties.
 
 \begin{definition}
 	Let $m, n \in \mathbb{N}$ and $V \in \mathbb{R}^{m \times n}$. Let $(\kappa_1, \lambda_1), (\kappa_2, \lambda_2) \in \mathbb{N}^2$ be two pairs of indices with $1 \leq \kappa_1 \leq \kappa_2 \leq m$ and $1 \leq \lambda_1 \leq \lambda_2 \leq m$, such that
-	\begin{equation}\label{eqrROI}
-		V(i, j) \neq 0 \textrm{ if and only if } (i, j) \in \{ \kappa_1, \dots, \kappa_2 \} \times \{ \lambda_1, \dots, \lambda_2 \}
+	\begin{equation}\label{def: rROI}
+		V(i, j) \neq 0 \textrm{ if and only if } (i, j) \in \{ \kappa_1, \dots, \kappa_2 \} \times \{ \lambda_1, \dots, \lambda_2 \}.
 	\end{equation}
 	We call $\varLambda = \{ \kappa_1, \dots, \kappa_2 \} \times \{ \lambda_1, \dots, \lambda_2 \}$ a \emph{rectangular region of interest (rROI)} and say that $V$ contains the rROI $\varLambda$.
 	
@@ -304,14 +313,14 @@ We consider a simplified model. Assume that the noise-free image $V$ in our stat
 
 \begin{definition}
 	Let $m, n \in \mathbb{N}$ and $c \in \mathbb{R} \setminus \{ 0 \}$. Let $V \in \mathbb{R}^{m \times n}$ be a matrix, that only takes values in the set $\{ 0, \pm c \}$, i.e. $V \in \{ 0, \pm c \}^{m \times n}$. Let $V$ contain a rectangular region of interest $\varLambda$ and let $(\kappa_1, \lambda_1)$ be the top left corner of $\varLambda$. We say that $\varLambda$ has a \emph{checkerboard pattern}, if the equivalence
-	\begin{equation}\label{eqcheckerboard}
+	\begin{equation}\label{def: checkerboard}
 		V(i, j) = c \Leftrightarrow i + j \equiv \kappa_1 + \lambda_1 \mod 2
 	\end{equation}
 	holds for all $(i, j) \in \varLambda$.
 \end{definition}
 
 \begin{remark}
-	Relation \eqref{eqcheckerboard} implies $V(\kappa_1, \lambda_1) = c$. Furthermore, we have assumed that $V$ only takes values in $\{ 0, \pm c \}$. Also, by assumption $V$ contains a rROI, which implies $V(i,j) \neq 0$, if and only if $(i, j) \in \varLambda$. This yields
+	Relation \eqref{def: checkerboard} implies $V(\kappa_1, \lambda_1) = c$. Furthermore, we have assumed that $V$ only takes values in $\{ 0, \pm c \}$. Also, by assumption $V$ contains a rROI, which implies $V(i,j) \neq 0$, if and only if $(i, j) \in \varLambda$. This yields
 	\begin{equation*}
 		V(i, j) = - c \Leftrightarrow i + j \not\equiv \kappa_1 + \lambda_1 \mod 2
 	\end{equation*}
@@ -321,14 +330,14 @@ We consider a simplified model. Assume that the noise-free image $V$ in our stat
 Hence, the top left corner of $V$ takes the value $c$ and then the values of $V$ alternate between $+c$ and $-c$ along the rows and columns of $\varLambda$. This is similar to the classical checkerboard pattern.
 
 \begin{definition}
-	Let $m, n \in \mathbb{N}$ and $c \in \mathbb{R} \setminus \{ 0 \}$. We define $\mathcal{V}_c^{m, n}$ to be the set of all matrices, that only take values in $\{ 0, \pm c \}$ and that contain a rROI with a checkerboard pattern, i.e. all matrices  $V \in \{ 0, \pm c \}^{m \times n}$, that fulfill equivalences \eqref{eqrROI} and \eqref{eqcheckerboard} for some $1 \leq \kappa_1 \leq \kappa_2 \leq m$ and $1 \leq \lambda_1 \leq \lambda_2 \leq n$.
+	Let $m, n \in \mathbb{N}$ and $c \in \mathbb{R} \setminus \{ 0 \}$. We define $\mathcal{V}_c^{m, n}$ to be the set of all matrices, that only take values in $\{ 0, \pm c \}$ and that contain a rROI with a checkerboard pattern, i.e. all matrices  $V \in \{ 0, \pm c \}^{m \times n}$, that fulfill equivalences \eqref{def: rROI} and \eqref{def: checkerboard} for some $1 \leq \kappa_1 \leq \kappa_2 \leq m$ and $1 \leq \lambda_1 \leq \lambda_2 \leq n$.
 \end{definition}
 
 \begin{remark}
 	Any matrix $V \in \mathcal{V}_c^{m, n}$ is uniquely defined by the top left and bottom right corner of $\varLambda$. Hence, a rROI $\varLambda = \{ \kappa_1, \dots, \kappa_2 \} \times \{ \lambda_1, \dots, \lambda_2 \}$ corresponds to a unique element $V \in \mathcal{V}_c^{m, n}$, that contains the rROI $\varLambda$.
 \end{remark}
 
-In figure \ref{examplerROItlcbrc} we see an example of such a matrix. To visualize these types of matrices, we take $c = 127.5$ and plot the grayscale image $V + c$. Thus, gray pixels represent $V = 0$, white pixels represent $V = c$ and black pixels represent $V = - c$.
+In figure \ref{fig: rROI} we see an example of such a matrix. To visualize these types of matrices, we take $c = 127.5$ and plot the grayscale image $V + c$. Thus, gray pixels represent $V = 0$, white pixels represent $V = c$ and black pixels represent $V = - c$.
 
 % Draw example of a matrix with a rROI with a checkerboard pattern:
 \begin{figure}[h]
@@ -352,7 +361,7 @@ In figure \ref{examplerROItlcbrc} we see an example of such a matrix. To visuali
 		\node at (-5.5, 3.5) {$\vdots$};
 	\end{tikzpicture}
 	\caption{Example of a matrix, that contains a rROI with a checkerboard pattern. The top left corner of the rROI is $(4, 3)$ and the bottom right corner is $(8, 8)$. Here we have $m = n = 12$.}
-	\label{examplerROItlcbrc}
+	\label{fig: rROI}
 \end{figure}
 
 The goal of the previous definitions was to formalize the objects of study of this paper: Images, that have a rectangular region of interest with a black \& white checkerboard pattern surrounded by a constant gray background. We also need the forward and backward discrete derivative operator to establish our statistical test. As a reminder, we give the definition of these operators.
@@ -373,22 +382,23 @@ The goal of the previous definitions was to formalize the objects of study of th
 			V(i - 1, j) - V(i, j) \\
 			V(i, j - 1) - V(i, j)
 		\end{pmatrix}
+		,
 	\end{equation}
 	respectively. To adjust to boundary issues, we use a periodic boundary condition, i.e. $V(i, j) = V(i \mod m, j \mod n)$ for all $(i, j) \in \mathbb{Z}^2$.
 \end{definition}
 
 The following lemma shows, that the euclidean norm of these operators for matrices $V \in \mathcal{V}_c^{m, n}$ can only take specific values.
 
-\begin{lemma}\label{lemsetD}
+\begin{lemma}\label{lem: setD}
 	Let $m, n \in \mathbb{N}$ and $c \in \mathbb{R} \setminus \{ 0 \}$. Let $V \in \mathcal{V}_c^{m, n}$. For any $(i, j) \in \Omega$ we have
 	\begin{equation}
-		\norm{\Delta^+ V(i, j)}, \norm{\Delta^- V(i, j)} \in \{ 0, c, \sqrt{2} c, \sqrt{5} c, \sqrt{8} c \}
+		\norm{\Delta^+ V(i, j)}, \norm{\Delta^- V(i, j)} \in \{ 0, c, \sqrt{2} c, \sqrt{5} c, \sqrt{8} c \}.
 	\end{equation}
 \end{lemma}
 \begin{proof}
 	Let $(i, j) \in \Omega$. We have assumed, that $V \in \mathcal{V}_c^{m, n}$. Thus, $V$ only takes values in $\{ 0, \pm c \}$ and we obtain $\Delta^+ V(i, j), \Delta^- V(i, j) \in \{ 0, \pm c, \pm 2 c \}^2$. Taking the euclidean norm of all possible combinations yields
 	\begin{equation*}
-		\norm{\Delta^+ V(i, j)}, \norm{\Delta^- V(i, j)} \in \{ 0, c, 2 c, \sqrt{2} c, \sqrt{5} c, \sqrt{8} c \}
+		\norm{\Delta^+ V(i, j)}, \norm{\Delta^- V(i, j)} \in \{ 0, c, 2 c, \sqrt{2} c, \sqrt{5} c, \sqrt{8} c \}.
 	\end{equation*}
 	
 	We can narrow this list down even more. By assumption, $V$ contains a rectangular region of interest $\varLambda$ with a checkerboard pattern. This only allows the following combinations of $\abs{V(i + 1, j) - V(i, j)}$ and $\abs{V(i, j + 1) - V(i, j)}$:
@@ -414,7 +424,7 @@ The following lemma shows, that the euclidean norm of these operators for matric
 			\end{tabular}
 		}
 	\caption{Possible locations of the pixels $(i, j)$, $(i + 1, j)$, $(i, j + 1)$ and the corresponding values of $\abs{V(i + 1, j) - V(i, j)}$ and $\abs{V(i, j + 1) - V(i, j)}$.}
-	\label{tablediscretederivativevalues}
+	\label{table: discretederivativevalues}
 	\end{table}
 	
 	Other cases are not possible and thus $\norm{\Delta^+ V(i, j)} \in \{ 0, c, \sqrt{2} c, \sqrt{5} c, \sqrt{8} c \}$. By a similar deduction, we also obtain $\norm{\Delta^- V(i, j)} \in \{ 0, c, \sqrt{2} c, \sqrt{5} c, \sqrt{8} c \}$.
@@ -424,19 +434,19 @@ The following lemma shows, that the euclidean norm of these operators for matric
 
 \newpage
 
-\subsection{Statistical model}\label{sectionstatisticalmodel}
+\subsection{Statistical model}\label{section: statisticalmodel}
 
-After having established the definitions needed for our statistical model, we can proceed to develop a statistical test, that categorizes pixels as fore- or background.
+Our goal in this section is the development of a statistical test, that categorizes pixels as fore- or background.
 
 Let $m, n \in \mathbb{N}$, $c \in \mathbb{R} \setminus \{ 0 \}$ and $\Omega = \left\{ 1, \dots, m \right\} \times \left\{ 1, \dots, n \right\}$. Assume we are given noisy data
-\begin{equation}\label{image}
+\begin{equation}\label{statmodel2}
 	F(i, j) = c + V(i, j) + \varepsilon_{i, j}
 \end{equation}
 for all $(i, j) \in \Omega$, where $V \in \mathcal{V}_c^{m, n}$ is unknown and $\varepsilon_{i, j} \sim \mathcal{N}(0, \sigma^2)$ are i.i.d. normal distributed random variables for some $\sigma > 0$.
 
 Let $\varLambda$ be the rectangular region of interest contained in $V$. We aim to find a statistical test to determine for each individual pixel whether $(i, j) \in \varLambda$ or $(i, j) \notin \varLambda$.
 
-From the assumption, that $V$ contains a rROI, it follows, that $V(i, j) = 0$ if and only if $(i, j) \notin \varLambda$. Let $(\kappa_1, \lambda_1)$ and $(\kappa_2, \lambda_2)$ be the top left and bottom right corner of $\varLambda$, respectively. Now, if $(i, j) \notin \varLambda$, it follows that $i \notin \{ \kappa_1, \dots, \kappa_2 \}$ or $j \notin \{ \lambda_1, \dots, \lambda_2 \}$. We have to distinguish four cases here:
+By the assumption, that $V$ contains a rROI, it follows, that $V(i, j) = 0$ if and only if $(i, j) \notin \varLambda$. Let $(\kappa_1, \lambda_1)$ and $(\kappa_2, \lambda_2)$ be the top left and bottom right corner of $\varLambda$, respectively. Now, if $(i, j) \notin \varLambda$, it follows that $i \notin \{ \kappa_1, \dots, \kappa_2 \}$ or $j \notin \{ \lambda_1, \dots, \lambda_2 \}$. We have to distinguish four cases here:
 \begin{align*}
 	i < \kappa_1 &\Rightarrow (i, j - 1) \notin \varLambda \textrm{ and } (i - 1, j) \notin \varLambda \\
 	&\Rightarrow V(i, j - 1) = V(i - 1, j) = 0 \\
@@ -452,7 +462,7 @@ We see, that in the first two cases, we have $\norm{\Delta^- V(i, j)} = 0$. In t
 
 On the other hand, we have assumed, that $\varLambda$ has a checkerboard pattern. Thus $\norm{\Delta^- V(i, j)}, \norm{\Delta^+ V(i, j)} \neq 0$ for $(i, j) \in \varLambda$. This yields the equivalence
 \begin{equation*}
-	(i, j) \notin \varLambda \Leftrightarrow \min \{ \norm{\Delta^+ V(i, j)}, \norm{\Delta^- V(i, j)} \} = 0
+	(i, j) \notin \varLambda \Leftrightarrow \min \{ \norm{\Delta^+ V(i, j)}, \norm{\Delta^- V(i, j)} \} = 0.
 \end{equation*}
 
 Since our goal is to test for $(i, j) \in \varLambda$, we define a null hypothesis for each individual pixel:
@@ -470,49 +480,49 @@ against the alternative hypothesis
 \end{equation}
 using the test statistic
 \begin{equation}\label{teststatistic}
-	T(i, j) \coloneqq \min \{ \norm{\Delta^+ F(i, j)}, \norm{\Delta^- F(i, j)} \}
+	T(i, j) \coloneqq \min \{ \norm{\Delta^+ F(i, j)}, \norm{\Delta^- F(i, j)} \}.
 \end{equation}
 
-The pixels the can be categorized by rejecting the null hypothesis, i.e. classifying the pixel $(i, j)$ as foreground, if $T(i, j) \geq t$ for some threshold $t \in \mathbb{R}^+$. How the threshold should be chosen will be examined in section \ref{sectionstatisticalsignificance}.
+The pixels then can be categorized by rejecting the null hypothesis, i.e. classifying the pixel $(i, j)$ as foreground, if $T(i, j) \geq t$ for some threshold $t \in \mathbb{R}^+$. How the threshold should be chosen will be examined in Section \ref{section: boundtypeIerror}.
 
 For convenience, we want to define some subsets of $\mathcal{V}_c^{m, n}$. For every $(i, j) \in \Omega$ we define the set of images, for which the null hypothesis $H_0(i, j)$ is true as
 \begin{equation}
-	\mathcal{H}_0(i, j) \coloneqq \left\{ V \in \mathcal{V}_c^{m, n} \mid \min \{ \norm{\Delta^+ V(i, j)}, \norm{\Delta^- V(i, j)} \} = 0 \right\}
+	\mathcal{H}_0(i, j) \coloneqq \left\{ V \in \mathcal{V}_c^{m, n} \mid \min \{ \norm{\Delta^+ V(i, j)}, \norm{\Delta^- V(i, j)} \} = 0 \right\}.
 \end{equation}
 
 Then $H_0(i, j)$ is true, if and only if $V \in \mathcal{H}_0(i, j)$. Furthermore, we define two subsets of this set as
 \begin{align}
-	\mathcal{H}_0^+(i, j) &\coloneqq \left\{ V \in \mathcal{V}_c^{m, n} \mid \norm{\Delta^+ V(i, j)} = 0 \right\} \label{setH0+} \\
-	\mathcal{H}_0^-(i, j) &\coloneqq \left\{ V \in \mathcal{V}_c^{m, n} \mid \norm{\Delta^- V(i, j)} = 0 \right\} \label{setH0-}
+	\mathcal{H}_0^+(i, j) &\coloneqq \left\{ V \in \mathcal{V}_c^{m, n} \mid \norm{\Delta^+ V(i, j)} = 0 \right\} \label{setH0+}, \\
+	\mathcal{H}_0^-(i, j) &\coloneqq \left\{ V \in \mathcal{V}_c^{m, n} \mid \norm{\Delta^- V(i, j)} = 0 \right\} \label{setH0-}.
 \end{align}
 
 Then $\mathcal{H}_0(i, j) = \mathcal{H}_0^+(i, j) \cup \mathcal{H}_0^-(i, j)$, where the union is not necessarily disjoint.
 
 \newpage
 
-\subsection{Analysis of the statistical significance}\label{sectionstatisticalsignificance}
+\subsection{Bound for the probability of a type I error}\label{section: boundtypeIerror}
 
-After having established our hypotheses and test statistic, we want to examine the choice of the threshold $t \in \mathbb{R}^+$ in the testing procedure. We reject the null hypothesis, if $T(i, j) \geq t$ for some threshold $t \in \mathbb{R}^+$. We want to choose $t$ such, that the probability of falsely classifying a background pixel as foreground is bound to a given statistical significance $\alpha \in (0, 1)$. Such a threshold will be denoted as $t_\alpha$.
+Having established our hypotheses and test statistic, we want to examine the choice of the threshold $t \in \mathbb{R}^+$ in the testing procedure. We reject the null hypothesis, if $T(i, j) \geq t$ for some threshold $t \in \mathbb{R}^+$. We want to choose $t$ such, that the probability of falsely classifying a background pixel as foreground is bounded from above by a given statistical significance $\alpha \in (0, 1)$. Such a threshold will be denoted as $t_\alpha$.
 
 As a reminder, we use the notation $\mathbb{P}_V( \ldots )$ for the probability of an event for some \emph{fixed} image $V$. This will allow us to analyze the probabilites of falsely categorizing a pixel. Using this notation, we want to find a threshold $t_\alpha$, such that $\mathbb{P}_V( T(i, j) \geq t_\alpha ) \leq \alpha$ for every $V \in \mathcal{H}_0(i, j)$. A first step towards finding such a threshold is the following lemma.
 
-\begin{lemma}\label{lemtypeIbound}
-	Let $(i, j) \in \Omega$ and $t \in \mathbb{R}^+$. Assume that $F$ follows the statistical model given in \eqref{image} and let $T(i, j)$ be defined as in \eqref{teststatistic}. Let $V \in \mathcal{V}_c^{m, n}$. Then
-	\begin{equation}\label{eqtypeIbound}
-		\mathbb{P}_V( T(i, j) \geq t ) \leq \min \left\{ \mathbb{P}_V( \norm{\Delta^+ F(i, j)} \geq t ), \mathbb{P}_V( \norm{\Delta^- F(i, j)} \geq t ) \right\}
+\begin{lemma}\label{lem: typeIbound}
+	Let $(i, j) \in \Omega$ and $t \in \mathbb{R}^+$. Assume that $F$ follows the statistical model given in \eqref{statmodel2} and let $T(i, j)$ be defined as in \eqref{teststatistic}. Let $V \in \mathcal{V}_c^{m, n}$. Then
+	\begin{equation}
+		\mathbb{P}_V( T(i, j) \geq t ) \leq \min \left\{ \mathbb{P}_V( \norm{\Delta^+ F(i, j)} \geq t ), \mathbb{P}_V( \norm{\Delta^- F(i, j)} \geq t ) \right\}.
 	\end{equation}
 \end{lemma}
 \begin{proof}
-	Let $t \in \mathbb{R}^+$. On the one hand, we have
+	Let $t \in \mathbb{R}^+$. We have
 	\begin{align*}
 		\mathbb{P}_V( T(i, j) \geq t ) &= \mathbb{P}_V( \min \{ \norm{\Delta^+ F(i, j)}, \norm{\Delta^- F(i, j)} \} \geq t ) \\
 		&= \mathbb{P}_V( \{ \norm{\Delta^+ F(i, j)} \geq t \} \cap \{ \norm{\Delta^- F(i, j)} \geq t \} ) \\
-		&\leq \mathbb{P}_V( \norm{\Delta^+ F(i, j)} \geq t )
+		&\leq \mathbb{P}_V( \norm{\Delta^+ F(i, j)} \geq t ).
 	\end{align*}
 	
-	On the other hand, we obtain analogously
+	Analogously, we obtain
 	\begin{equation*}
-		\mathbb{P}_V( T(i, j) \geq t ) \leq \mathbb{P}_V( \norm{\Delta^- F(i, j)} \geq t )
+		\mathbb{P}_V( T(i, j) \geq t ) \leq \mathbb{P}_V( \norm{\Delta^- F(i, j)} \geq t ).
 	\end{equation*}
 	
 	Combining these two inequalities yields the result and thus finishes the proof of the lemma.
@@ -520,15 +530,15 @@ As a reminder, we use the notation $\mathbb{P}_V( \ldots )$ for the probability 
 
 The second step is given in the following theorem, where we calculate the cumulative distribution functions of $\mathbb{P}_V( \norm{\Delta^+ F(i, j)} \leq t )$ for $V \in \mathcal{H}_0^+(i, j)$ and $\mathbb{P}_V( \norm{\Delta^- F(i, j)} \leq t )$ for $V \in \mathcal{H}_0^-(i, j)$, which turn out to be the same.
 
-\begin{theorem}\label{thmeqcdf}
-	Let $(i, j) \in \Omega$ and $t \in \mathbb{R}^+$. Assume that $F$ follows the statistical model given in \eqref{image}. Let $V_1 \in \mathcal{H}_0^+(i, j)$ and $V_2 \in \mathcal{H}_0^-(i, j)$. Then
-	\begin{equation}\label{eqprobequality}
-		\mathbb{P}_{V_1}( \norm{\Delta^+ F(i, j)} \leq t ) = p(t) = \mathbb{P}_{V_2}( \norm{\Delta^- F(i, j)} \leq t )
+\begin{theorem}\label{thm: cdf}
+	Let $(i, j) \in \Omega$ and $t \in \mathbb{R}^+$. Assume that $F$ follows the statistical model given in \eqref{statmodel2}. Let $V_1 \in \mathcal{H}_0^+(i, j)$ and $V_2 \in \mathcal{H}_0^-(i, j)$. Then
+	\begin{equation}\label{eq: probequality}
+		\mathbb{P}_{V_1}( \norm{\Delta^+ F(i, j)} \leq t ) = p_\sigma(t) = \mathbb{P}_{V_2}( \norm{\Delta^- F(i, j)} \leq t )
 	\end{equation}
 	where
-	\begin{equation}\label{eqcdf}
+	\begin{equation}\label{eq: cdf}
 		\begin{aligned}
-			p(t) &\coloneqq \frac{1}{\sqrt{3}} \left( \frac{3}{2} - \frac{3}{2} \exp \left( - \frac{t^2}{3 \sigma^2} \right) I_0 \left( \frac{t^2}{6 \sigma^2} \right) \right) - \sqrt{3} \\
+			p_\sigma(t) &\coloneqq \frac{1}{\sqrt{3}} \left( \frac{3}{2} - \frac{3}{2} \exp \left( - \frac{t^2}{3 \sigma^2} \right) I_0 \left( \frac{t^2}{6 \sigma^2} \right) \right) - \sqrt{3} \\
 			&\quad - \frac{2 - \sqrt{3}}{2} Q_1 \left( \frac{2 - \sqrt{3}}{6} \sqrt{\frac{t}{\sigma}}, \frac{2 + \sqrt{3}}{6} \sqrt{\frac{t}{\sigma}} \right) \\
 			&\quad + \frac{2 + \sqrt{3}}{2} Q_1 \left( \frac{2 + \sqrt{3}}{6} \sqrt{\frac{t}{\sigma}}, \frac{2 - \sqrt{3}}{6} \sqrt{\frac{t}{\sigma}} \right)
 		\end{aligned}
@@ -536,9 +546,9 @@ The second step is given in the following theorem, where we calculate the cumula
 	with $I_0$ being the modified Bessel function of the first kind and $Q_M$ denoting the Marcum $Q$-function.
 \end{theorem}
 \begin{proof}
-	We start by proving the first equality of equation \eqref{eqprobequality}. By assumption, $V_1 \in \mathcal{H}_0^+(i, j)$ and thus $\norm{\Delta^+ V_1(i, j)} = 0$. By definition of $\Delta^+$ we get the equivalence
+	We start by proving the first equality of equation \eqref{eq: probequality}. By assumption, $V_1 \in \mathcal{H}_0^+(i, j)$ and thus $\norm{\Delta^+ V_1(i, j)} = 0$. By definition of $\Delta^+$ we get the equivalence
 	\begin{equation*}
-		\norm{\Delta^+ V_1(i, j)} = 0 \Leftrightarrow V_1(i + 1, j) - V_1(i, j) = V_1(i, j + 1) - V_1(i, j) = 0
+		\norm{\Delta^+ V_1(i, j)} = 0 \Leftrightarrow V_1(i + 1, j) - V_1(i, j) = V_1(i, j + 1) - V_1(i, j) = 0.
 	\end{equation*}
 	
 	We write out the term $\mathbb{P}_{V_1}( \norm{\Delta^+ F(i, j)} \leq t )$, which we call $q(t)$, and use the equivalence above to get
@@ -558,7 +568,7 @@ The second step is given in the following theorem, where we calculate the cumula
 	\end{align*}
 	we obtain
 	\begin{equation*}
-		q(t) = \mathbb{P}\left( \sqrt{\left( \frac{X_1}{\sigma} \right)^2 + \left( \frac{X_2}{\sigma} \right)^2} \leq \frac{t}{\sigma} \right)
+		q(t) = \mathbb{P}\left( \sqrt{\left( \frac{X_1}{\sigma} \right)^2 + \left( \frac{X_2}{\sigma} \right)^2} \leq \frac{t}{\sigma} \right).
 	\end{equation*}
 	
 	This shows, that the square root inside has a non-central Chi distribution with two degrees of freedom and non-centrality parameter
@@ -567,7 +577,7 @@ The second step is given in the following theorem, where we calculate the cumula
 	\end{equation*}
 	and hence
 	\begin{equation*}
-		\sqrt{\left( \frac{X_1}{\sigma} \right)^2 + \left( \frac{X_2}{\sigma} \right)^2} \sim \chi_2 \left( \frac{\sqrt{2} \abs{\varepsilon_{i, j}}}{\sigma} \right)
+		\sqrt{\left( \frac{X_1}{\sigma} \right)^2 + \left( \frac{X_2}{\sigma} \right)^2} \sim \chi_2 \left( \frac{\sqrt{2} \abs{\varepsilon_{i, j}}}{\sigma} \right).
 	\end{equation*}
 	
 	Up until this point we assumed $\varepsilon_{i, j}$ to be constant, but it is a normal distributed random variable with zero mean and standard deviation $\sigma$. Thus, we have a compound probability distribution:
@@ -578,21 +588,21 @@ The second step is given in the following theorem, where we calculate the cumula
 	\end{align*}
 	
 	where $I_0$ is the modified Bessel function of the first kind. We can solve the inner integral first. For $\mathrm{Re} \ \nu > -1$, $\mathrm{Re} \ \alpha > 0$ the following equality holds\cite{TISP}.
-	\begin{equation}\label{eqintbessel}
+	\begin{equation}\label{eq: intbessel}
 		\int_0^\infty \exp \left( - \alpha x^2 \right) I_\nu ( \beta x ) \mathrm{d}x = \frac{\sqrt{\pi}}{2 \sqrt{\alpha}} \exp \left( \frac{\beta^2}{8 \alpha} \right) I_{\frac{1}{2} \nu} \left( \frac{\beta^2}{8 \alpha} \right)
 	\end{equation}
 	
 	In our case, we have $\nu = 0$, $\alpha = \frac{3}{2 \sigma^2}$ and $\beta = \frac{\sqrt{2} x}{\sigma}$, which yields
 	\begin{align*}
 		\int_0^\infty \exp \left( - \frac{3}{2 \sigma^2} \eta^2 \right) I_0 \left( \frac{\sqrt{2} x}{\sigma} \eta \right) \mathrm{d}\eta &= \frac{\sqrt{\pi}}{2 \sqrt{\frac{3}{2 \sigma^2}}} \exp \left( \frac{\frac{2 x^2}{\sigma^2}}{8 \frac{3}{2 \sigma^2}} \right) I_0 \left( \frac{\frac{2 x^2}{\sigma^2}}{8 \frac{3}{2 \sigma^2}} \right) \\
-		&= \frac{\sqrt{\pi} \sigma}{\sqrt{6}} \exp \left( \frac{x^2}{6} \right) I_0 \left( \frac{x^2}{6} \right)
+		&= \frac{\sqrt{\pi} \sigma}{\sqrt{6}} \exp \left( \frac{x^2}{6} \right) I_0 \left( \frac{x^2}{6} \right).
 	\end{align*}
 	
 	Plugging this in, we obtain
 	\begin{align*}
 		q(t) &= \frac{2}{\sqrt{2 \pi \sigma^2}} \int_0^\frac{t}{\sigma} x \exp \left( - \frac{x^2}{2} \right) \frac{\sqrt{\pi} \sigma}{\sqrt{6}} \exp \left( \frac{x^2}{6} \right) I_0 \left( \frac{x^2}{6} \right) \mathrm{d}x \\
 		&= \frac{1}{\sqrt{3}} \int_0^\frac{t}{\sigma} x \exp \left( - \frac{x^2}{2} \right) \exp \left( \frac{x^2}{6} \right) I_0 \left( \frac{x^2}{6} \right) \mathrm{d}x \\
-		&= \frac{1}{\sqrt{3}} \int_0^\frac{t}{\sigma} x \exp \left( - \frac{x^2}{3} \right) I_0 \left( \frac{x^2}{6} \right) \mathrm{d}x
+		&= \frac{1}{\sqrt{3}} \int_0^\frac{t}{\sigma} x \exp \left( - \frac{x^2}{3} \right) I_0 \left( \frac{x^2}{6} \right) \mathrm{d}x.
 	\end{align*}
 	
 	To proceed, we need to integrate by parts to replace the modified Bessel function $I_0$ with order zero by a modified Bessel function $I_1$ with order one.
@@ -603,11 +613,11 @@ The second step is given in the following theorem, where we calculate the cumula
 	
 	In the next step we substitute $y = x^2$ in the remaining integral, which leaves us with
 	\begin{equation*}
-		q(t) = \frac{1}{\sqrt{3}} \left( \frac{3}{2} - \frac{3}{2} \exp \left( - \frac{t^2}{3 \sigma^2} \right) I_0 \left( \frac{t^2}{6 \sigma^2} \right) \right) + \frac{1}{4 \sqrt{3}} \int_0^\frac{t}{\sigma} \exp \left( - \frac{y}{3} \right) I_1 \left( \frac{y}{6} \right) \mathrm{d}y
+		q(t) = \frac{1}{\sqrt{3}} \left( \frac{3}{2} - \frac{3}{2} \exp \left( - \frac{t^2}{3 \sigma^2} \right) I_0 \left( \frac{t^2}{6 \sigma^2} \right) \right) + \frac{1}{4 \sqrt{3}} \int_0^\frac{t}{\sigma} \exp \left( - \frac{y}{3} \right) I_1 \left( \frac{y}{6} \right) \mathrm{d}y.
 	\end{equation*}
 	
 	We want to solve the remaining integral. Let $p \neq b$ and $s = \sqrt{p^2 - b^2}$, $u = \sqrt{a (p - s)}$ and $v = \sqrt{a (p + s)}$. Then\cite{IntQFunction}
-	\begin{equation}\label{eqintmarcum}
+	\begin{equation}\label{eq: intmarcum}
 		\int_0^a \exp(-p x) I_M ( b x ) \mathrm{d}x = \frac{1}{s b^M} \left( (p - s)^M ( 1 - Q_M(u, v) ) - (p + s)^M ( 1 - Q_M(v, u) ) \right)
 	\end{equation}
 	where $Q_M$ denotes the Marcum $Q$-function. The Marcum $Q$-function is only defined for $M \geq 1$, which made the integration by parts necessary. Applying this equation with $M = 1$ to the integral yields
@@ -615,7 +625,7 @@ The second step is given in the following theorem, where we calculate the cumula
 		\int_0^\frac{t}{\sigma} \exp \left( - \frac{y}{3} \right) I_1 \left( \frac{y}{6} \right) \mathrm{d}y &= \frac{1}{\frac{1}{2 \sqrt{3}} \frac{1}{6}} \frac{2 - \sqrt{3}}{6} \left( 1 - Q_1 \left( \frac{2 - \sqrt{3}}{6} \sqrt{\frac{t}{\sigma}}, \frac{2 + \sqrt{3}}{6} \sqrt{\frac{t}{\sigma}} \right) \right) \\
 		&\quad - \frac{1}{\frac{1}{2 \sqrt{3}} \frac{1}{6}} \frac{2 + \sqrt{3}}{6} \left( 1 - Q_1 \left( \frac{2 + \sqrt{3}}{6} \sqrt{\frac{t}{\sigma}}, \frac{2 - \sqrt{3}}{6} \sqrt{\frac{t}{\sigma}} \right) \right) \\
 		&= 2 \sqrt{3} (2 - \sqrt{3}) \left( 1 - Q_1 \left( \frac{2 - \sqrt{3}}{6} \sqrt{\frac{t}{\sigma}}, \frac{2 + \sqrt{3}}{6} \sqrt{\frac{t}{\sigma}} \right) \right) \\
-		&\quad - 2 \sqrt{3} (2 + \sqrt{3}) \left( 1 - Q_1 \left( \frac{2 + \sqrt{3}}{6} \sqrt{\frac{t}{\sigma}}, \frac{2 - \sqrt{3}}{6} \sqrt{\frac{t}{\sigma}} \right) \right)
+		&\quad - 2 \sqrt{3} (2 + \sqrt{3}) \left( 1 - Q_1 \left( \frac{2 + \sqrt{3}}{6} \sqrt{\frac{t}{\sigma}}, \frac{2 - \sqrt{3}}{6} \sqrt{\frac{t}{\sigma}} \right) \right).
 	\end{align*}
 	
 	Plugging this in, we obtain the final result
@@ -627,47 +637,49 @@ The second step is given in the following theorem, where we calculate the cumula
 		&= \frac{1}{\sqrt{3}} \left( \frac{3}{2} - \frac{3}{2} \exp \left( - \frac{t^2}{3 \sigma^2} \right) I_0 \left( \frac{t^2}{6 \sigma^2} \right) \right) - \sqrt{3} \\
 		&\quad - \frac{2 - \sqrt{3}}{2} Q_1 \left( \frac{2 - \sqrt{3}}{6} \sqrt{\frac{t}{\sigma}}, \frac{2 + \sqrt{3}}{6} \sqrt{\frac{t}{\sigma}} \right) \\
 		&\quad + \frac{2 + \sqrt{3}}{2} Q_1 \left( \frac{2 + \sqrt{3}}{6} \sqrt{\frac{t}{\sigma}}, \frac{2 - \sqrt{3}}{6} \sqrt{\frac{t}{\sigma}} \right) \\
-		&= p(t)
+		&= p_\sigma(t).
 	\end{align*}
 	
-	This finishes the proof of the first equality of equation \eqref{eqcdf}. Analogously, we can proof $\mathbb{P}_{V_2}( \norm{\Delta^- F(i, j)} \leq t ) = p(t)$. This proves the second equality and thus finishes the proof of Theorem \ref{thmeqcdf}.
+	This finishes the proof of the first equality of equation \eqref{eq: cdf}. Analogously, we can proof $\mathbb{P}_{V_2}( \norm{\Delta^- F(i, j)} \leq t ) = p_\sigma(t)$. This proves the second equality and thus finishes the proof of Theorem \ref{thm: cdf}.
 \end{proof}
 
 \begin{corollary}
-	Let $(i, j) \in \Omega$ and $t \in \mathbb{R}^+$. Assume that $F$ follows the statistical model given in \eqref{image} and let $T(i, j)$ be defined as in \eqref{teststatistic}. Then
-	\begin{equation}\label{eqstatsignificance}
-		\mathbb{P}_V( T(i, j) \geq t ) \leq 1 - p(t)
+	Let $(i, j) \in \Omega$ and $t \in \mathbb{R}^+$. Assume that $F$ follows the statistical model given in \eqref{statmodel2} and let $T(i, j)$ be defined as in \eqref{teststatistic}. Then
+	\begin{equation}\label{ineq: typeIbound}
+		\mathbb{P}_V( T(i, j) \geq t ) \leq 1 - p_\sigma(t)
 	\end{equation}
 	for every $V \in \mathcal{H}_0(i, j)$.
 \end{corollary}
 \begin{proof}
-	Since $V \in \mathcal{H}_0(i, j)$, we have $V \in \mathcal{H}_0^+(i, j)$ or $V \in \mathcal{H}_0^-(i, j)$. In the first case, by Lemma \ref{lemtypeIbound} and Theorem \ref{thmeqcdf} we have
+	Since $V \in \mathcal{H}_0(i, j)$, we have $V \in \mathcal{H}_0^+(i, j)$ or $V \in \mathcal{H}_0^-(i, j)$. In the first case, by Lemma \ref{lem: typeIbound} and Theorem \ref{thm: cdf} we have
 	\begin{align*}
 		\mathbb{P}_V( T(i, j) \geq t ) &\leq \min \left\{ \mathbb{P}_V( \norm{\Delta^+ F(i, j)} \geq t ), \mathbb{P}_V( \norm{\Delta^- F(i, j)} \geq t ) \right\} \\
 		&\leq \mathbb{P}_V( \norm{\Delta^+ F(i, j)} \geq t ) \\
-		&= 1 - p(t)
+		&= 1 - p_\sigma(t).
 	\end{align*}
 	
 	The second case is proven analogously.
 \end{proof}
 
-Let $\alpha \in (0, 1)$ be given. Equation \eqref{eqstatsignificance} shows, that if we find a threshold $t_\alpha$, such that $1 - p(t_\alpha) \leq \alpha$, we have
+Let $\alpha \in (0, 1)$ be given. Inequality \eqref{ineq: typeIbound} shows, that if we find a threshold $t_\alpha$, such that $1 - p_\sigma(t_\alpha) \leq \alpha$, we have
 \begin{equation}
-	\mathbb{P}_V(T(i, j) \geq t_\alpha) \leq 1 - p(t_\alpha) \leq \alpha
+	\mathbb{P}_V(T(i, j) \geq t_\alpha) \leq 1 - p_\sigma(t_\alpha) \leq \alpha
 \end{equation}
-for all $V \in \mathcal{H}_0(i, j)$. Since the function $p(t)$ does not depend on $V$, the threshold is independent of $V$ as well. Thus, we have ensured a statistical significance of $\alpha$ in our testing procedure.
+for all $V \in \mathcal{H}_0(i, j)$. Thus, using such a threshold for our testing procedure bounds the probability of a type I error below a given statistical significance $\alpha$. Since the function $p_\sigma(t)$ does not depend on $V$, the threshold is independent of $V$.
 
-The easiest way to compute such a threshold would be to find the inverse function of $p(t)$. Since finding inverse functions of the modified Bessel function of the first kind $I_\nu$ and of the Marcum $Q$-function $Q_M$ is already complicated, there is unfortunately no easy way to compute an inverse function of $p(t)$. We can, however, compute a threshold $t_\alpha$ numerically with a trial and error algorithm. We will give a pseudocode here. A \emph{MATLAB} implementation of this pseudocode can be found in the appendix. In figure \ref{figurecdf} the cumulative distribution function $p(t)$ is plotted. For $\alpha = 0.05$ and $\alpha = 0.01$ the thresholds have been numerically computed.\\
+Since finding inverse functions of the modified Bessel function of the first kind $I_\nu$ and of the Marcum $Q$-function $Q_M$ is complicated, there is no easy way to compute an inverse function of $p_\sigma(t)$. Thus, we cannot provide a closed form to calculate the threshold, but we can compute a threshold $t_\alpha$ numerically with a trial and error algorithm.
+
+To this end, we note, that $p_\sigma(t_\alpha \cdot \sigma) = p_1(t_\alpha)$. Hence, it is sufficient to calculate a threshold $t_\alpha$ for $\sigma = 1$. We will give a pseudocode here. A \emph{MATLAB} implementation of this pseudocode can be found in the appendix. In figure \ref{fig: cdf} the cumulative distribution function $p_1(t)$ is plotted. For $\alpha = 0.05$ and $\alpha = 0.01$ the thresholds have been numerically computed.\\
 
 \begin{algorithm}[H]
 	\KwIn{$\alpha \in (0, 1)$}
-	\KwOut{$t_\alpha$ and $\alpha_{real}$, s.t. $p(t_\alpha) = 1 - \alpha_{real} \geq 1 - \alpha$}
+	\KwOut{$t_\alpha$ and $\alpha_{real}$, s.t. $p_1(t_\alpha) = 1 - \alpha_{real} \geq 1 - \alpha$}
 	$t_\alpha = 0$\;
 	$t_{inc} = 0.0001$\;
-	\While{$p(t_\alpha) < 1 - \alpha$}
+	\While{$p_1(t_\alpha) < 1 - \alpha$}
 	{
 		$t_\alpha + t_{inc}$\;
-		$\alpha_{real} = 1 - p(t_\alpha)$\;
+		$\alpha_{real} = 1 - p_1(t_\alpha)$\;
 	}
 	\caption{Computation of a threshold for a given statistical significance}
 \end{algorithm}
@@ -677,8 +689,8 @@ The easiest way to compute such a threshold would be to find the inverse functio
 	\begin{tikzpicture}
 		\begin{axis}[
 			xlabel=$t$,
-			ylabel=$p(t)$,
-			title={Cumulative distribution function $p(t)$},
+			ylabel=$p_1(t)$,
+			title={Cumulative distribution function $p_1(t)$},
 			grid=both,
 			minor grid style={gray!25},
 			major grid style={gray!25},
@@ -697,161 +709,163 @@ The easiest way to compute such a threshold would be to find the inverse functio
 			\node[left] at (axis cs: 0, 0.99) {\tiny{$0.99$}};
 		\end{axis}
 	\end{tikzpicture}
-	\caption{Plot of the cumulative distribution function $p(t)$. The numerically computed thresholds $t_{0.05} = 3.2555$ and $t_{0.01} = 4.2792$ are marked.}
-	\label{figurecdf}
+	\caption{Plot of the cumulative distribution function $p_1(t)$. The numerically computed thresholds $t_{0.05} = 3.2555$ and $t_{0.01} = 4.2792$ are marked.}
+	\label{fig: cdf}
 \end{figure}
 
 \newpage
 
-\subsection{Analysis of the power}\label{sectionpower}
+\subsection{Analysis of the probability of a type II error}\label{section: analyzetypeIIerror}
 
-In equation \eqref{eqstatsignificance} we have found a way to bound the probability of falsely classifying a background pixel as a foreground pixel to a given statistical significance. This type of false classifications is called a type I error. In contract to that, falsely classifying a foreground pixel as a background pixel is called a type II error. We choose the threshold in the testing procedure, such that the probability of a type I error is below the given statistical significance $\alpha$. We now want to look at the probability of a type II error. Since this probability is not bound by a given value, we are interested in upper and lower bounds for it.
+Through inequality \eqref{ineq: typeIbound} we have found a way to bound the probability of falsely classifying a background pixel as a foreground pixel below a given statistical significance. Such an error is called a type I error. We choose the threshold in the testing procedure, such that the probability of a type I error is below a given statistical significance $\alpha$. Falsely classifying a foreground pixel as a background pixel is called a type II error. Since the probability of a type II error is not bounded by a given value, we are interested in upper and lower bounds for it.
 
-To this end, we define more subsets of $\mathcal{V}_c^{m, n}$. For every $(i, j) \in \Omega$ we define the set of images, for which the alternative hypothesis $H_1(i, j)$ is true as
+To this end, we define subsets of $\mathcal{V}_c^{m, n}$. For every $(i, j) \in \Omega$ we define the set of images, for which the alternative hypothesis $H_1(i, j)$ is true as
 \begin{equation}
-	\mathcal{H}_1(i, j) \coloneqq \left\{ V \in \mathcal{V}_c^{m, n} \mid \min \{ \norm{\Delta^+ V(i, j)}, \norm{\Delta^- V(i, j)} \} \neq 0 \right\}
+	\mathcal{H}_1(i, j) \coloneqq \left\{ V \in \mathcal{V}_c^{m, n} \mid \min \{ \norm{\Delta^+ V(i, j)}, \norm{\Delta^- V(i, j)} \} \neq 0 \right\}.
 \end{equation}
 
 A first step towards bounds for the probability of a type II error is achieved in the following lemma.
 
-\begin{theorem}\label{thmtypeIIbounds}
-	Let $(i, j) \in \Omega$ and $t \in \mathbb{R}^+$. Assume that $F$ follows the statistical model given \eqref{image} and let $T(i, j)$ and $H_1(i, j)$ be defined as in \eqref{teststatistic} and \eqref{alternativehypothesis}. Let $V, V_1, V_2 \in \mathcal{H}_1(i, j)$. Assume $V_1$ is such, that $\norm{\Delta^+ V_1(i, j)} = \sqrt{2} c$ and $V_2$ such, that $\norm{\Delta^+ V_2(i, j)} = \sqrt{8} c$. Then the following inequalities hold:
+\begin{theorem}\label{thm: typeIIboundssimulation}
+	Let $(i, j) \in \Omega$ and $t \in \mathbb{R}^+$. Assume that $F$ follows the statistical model given \eqref{statmodel2} and let $T(i, j)$ and $H_1(i, j)$ be defined as in \eqref{teststatistic} and \eqref{alternativehypothesis}. Let $V, V_1, V_2 \in \mathcal{H}_1(i, j)$. Assume $V_1$ is such, that $\norm{\Delta^+ V_1(i, j)} = \sqrt{2} c$ and $V_2$ such, that $\norm{\Delta^+ V_2(i, j)} = \sqrt{8} c$. Then the following inequalities hold:
 	\begin{align}
-		\mathbb{P}_V( T(i, j) \leq t ) &\leq 2 \cdot \mathbb{P}_{V_1}( \norm{\Delta^+ F(i, j)} \leq t ) \label{eqtypeIIupperbound} \\
-		\mathbb{P}_V( T(i, j) \leq t ) &\geq \mathbb{P}_{V_2}( \norm{\Delta^+ F(i, j)} \leq t ) \label{eqtypeIIlowerbound}
+		\mathbb{P}_V\left( T(i, j) \leq t \right) &\leq 2 \cdot \mathbb{P}_{V_1}\left( \norm{\Delta^+ F(i, j)} \leq t \right) \label{eq: typeIIupperboundsimulation} \\
+		\mathbb{P}_V\left( T(i, j) \leq t \right) &\geq \mathbb{P}_{V_2}\left( \norm{\Delta^+ F(i, j)} \leq t \right) \label{eq: typeIIlowerboundsimulation}
 	\end{align}
 \end{theorem}
 \begin{proof}
-	By assumption $V \in \mathcal{H}_1(i, j) \subseteq \mathcal{V}_c^{m, n}$. In Lemma \ref{lemsetD} we showed, that
+	By assumption $V \in \mathcal{H}_1(i, j) \subseteq \mathcal{V}_c^{m, n}$. In Lemma \ref{lem: setD} we showed, that
 	\begin{equation*}
-		\norm{\Delta^+ V(i, j)}, \norm{\Delta^- V(i, j)} \in \{ 0, c, \sqrt{2} c, \sqrt{5} c, \sqrt{8} c \}
+		\norm{\Delta^+ V(i, j)}, \norm{\Delta^- V(i, j)} \in \left\{ 0, c, \sqrt{2} c, \sqrt{5} c, \sqrt{8} c \right\}.
 	\end{equation*}
 	
-	By design of our statistical test, if $H_1(i, j)$ is true, then $(i, j) \in \varLambda$. As can be seen from table \ref{tablediscretederivativevalues} in the proof of Lemma \ref{lemsetD}, $(i, j) \in \varLambda$ implies
+	By design of our statistical test, if $H_1(i, j)$ is true, then $(i, j) \in \varLambda$. As can be seen from Table \ref{table: discretederivativevalues} in the proof of Lemma \ref{lem: setD}, $(i, j) \in \varLambda$ implies
 	\begin{equation*}
-		\norm{\Delta^+ V(i, j)}, \norm{\Delta^- V(i, j)} \in \{ \sqrt{2} c, \sqrt{5} c, \sqrt{8} c \}
+		\norm{\Delta^+ V(i, j)}, \norm{\Delta^- V(i, j)} \in \left\{ \sqrt{2} c, \sqrt{5} c, \sqrt{8} c \right\}.
 	\end{equation*}
 	
 	Hence, we can rewrite the set $\mathcal{H}_1(i, j)$ as
 	\begin{equation*}
-		\mathcal{H}_1(i, j) = \left\{ V \in \mathcal{V}_c^{m, n} \mid \norm{\Delta^+ V(i, j)}, \norm{\Delta^- V(i, j)} \in \{ \sqrt{2} c, \sqrt{5} c, \sqrt{8} c \} \right\}
+		\mathcal{H}_1(i, j) = \left\{ V \in \mathcal{V}_c^{m, n} \mid \norm{\Delta^+ V(i, j)}, \norm{\Delta^- V(i, j)} \in \{ \sqrt{2} c, \sqrt{5} c, \sqrt{8} c \} \right\}.
 	\end{equation*}
 	
-	Using this knowledge, we can find an upper bound for the probability of a type II error in our testing procedure:
+	Using this knowledge, we can start bounding the probability of a type II error in our testing procedure, which we call $\beta$, from above by
 	\begin{align*}
-		\beta(t) &\coloneqq \mathbb{P}_V( T(i, j) \leq t ) \\
-		&= \mathbb{P}_V( \min \{ \norm{\Delta^+ F(i, j)}, \norm{\Delta^- F(i, j)} \} \leq t ) \\
-		&\leq \mathbb{P}_V( \norm{\Delta^+ F(i, j)} \leq t) + \mathbb{P}_V(\norm{\Delta^- F(i, j)} \leq t )
+		\beta(t) &\coloneqq \mathbb{P}_V\left( T(i, j) \leq t \right) \\
+		&= \mathbb{P}_V\left( \min \left\{ \norm{\Delta^+ F(i, j)}, \norm{\Delta^- F(i, j)} \right\} \leq t \right) \\
+		&= \mathbb{P}_V\left( \left\{ \norm{\Delta^+ F(i, j)} \leq t \right\} \cup \left\{ \norm{\Delta^- F(i, j)} \leq t \right\} \right) \\
+		&\leq \mathbb{P}_V\left( \norm{\Delta^+ F(i, j)} \leq t \right) + \mathbb{P}_V\left( \norm{\Delta^- F(i, j)} \leq t \right).
 	\end{align*}
 	
 	This upper bound depends on the actual value of $\norm{\Delta^+ V(i, j)}$, which is unknown. In both terms we take a $V^* \in \mathcal{H}_1(i, j)$ that maximizes the probability and obtain
 	\begin{align*}
-		\beta(t) &\leq \max_{V^* \in \mathcal{H}_1(i, j)} \mathbb{P}_{V^*}( \norm{\Delta^+ F(i, j)} \leq t ) + \max_{V^* \in \mathcal{H}_1(i, j)} \mathbb{P}_{V^*}( \norm{\Delta^- F(i, j)} \leq t ) \\
-		&= 2 \cdot \max_{V^* \in \mathcal{H}_1(i, j)} \mathbb{P}_{V^*}( \norm{\Delta^+ F(i, j)} \leq t )
+		\beta(t) &\leq \max_{V^* \in \mathcal{H}_1(i, j)} \mathbb{P}_{V^*}\left( \norm{\Delta^+ F(i, j)} \leq t \right) + \max_{V^* \in \mathcal{H}_1(i, j)} \mathbb{P}_{V^*}\left( \norm{\Delta^- F(i, j)} \leq t \right) \\
+		&= 2 \cdot \max_{V^* \in \mathcal{H}_1(i, j)} \mathbb{P}_{V^*}\left( \norm{\Delta^+ F(i, j)} \leq t \right)
 	\end{align*}
 	where we used the equality
 	\begin{equation*}
-		\max_{V^* \in \mathcal{H}_1(i, j)} \mathbb{P}_{V^*}( \norm{\Delta^+ F(i, j)} \leq t ) = \max_{V^* \in \mathcal{H}_1(i, j)} \mathbb{P}_{V^*}( \norm{\Delta^- F(i, j)} \leq t )
+		\max_{V^* \in \mathcal{H}_1(i, j)} \mathbb{P}_{V^*}\left( \norm{\Delta^+ F(i, j)} \leq t \right) = \max_{V^* \in \mathcal{H}_1(i, j)} \mathbb{P}_{V^*}\left( \norm{\Delta^- F(i, j)} \leq t \right).
 	\end{equation*}
 	
 	The maximum is attained for any $V^* \in \mathcal{H}_1(i, j)$ with $\norm{\Delta^+ V^*(i, j)} = \sqrt{2} c$. One such $V^*$ is $V_1$ and thus we get
 	\begin{align*}
-		\beta(t) &\leq 2 \cdot \max_{V^* \in \mathcal{H}_1(i, j)} \mathbb{P}_{V^*}( \norm{\Delta^+ F(i, j)} \leq t ) \\
-		&= 2 \cdot \mathbb{P}_{V_1}( \norm{\Delta^+ F(i, j)} \leq t )
+		\beta(t) &\leq 2 \cdot \max_{V^* \in \mathcal{H}_1(i, j)} \mathbb{P}_{V^*}\left( \norm{\Delta^+ F(i, j)} \leq t \right) \\
+		&= 2 \cdot \mathbb{P}_{V_1}\left( \norm{\Delta^+ F(i, j)} \leq t \right)
 	\end{align*}
-	which proves inequality \eqref{eqtypeIIupperbound}.
+	which proves inequality \eqref{eq: typeIIupperboundsimulation}.
 	
-	Using similar techniques, we can also get a lower bound for the probability of a type II error:
+	Using similar techniques, we can also get a lower bound for the probability of a type II error. We start with
 	\begin{align*}
-		\beta(t) &= \mathbb{P}_V( T(i, j) \leq t ) \\
-		&= \mathbb{P}_V( \min \{ \norm{\Delta^+ F(i, j)}, \norm{\Delta^- F(i, j)} \} \leq t ) \\
-		&\geq \mathbb{P}_V( \norm{\Delta^+ F(i, j)} \leq t )
+		\beta(t) &= \mathbb{P}_V\left( T(i, j) \leq t \right) \\
+		&= \mathbb{P}_V\left( \min \{ \norm{\Delta^+ F(i, j)}, \norm{\Delta^- F(i, j)} \} \leq t \right) \\
+		&\geq \mathbb{P}_V\left( \norm{\Delta^+ F(i, j)} \leq t \right).
 	\end{align*}
 	
 	Again, this lower bound is not fully determined and we bound this further by
 	\begin{align*}
-		\beta(t) &\geq \mathbb{P}_V( \norm{\Delta^+ F(i, j)} \leq t ) \\
-		&\geq \min_{V^* \in \mathcal{H}_1(i, j)} \mathbb{P}_{V^*}( \norm{\Delta^+ F(i, j)} \leq t )
+		\beta(t) &\geq \mathbb{P}_V\left( \norm{\Delta^+ F(i, j)} \leq t \right) \\
+		&\geq \min_{V^* \in \mathcal{H}_1(i, j)} \mathbb{P}_{V^*}\left( \norm{\Delta^+ F(i, j)} \leq t \right).
 	\end{align*}
 	
 	The minimum is attained for any $V^* \in \mathcal{H}_1(i, j)$ with $\norm{\Delta^+ V^*(i, j)} = \sqrt{8} c$. One such $V^*$ is $V_2$ and we obtain
 	\begin{align*}
-		\beta(t) &\geq \min_{V^* \in \mathcal{H}_1(i, j)} \mathbb{P}_{V^*}( \norm{\Delta^+ F(i, j)} \leq t ) \\
-		&= \mathbb{P}_{V_2}( \norm{\Delta^+ F_2(i, j)} \leq t )
+		\beta(t) &\geq \min_{V^* \in \mathcal{H}_1(i, j)} \mathbb{P}_{V^*}\left( \norm{\Delta^+ F(i, j)} \leq t \right) \\
+		&= \mathbb{P}_{V_2}\left( \norm{\Delta^+ F_2(i, j)} \leq t \right)
 	\end{align*}
-	which proves inequality \eqref{eqtypeIIlowerbound} and finishes the proof.
+	which proves inequality \eqref{eq: typeIIlowerboundsimulation} and finishes the proof.
 \end{proof}
 
-This result is the equivalent to Lemma \ref{lemtypeIbound} for the probability of a type II error. We would like to find an equivalent result to Theorem \ref{thmeqcdf} to write the bounds in the inequalities \eqref{eqtypeIIupperbound} and \eqref{eqtypeIIlowerbound} in terms of well-known functions like we did in equation \eqref{eqcdf}. This would require more generalized versions of equalities \eqref{eqintbessel} and \eqref{eqintmarcum}, which, to the best of the author's knowledge, are not known.
+This result is the equivalent to Lemma \ref{lem: typeIbound} for the probability of a type II error. We would like to find an equivalent result to Theorem \ref{thm: cdf} to write these bounds in terms of well-known functions like we did in equation \eqref{eq: cdf}. This would require more generalized versions of equalities \eqref{eq: intbessel} and \eqref{eq: intmarcum}, which, to the best of the author's knowledge, are not known.
 
-We can however write down the compound probability distribution of the upper and lower bound as we did in the proof of Theorem \ref{thmeqcdf}.
+We can write down the compound probability distribution of the upper and lower bound from Theorem \ref{thm: typeIIboundssimulation}. The results are given in the following theorem.
 
-\begin{theorem}\label{thmcompprob}
-	Let $(i, j) \in \Omega$ and $t \in \mathbb{R}^+$. Assume that $F$ follows the statistical model given \eqref{image} and let $T(i, j)$ and $H_1(i, j)$ be defined as in \eqref{teststatistic} and \eqref{alternativehypothesis}. Let $V_1, V_2 \in \mathcal{H}_1(i, j)$. Assume $V_1$ is such, that $\norm{\Delta^+ V_1(i, j)} = \sqrt{2} c$ and $V_2$ such, that $\norm{\Delta^+ V_2(i, j)} = \sqrt{8} c$. Then the following equalities hold:
-	\begin{equation}\label{eqcompprobupper}
+\begin{theorem}\label{thm: typeIIboundsintegration}
+	Let $(i, j) \in \Omega$ and $t \in \mathbb{R}^+$. Assume that $F$ follows the statistical model given \eqref{statmodel2} and let $T(i, j)$ and $H_1(i, j)$ be defined as in \eqref{teststatistic} and \eqref{alternativehypothesis}. Let $V_1, V_2 \in \mathcal{H}_1(i, j)$. Assume $V_1$ is such, that $\norm{\Delta^+ V_1(i, j)} = \sqrt{2} c$ and $V_2$ such, that $\norm{\Delta^+ V_2(i, j)} = \sqrt{8} c$. Then the following equalities hold:
+	\begin{equation}\label{eq: typeIIupperboundintegration}
 		\begin{aligned}
-			&\mathbb{P}_{V_1}( \norm{\Delta^+ F(i, j)} \leq t ) \\
+			&\mathbb{P}_{V_1}\left( \norm{\Delta^+ F(i, j)} \leq t \right) \\
 			&= \frac{1}{\sqrt{2 \pi \sigma^2}} \int_0^\frac{t}{\sigma} x \exp \left( - \frac{x^2}{2} \right) \int_{-\infty}^\infty \exp \left( - \frac{(c - \eta)^2}{\sigma^2} - \frac{\eta^2}{2 \sigma^2} \right) I_0 \left( \frac{\sqrt{2} x}{\sigma} (c - \eta) \right) \mathrm{d}\eta \mathrm{d}x
 		\end{aligned}
 	\end{equation}
-	\begin{equation}\label{eqcompproblower}
+	\begin{equation}\label{eq: typeIIlowerboundintegration}
 		\begin{aligned}
-			&\mathbb{P}_{V_2}( \norm{\Delta^+ F(i, j)} \leq t ) \\
+			&\mathbb{P}_{V_2}\left( \norm{\Delta^+ F(i, j)} \leq t \right) \\
 			&= \frac{1}{\sqrt{2 \pi \sigma^2}} \int_0^\frac{t}{\sigma} x \exp \left( - \frac{x^2}{2} \right) \int_{-\infty}^\infty \exp \left( - \frac{(2 c - \eta)^2}{\sigma^2} - \frac{\eta^2}{2 \sigma^2} \right) I_0 \left( \frac{\sqrt{2} x}{\sigma} (2 c - \eta) \right) \mathrm{d}\eta \mathrm{d}x
 		\end{aligned}
 	\end{equation}
 \end{theorem}
 \begin{proof}
-	From the analysis of possible combinations of $\abs{V(i + 1, j) - V(i, j)}$ and $\abs{V(i, j + 1) - V(i, j)}$ in the proof of Lemma \ref{lemsetD} we can deduce the equivalences
+	From the analysis of possible combinations of $\abs{V(i + 1, j) - V(i, j)}$ and $\abs{V(i, j + 1) - V(i, j)}$ in table \ref{table: discretederivativevalues} we can deduce the equivalences
 	\begin{align*}
-		\abs{V(i + 1, j) - V(i, j)} = \abs{V(i, j + 1) - V(i, j)} = c &\Leftrightarrow \norm{\Delta^+ V(i, j)} = \sqrt{2} c \\
-		\abs{V(i + 1, j) - V(i, j)} = \abs{V(i, j + 1) - V(i, j)} = 2 c &\Leftrightarrow \norm{\Delta^+ V(i, j)} = \sqrt{8} c
+		\abs{V(i + 1, j) - V(i, j)} = \abs{V(i, j + 1) - V(i, j)} = c &\Leftrightarrow \norm{\Delta^+ V(i, j)} = \sqrt{2} c, \\
+		\abs{V(i + 1, j) - V(i, j)} = \abs{V(i, j + 1) - V(i, j)} = 2 c &\Leftrightarrow \norm{\Delta^+ V(i, j)} = \sqrt{8} c.
 	\end{align*}
 	
-	We proceed as in the proof of Theorem \ref{thmeqcdf}. We have
+	We proceed as in the proof of Theorem \ref{thm: cdf}. We have
 	\begin{align*}
-		&\mathbb{P}_{V_1}( \norm{\Delta^+ F(i, j)} \leq t ) \\
+		&\mathbb{P}_{V_1}\left( \norm{\Delta^+ F(i, j)} \leq t \right) \\
 		&= \mathbb{P}_{V_1}\big( (c + V_1(i + 1, j) + \varepsilon_{i + 1, j} - c - V_1(i, j) - \varepsilon_{i, j})^2 \\
 		&\quad + (c + V_1(i, j + 1) + \varepsilon_{i, j + 1} - c - V_1(i, j) - \varepsilon_{i, j})^2 \leq t^2 \big) \\
 		&= \mathbb{P}_{V_1}\big( (V_1(i + 1, j) - V_1(i, j) + \varepsilon_{i + 1, j} - \varepsilon_{i, j})^2 \\
-		&\quad + (V_1(i, j + 1) - V_1(i, j) + \varepsilon_{i, j + 1} - \varepsilon_{i, j})^2 \leq t^2 \big)
+		&\quad + (V_1(i, j + 1) - V_1(i, j) + \varepsilon_{i, j + 1} - \varepsilon_{i, j})^2 \leq t^2 \big).
 	\end{align*}
 	
 	We define the following random variables
 	\begin{align*}
-		\xi_1 &= V_1(i + 1, j) - V_1(i, j) - \varepsilon_{i, j} \sim \mathcal{N}(V_1(i + 1, j) - V_1(i, j), \sigma^2) \\
-		\xi_2 &= V_1(i, j + 1) - V_1(i, j) - \varepsilon_{i, j} \sim \mathcal{N}(V_1(i, j + 1) - V_1(i, j), \sigma^2) \\
-		X_1 &= \xi_1 + \varepsilon_{i + 1, j} \sim \mathcal{N}(\xi_1, \sigma^2) \\
-		X_2 &= \xi_2 + \varepsilon_{i, j + 1} \sim \mathcal{N}(\xi_2, \sigma^2)
+		\xi_1 &= V_1(i + 1, j) - V_1(i, j) - \varepsilon_{i, j} \sim \mathcal{N}\left( V_1(i + 1, j) - V_1(i, j), \sigma^2 \right), \\
+		\xi_2 &= V_1(i, j + 1) - V_1(i, j) - \varepsilon_{i, j} \sim \mathcal{N}\left( V_1(i, j + 1) - V_1(i, j), \sigma^2 \right), \\
+		X_1 &= \xi_1 + \varepsilon_{i + 1, j} \sim \mathcal{N}\left( \xi_1, \sigma^2 \right), \\
+		X_2 &= \xi_2 + \varepsilon_{i, j + 1} \sim \mathcal{N}\left( \xi_2, \sigma^2 \right)
 	\end{align*}
 	and obtain
 	\begin{equation*}
-		\mathbb{P}_{V_1}( \norm{\Delta^+ F(i, j)} \leq t ) = \mathbb{P}_{V_1}\left( \sqrt{\left( \frac{X_1}{\sigma} \right)^2 + \left( \frac{X_2}{\sigma} \right)^2} \leq \frac{t}{\sigma} \right)
+		\mathbb{P}_{V_1}\left( \norm{\Delta^+ F(i, j)} \leq t \right) = \mathbb{P}_{V_1}\left( \sqrt{\left( \frac{X_1}{\sigma} \right)^2 + \left( \frac{X_2}{\sigma} \right)^2} \leq \frac{t}{\sigma} \right).
 	\end{equation*}
 	
 	Thus, we see, that the square root inside has a non-central Chi distribution with two degrees of freedom. We have assumed, that $\norm{\Delta^+ V_1(i, j)} = \sqrt{2} c$. As we have seen, this is equivalent to
 	\begin{equation*}
-		\abs{V_1(i + 1, j) - V_1(i, j)} = \abs{V_1(i, j + 1) - V_1(i, j)} = c
+		\abs{V_1(i + 1, j) - V_1(i, j)} = \abs{V_1(i, j + 1) - V_1(i, j)} = c.
 	\end{equation*}
+	
 	We can replace $\xi_1$ or $\xi_2$ by $- \xi_1$ or $- \xi_2$, respectively, without changing the probability. Thus, we can assume without loss of generality
 	\begin{equation*}
-		V_1(i + 1, j) - V_1(i, j) = V_1(i, j + 1) - V_1(i, j) = c
+		V_1(i + 1, j) - V_1(i, j) = V_1(i, j + 1) - V_1(i, j) = c.
 	\end{equation*}
 	
 	Assuming $\varepsilon_{i, j}$ to be constant, this non-central Chi distribution has non-centrality parameter
 	\begin{align*}
 		\lambda &= \sqrt{\left( \frac{V_1(i + 1, j) - V_1(i, j) - \varepsilon_{i, j}}{\sigma} \right)^2 + \left( \frac{V_1(i, j + 1) - V_1(i, j) - \varepsilon_{i, j}}{\sigma} \right)^2} \\
-		&= \frac{\sqrt{2} \abs{c - \varepsilon_{i, j}}}{\sigma}
+		&= \frac{\sqrt{2} \abs{c - \varepsilon_{i, j}}}{\sigma}.
 	\end{align*}
 	
 	This yields
 	\begin{equation*}
-		\sqrt{\left( \frac{X_1}{\sigma} \right)^2 + \left( \frac{X_2}{\sigma} \right)^2} \sim \chi_2 \left( \frac{\sqrt{2} \abs{c - \varepsilon_{i, j}}}{\sigma} \right)
+		\sqrt{\left( \frac{X_1}{\sigma} \right)^2 + \left( \frac{X_2}{\sigma} \right)^2} \sim \chi_2 \left( \frac{\sqrt{2} \abs{c - \varepsilon_{i, j}}}{\sigma} \right).
 	\end{equation*}
 	
 	Since $\varepsilon_{i, j}$ is not constant, but a normal distributed random variable with zero mean and standard deviation $\sigma$, we have a compound probability distribution:
 	\begin{align*}
-		&\mathbb{P}_{V_1}( \norm{\Delta^+ F(i, j)} \leq t ) \\
+		&\mathbb{P}_{V_1}\left(( \norm{\Delta^+ F(i, j)} \leq t \right) \\
 		&= \mathbb{P}_{V_1}\left( \sqrt{\left( \frac{X_1}{\sigma} \right)^2 + \left( \frac{X_2}{\sigma} \right)^2} \leq \frac{t}{\sigma} \right) \\
 		&= \int_0^\frac{t}{\sigma} \int_{-\infty}^\infty \underbrace{x \exp \left( - \frac{x^2}{2} - \frac{\abs{c - \eta}^2}{\sigma^2} \right) I_0 \left( \frac{\sqrt{2} \abs{c - \eta}}{\sigma} x \right)}_{\textrm{pdf of } \chi_2 \left( \frac{\sqrt{2} \abs{c - \eta}}{\sigma} \right) \textrm{ for fixed } \eta} \underbrace{\frac{1}{\sqrt{2 \pi \sigma^2}} \exp \left( - \frac{\eta^2}{2 \sigma^2} \right)}_{\textrm{pdf of } \mathcal{N}(0, \sigma^2)} \mathrm{d}\eta \mathrm{d}x \\
 		&= \frac{1}{\sqrt{2 \pi \sigma^2}} \int_0^\frac{t}{\sigma} x \exp \left( - \frac{x^2}{2} \right) \int_{-\infty}^\infty \exp \left( - \frac{(c - \eta)^2}{\sigma^2} - \frac{\eta^2}{2 \sigma^2} \right) I_0 \left( \frac{\sqrt{2} x}{\sigma} (c - \eta) \right) \mathrm{d}\eta \mathrm{d}x
@@ -859,13 +873,45 @@ We can however write down the compound probability distribution of the upper and
 	where we used the symmetry of $I_0$. The second equality can be proven analogously.
 \end{proof}
 
-While these results are not as strong as the result from Theorem \ref{thmeqcdf}, they still give us two ways to estimate an upper and lower bound for the probability of a type II error in our testing procedure. Theorem \ref{thmtypeIIbounds} gives us the option to simulate the random variables and consequently the probabilities on the right hand side of equations \eqref{eqtypeIIupperbound} and \eqref{eqtypeIIlowerbound} to estimate an upper and lower bound. On the other hand, Theorem \ref{thmcompprob} gives us the option to numerically integrate the right hand side of equations \eqref{eqcompprobupper} and \eqref{eqcompproblower} to get estimates of bounds for the probability of a type II error.
+These results are not as strong as the results from Theorem \ref{thm: cdf}. By using equation \eqref{eq: probequality} we are able to compute an upper bound for the probability of a type I error. Theorems \ref{thm: typeIIboundssimulation} and \ref{thm: typeIIboundsintegration} do not provide a similar result for the probability of a type II error.
+
+We can, however, simulate random variables $V_1$ and $V_2$ as in Theorem \ref{thm: typeIIboundssimulation}. This way, we obtain empirical estimates of upper and lower bounds for the probability of a type II error depending on the standard deviation $\sigma$ of the noise term in the statistical model \eqref{statmodel2}.
+
+Figure \ref{fig: simulatedboundstypeIIerror} shows the result of this simulation for the thresholds $t_{0.05} = 3.2555$ and $t_{0.01} = 4.2792$, that were computed in Section \ref{section: boundtypeIerror}. A \emph{MATLAB} implementation of the simulation can be found in the appendix.
+
+\begin{figure}[h!]
+	\centering
+	\begin{tikzpicture}
+		\begin{axis}[
+			legend pos=south east,
+			xlabel=Standard deviation $\sigma$,
+			ylabel=Probability of a type II error,
+			grid=both,
+			minor grid style={gray!25},
+			major grid style={gray!25},
+			width=\linewidth,
+			no marks]
+			\addplot[line width=1pt,dashed,color=blue] table[x=sigma,y=probtypeII,col sep=comma]{CSV/resultsPowerSimUpperBound1percent.csv};
+			\addlegendentry{Upper bound for $\alpha = 0.01$}
+			\addplot[line width=1pt,dashed,color=red] table[x=sigma,y=probtypeII,col sep=comma]{CSV/resultsPowerSimUpperBound5percent.csv};
+			\addlegendentry{Upper bound for $\alpha = 0.05$}
+			\addplot[line width=1pt,dotted,color=blue] table[x=sigma,y=probtypeII,col sep=comma]{CSV/resultsPowerSimLowerBound1percent.csv};
+			\addlegendentry{Lower bound for $\alpha = 0.01$}
+			\addplot[line width=1pt,dotted,color=red] table[x=sigma,y=probtypeII,col sep=comma]{CSV/resultsPowerSimLowerBound5percent.csv};
+			\addlegendentry{Lower bound for $\alpha = 0.05$}
+		\end{axis}
+	\end{tikzpicture}
+	\caption{Simulated bounds for the probability of a type II error. We use the thresholds $t_{0.05} = 3.2555$ for $\alpha = 0.05$ and $t_{0.01} = 4.2792$ for $\alpha = 0.01$. (Sample size: $1000000$)}
+	\label{fig: simulatedboundstypeIIerror}
+\end{figure}
+
+Theorem \ref{thm: typeIIboundsintegration} also gives a second way to numerically obtain upper and lower bounds for the probability of a type II error by numerically integrating the right hand side of equations \eqref{eq: typeIIupperboundintegration} and \eqref{eq: typeIIlowerboundintegration}.
 
 \newpage
 
-\section{Binary morphological operations}\label{sectionmorphologicaloperations}
+\section{Binary morphological operations}\label{section: morphologicaloperations}
 
-After having developed a basic testing procedure for extracting a rectangular region of interest, we now introduce morphological operations. It is our goal to study the influence of these operations on the statistical significance. Since we can view the output of the testing procedure as a binarization, it is sufficient to only consider \emph{binary} morphological operations. Moreover, we will only study the impact of \emph{binary opening} and \emph{binary closing}. These operations can be viewed as local, meaning they only depend on a limited and fixed number of pixels. In contrast to that, the \emph{convex hull} is a more global morphological operation depending on all pixels in an image, which makes it way harder to study on a pixel-by-pixel basis.
+We now introduce morphological operations. It is our goal to study the influence of these operations on the probabilities of type I and II errors in our testing procedure. Since we can view the output of the testing procedure as a binarization, it is sufficient to only consider \emph{binary} morphological operations. Moreover, we will only study the impact of \emph{binary opening} and \emph{binary closing}. These operations only depend on a limited and fixed number of pixels. In contrast to that, the \emph{convex hull} is a morphological operation depending on all pixels of an image, making it harder to study on a pixel-by-pixel basis.
 
 \subsection{Definition of opening \& closing}
 
@@ -876,11 +922,11 @@ Morphological binary opening and closing are closely related operations. They ar
 	\begin{enumerate}
 		\item The \emph{binary erosion} of $\Theta$ by $\Psi$ is defined as
 		\begin{equation*}
-			\Theta \ominus \Psi = \left\{ x \in \mathbb{Z}^2 \mid x + b \in \Theta \textrm{ for every } b \in \Psi \right\}
+			\Theta \ominus \Psi = \left\{ x \in \mathbb{Z}^2 \mid x + b \in \Theta \textrm{ for every } b \in \Psi \right\}.
 		\end{equation*}
 		\item The \emph{binary dilation} of $A$ by $\Psi$ is defined as
 		\begin{equation*}
-			\Theta \oplus \Psi = \left\{ c \in \mathbb{Z}^2 \mid c = a + b \textrm{ for some } a \in \Theta \textrm{ and } b \in \Psi \right\}
+			\Theta \oplus \Psi = \left\{ c \in \mathbb{Z}^2 \mid c = a + b \textrm{ for some } a \in \Theta \textrm{ and } b \in \Psi \right\}.
 		\end{equation*}
 	\end{enumerate}
 	The set $\Psi$ is called a \emph{structuring element}.
@@ -893,7 +939,7 @@ Morphological binary opening and closing are closely related operations. They ar
 As we can see, in binary morphology a binary image is a subset of $\mathbb{Z}^2$. This subset is the set of points at which the binary image is one. In contrast to that, we aim to study the influence of these morphological operations on the outcome of a statistical test for each individual pixel of an image. This outcome is best represented by a matrix $\mathfrak{I} \in \{ 0, 1 \}^{m \times n}$. Hence, we need to translate the definition of binary opening and closing as operations on subsets of $\mathbb{Z}^2$ to operations on matrices $\mathfrak{I} \in \{ 0, 1 \}^{m \times n}$. This gives rise to the following definition.
 
 \begin{definition}
-	Let $\mathfrak{I} \in \{ 0, 1 \}^{m \times n}$, $\Omega = \{ 1, \dots, m \} \times \{ 1, \dots, n \}$ and $\Psi \subseteq \mathbb{Z}^2$ be a structuring element. We call
+	Let $m, n \in \mathbb{N}$, $\mathfrak{I} \in \{ 0, 1 \}^{m \times n}$, $\Omega = \{ 1, \dots, m \} \times \{ 1, \dots, n \}$ and $\Psi \subseteq \mathbb{Z}^2$ be a structuring element. We call
 	\begin{equation*}
 		\Theta_\mathfrak{I} \coloneqq \{ (i, j) \in \Omega \mid \mathfrak{I}(i, j) = 1 \} \subseteq \mathbb{Z}^2
 	\end{equation*}
@@ -924,11 +970,11 @@ By definition, erosion and dilation of a binary matrix are binary matrices as we
 
 We want to express $\mathfrak{I} \ominus \Psi$ and $\mathfrak{I} \oplus \Psi$ in terms of $\mathfrak{I}$. This is done in the following lemma.
 
-\begin{lemma}\label{lemerodil}
-	Let $\mathfrak{I} \in \{ 0, 1 \}^{m \times n}$ and $\Psi \subseteq \mathbb{Z}^2$ be a structuring element. Let $(i, j) \in \Omega$. Then we have the following equalities:
+\begin{lemma}\label{lem: erodil}
+	Let $m, n \in \mathbb{N}$, $\mathfrak{I} \in \{ 0, 1 \}^{m \times n}$ and $\Psi \subseteq \mathbb{Z}^2$ be a structuring element. Let $(i, j) \in \Omega$. Then we have the following equalities:
 	\begin{align}
-		(\mathfrak{I} \ominus \Psi)(i, j) &= \prod_{(k, l) \in \Psi} \mathfrak{I}(i + k, j + l) \label{eqero} \\
-		(\mathfrak{I} \oplus \Psi)(i, j) &= 1 - \prod_{(k, l) \in \Psi} ( 1 - \mathfrak{I}(i - k, j - l) ) \label{eqdil}
+		(\mathfrak{I} \ominus \Psi)(i, j) &= \prod_{(k, l) \in \Psi} \mathfrak{I}(i + k, j + l) \label{eq: erosion} \\
+		(\mathfrak{I} \oplus \Psi)(i, j) &= 1 - \prod_{(k, l) \in \Psi} ( 1 - \mathfrak{I}(i - k, j - l) ) \label{eq: dilation}
 	\end{align}
 	where we extend the matrix $\mathfrak{I}$ to all of $\mathbb{Z}^2$ by setting $\mathfrak{I}(k, l) = 0$ for $(k, l) \notin \Omega$.
 \end{lemma}
@@ -943,18 +989,18 @@ We want to express $\mathfrak{I} \ominus \Psi$ and $\mathfrak{I} \oplus \Psi$ in
 	
 	The sets $\Theta_\mathfrak{I} - (k, l)$ are related to the matrix $\mathfrak{I}$ through the equivalence
 	\begin{equation*}
-		(i, j) \in ( \Theta_\mathfrak{I} - (k, l) ) \Leftrightarrow \mathfrak{I}(i + k, j + l) = 1
+		(i, j) \in ( \Theta_\mathfrak{I} - (k, l) ) \Leftrightarrow \mathfrak{I}(i + k, j + l) = 1.
 	\end{equation*}
 	
 	Using this relation, we get the equivalence
 	\begin{align*}
 		(\mathfrak{I} \ominus \Psi)(i, j) = 1 &\Leftrightarrow (i, j) \in \bigcap_{(k, l) \in \Psi} ( \Theta_\mathfrak{I} - (k, l) ) \\
-		&\Leftrightarrow \prod_{(k, l) \in \Psi} \mathfrak{I}(i + k, j + l) = 1
+		&\Leftrightarrow \prod_{(k, l) \in \Psi} \mathfrak{I}(i + k, j + l) = 1.
 	\end{align*}
 	
 	The functions on both sides of this equivalence only take values in $\{ 0, 1 \}$. Thus, we get a full equality
 	\begin{equation*}
-		(\mathfrak{I} \ominus \Psi)(i, j) = \prod_{(k, l) \in \Psi} \mathfrak{I}(i + k, j + l)
+		(\mathfrak{I} \ominus \Psi)(i, j) = \prod_{(k, l) \in \Psi} \mathfrak{I}(i + k, j + l).
 	\end{equation*}
 	
 	This proves the first equality.
@@ -963,42 +1009,42 @@ We want to express $\mathfrak{I} \ominus \Psi$ and $\mathfrak{I} \oplus \Psi$ in
 	\begin{align*}
 		(\mathfrak{I} \oplus \Psi)(i, j) = 1 &\Leftrightarrow (i, j) \in \Theta_\mathfrak{I} \oplus \Psi \\
 		&\Leftrightarrow \exists (k, l) \in \Psi: (i, j) - (k, l) \in \Theta_\mathfrak{I} \\
-		&\Leftrightarrow (i, j) \in \bigcup_{(k, l) \in \Psi} ( \Theta_\mathfrak{I} + (k, l) )
+		&\Leftrightarrow (i, j) \in \bigcup_{(k, l) \in \Psi} ( \Theta_\mathfrak{I} + (k, l) ).
 	\end{align*}
 	
 	The property $(i, j) \in \bigcup_{(k, l) \in \Psi} ( \Theta_\mathfrak{I} + (k, l) )$ is fulfilled, if $\mathfrak{I}(i - k, j - l) = 1$ for any $(k, l) \in \Psi$. This observation yields the equivalence
 	\begin{align*}
 		(\mathfrak{I} \oplus \Psi)(i, j) = 1 &\Leftrightarrow (i, j) \in \bigcup_{(k, l) \in \Psi} ( \Theta_\mathfrak{I} + (k, l) ) \\
-		&\Leftrightarrow \prod_{(k, l) \in \Psi} ( 1 - \mathfrak{I}(i - k, j - l) ) = 0
+		&\Leftrightarrow \prod_{(k, l) \in \Psi} ( 1 - \mathfrak{I}(i - k, j - l) ) = 0.
 	\end{align*}
 	
 	Since $\mathfrak{I}$ is binary, $\prod_{(k, l) \in \Psi} ( 1 - \mathfrak{I}(i - k, j - l) )$ only takes values in $\{ 0, 1 \}$. Hence, we have the equivalence
 	\begin{align*}
 		(\mathfrak{I} \oplus \Psi)(i, j) = 1 &\Leftrightarrow \prod_{(k, l) \in \Psi} ( 1 - \mathfrak{I}(i - k, j - l) ) = 0 \\
-		&\Leftrightarrow 1 - \prod_{(k, l) \in \Psi} ( 1 - \mathfrak{I}(i - k, j - l) ) = 1
+		&\Leftrightarrow 1 - \prod_{(k, l) \in \Psi} ( 1 - \mathfrak{I}(i - k, j - l) ) = 1.
 	\end{align*}
 	
 	Again, since both sides are binary, this yields a full equality
 	\begin{equation*}
-		(\mathfrak{I} \oplus \Psi)(i, j) = 1 - \prod_{(k, l) \in \Psi} ( 1 - \mathfrak{I}(i - k, j - l) )
+		(\mathfrak{I} \oplus \Psi)(i, j) = 1 - \prod_{(k, l) \in \Psi} ( 1 - \mathfrak{I}(i - k, j - l) ).
 	\end{equation*}
 \end{proof}
 
 \begin{remark}
-	The extension of $\mathfrak{I}$ to all of $\mathbb{Z}^2$ is necessary, because in the product of the right hand side of equation \eqref{eqero} and \eqref{eqdil}, we might reach indices outside of $\{ 1, \dots, m \} \times \{ 1, \dots, n \}$.
+	The extension of $\mathfrak{I}$ to all of $\mathbb{Z}^2$ is necessary, because in the products of the right hand sides of equations \eqref{eq: erosion} and \eqref{eq: dilation}, we might reach indices outside of $\Omega$.
 \end{remark}
 
 After having defined binary erosion and dilation, we now can define binary opening and closing. Again, we start by defining it for subsets of $\mathbb{Z}^2$ and then proceed to define it for binary matrices $\mathfrak{I} \in \{ 0, 1 \}^{m \times n}$.
 \begin{definition}
-	Let $\Theta, \Psi \subseteq \mathbb{Z}^n$.
+	Let $\Theta, \Psi \subseteq \mathbb{Z}^2$.
 	\begin{enumerate}
 		\item The \emph{binary opening} of $\Theta$ by a structuring element $\Psi$ is defined as
 		\begin{equation*}
-			\Theta \circ \Psi = (\Theta \ominus \Psi) \oplus \Psi
+			\Theta \circ \Psi = (\Theta \ominus \Psi) \oplus \Psi.
 		\end{equation*}
 		\item The \emph{binary closing} of $\Theta$ by a structuring element $\Psi$ is defined as
 		\begin{equation*}
-			\Theta \bullet \Psi = (\Theta \oplus \Psi) \ominus \Psi
+			\Theta \bullet \Psi = (\Theta \oplus \Psi) \ominus \Psi.
 		\end{equation*}
 	\end{enumerate}
 \end{definition}
@@ -1006,7 +1052,7 @@ After having defined binary erosion and dilation, we now can define binary openi
 As we can see, binary opening and closing are concatenations of binary erosion and dilation. The definitions for matrices are done the same way, as they were done for erosion and dilation of binary matrices.
 
 \begin{definition}
-	Let $\mathfrak{I} \in \{ 0, 1 \}^{m \times n}$, $\Psi \subseteq \mathbb{Z}^2$ be a structuring element and $\Theta_\mathfrak{I}$ be the index set of $\mathfrak{I}$.
+	Let $m, n \in \mathbb{N}$, $\mathfrak{I} \in \{ 0, 1 \}^{m \times n}$, $\Psi \subseteq \mathbb{Z}^2$ be a structuring element and $\Theta_\mathfrak{I}$ be the index set of $\mathfrak{I}$.
 	\begin{enumerate}
 		\item The \emph{opening of the binary matrix $\mathfrak{I}$ by the structuring element $\Psi$} is defined by
 		\begin{equation}
@@ -1032,7 +1078,7 @@ As we can see, binary opening and closing are concatenations of binary erosion a
 While we defined binary opening and closing for subsets of $\mathbb{Z}^2$ as concatenations of binary erosion and dilation, we did not define opening and closing of a binary matrix as concatenations of erosion and dilation of binary matrices. The following lemma shows the connection between these operations.
 
 \begin{lemma}
-	Let $\mathfrak{I} \in \{ 0, 1 \}^{m \times n}$ and $\Psi \subseteq \mathbb{Z}^2$ be a structuring element. We have the following connections between opening and closing and erosion and dilation of binary matrices:
+	Let $m, n \in \mathbb{N}$, $\mathfrak{I} \in \{ 0, 1 \}^{m \times n}$ and $\Psi \subseteq \mathbb{Z}^2$ be a structuring element. We have the following connections between opening and closing and erosion and dilation of binary matrices:
 	\begin{align}
 		(\mathfrak{I} \circ \Psi) = (\mathfrak{I} \ominus \Psi) \oplus \Psi \\
 		(\mathfrak{I} \bullet \Psi) = (\mathfrak{I} \oplus \Psi) \ominus \Psi
@@ -1044,7 +1090,7 @@ While we defined binary opening and closing for subsets of $\mathbb{Z}^2$ as con
 		\Theta_{\mathfrak{I} \ominus \Psi} &= \{ (i, j) \in \Omega \mid (\mathfrak{I} \ominus \Psi)(i, j) = 1 \} \\
 		&= \{ (i, j) \in \Omega \mid (i, j) \in \Theta_\mathfrak{I} \ominus \Psi \} \\
 		&= \Theta_\mathfrak{I} \ominus \Psi
-	\end{align*}
+	\end{align*}.
 	The second equality is proven similarly.
 	
 	Using this equality, we obtain
@@ -1057,64 +1103,79 @@ While we defined binary opening and closing for subsets of $\mathbb{Z}^2$ as con
 	and thus prove the first relation. The proof of the second relation is analogous.
 \end{proof}
 
-After we established this connection, we can use the equalites deduced in Lemma \ref{lemerodil} for erosion and dilation to derive similar equalities for opening and closing of a binary matrix.
+After we established this connection, we can use the equalites deduced in Lemma \ref{lem: erodil} for erosion and dilation to derive similar equalities for opening and closing of a binary matrix.
 
 \begin{lemma}
-	Let $\mathfrak{I} \in \{ 0, 1 \}^{m \times n}$ and $\Psi \subseteq \mathbb{Z}^2$ be a structuring element. Let $(i, j) \in \Omega$. Then the following equalities hold:
+	Let $m, n \in \mathbb{N}$, $\mathfrak{I} \in \{ 0, 1 \}^{m \times n}$ and $\Psi \subseteq \mathbb{Z}^2$ be a structuring element. Let $(i, j) \in \Omega$. Then the following equalities hold:
 	\begin{align}
-		(\mathfrak{I} \circ \Psi)(i, j) &= 1 - \prod_{(k, l) \in \Psi} \left( 1 - \left( \prod_{(\tilde{k}, \tilde{l}) \in \Psi} \mathfrak{I}(i - k + \tilde{k}, j - l + \tilde{l}) \right) \right) \label{eqopening} \\
-		(\mathfrak{I} \bullet \Psi)(i, j) &= \prod_{(k, l) \in \Psi} \left( 1 - \prod_{(\tilde{k}, \tilde{l}) \in \Psi} ( 1 - \mathfrak{I}(i + k - \tilde{k}, j + l - \tilde{l}) ) \right) \label{eqclosing}
+		(\mathfrak{I} \circ \Psi)(i, j) &= 1 - \prod_{(k, l) \in \Psi} \left( 1 - \left( \prod_{(\tilde{k}, \tilde{l}) \in \Psi} \mathfrak{I}(i - k + \tilde{k}, j - l + \tilde{l}) \right) \right) \label{eq: opening} \\
+		(\mathfrak{I} \bullet \Psi)(i, j) &= \prod_{(k, l) \in \Psi} \left( 1 - \prod_{(\tilde{k}, \tilde{l}) \in \Psi} ( 1 - \mathfrak{I}(i + k - \tilde{k}, j + l - \tilde{l}) ) \right) \label{eq: closing}
 	\end{align}
 	where we extend the matrix $\mathfrak{I}$ to all of $\mathbb{Z}^2$ by setting $\mathfrak{I}(k, l) = 0$ for $(k, l) \notin \Omega$.
 \end{lemma}
 \begin{proof}
-	We can use the previous lemma, as well as equations \eqref{eqdil} and \eqref{eqero} to obtain the first equality
+	We can use the previous lemma, as well as equations \eqref{eq: dilation} and \eqref{eq: erosion} to obtain the first equality
 	\begin{align*}
 		(\mathfrak{I} \circ \Psi)(i, j) &= ((\mathfrak{I} \ominus \Psi) \oplus \Psi)(i, j) \\
 		&= 1 - \prod_{(k, l) \in \Psi} ( 1 - (\mathfrak{I} \ominus \Psi)(i - k, j - l) ) \\
-		&= 1 - \prod_{(k, l) \in \Psi} \left( 1 - \left( \prod_{(\tilde{k}, \tilde{l}) \in \Psi} \mathfrak{I}(i - k + \tilde{k}, j - l + \tilde{l}) \right) \right)
+		&= 1 - \prod_{(k, l) \in \Psi} \left( 1 - \left( \prod_{(\tilde{k}, \tilde{l}) \in \Psi} \mathfrak{I}(i - k + \tilde{k}, j - l + \tilde{l}) \right) \right).
 	\end{align*}
 	
 	Using the same lemma and equations also yields the second equality
 	\begin{align*}
 		(\mathfrak{I} \bullet \Psi)(i, j) &= ((\mathfrak{I} \oplus \Psi) \ominus \Psi)(i, j) \\
 		&= \prod_{(k, l) \in \Psi} (\mathfrak{I} \oplus \Psi)(i + k, j + l) \\
-		&= \prod_{(k, l) \in \Psi} \left( 1 - \prod_{(\tilde{k}, \tilde{l}) \in \Psi} ( 1 - \mathfrak{I}(i + k - \tilde{k}, j + l - \tilde{l}) ) \right)
+		&= \prod_{(k, l) \in \Psi} \left( 1 - \prod_{(\tilde{k}, \tilde{l}) \in \Psi} ( 1 - \mathfrak{I}(i + k - \tilde{k}, j + l - \tilde{l}) ) \right).
 	\end{align*}
 	
 	This finishes the proof.
 \end{proof}
 
-We now assume $\mathfrak{I}(i, j)$ to be a random variable for all $(i, j) \in \Omega$. Equations \eqref{eqopening} and \eqref{eqclosing} show, that $(\mathfrak{I} \circ \Psi)(i, j)$ and $(\mathfrak{I} \bullet \Psi)(i, j)$ are random variables as well.
+\begin{remark}
+	Again, we needed to extend $\mathfrak{I}$ to all of $\mathbb{Z}^2$, because we might reach indices outside of $\Omega$ in the right hand sides of equations \eqref{eq: opening} and \eqref{eq: closing}. This will not cause any pixels outside of $\Omega$ to be set to one.
+\end{remark}
 
-We want to express the probabilities of $(\mathfrak{I} \circ \Psi)(i, j) = 1$ and $(\mathfrak{I} \bullet \Psi)(i, j) = 1$ as probabilities of unions and intersections of the events $\mathfrak{I}(i, j) = 1$. This is done in the following corollary.
+Using the previous lemma, we can deduce the following equalities of sets of matrices $\mathfrak{I} \in \{ 0, 1 \}^{m \times n}$.
 
 \begin{lemma}
-	Let $m, n \in \mathbb{N}$ and $\mathfrak{I}(i, j) \in \{ 0, 1 \}$ be a random variable for all $(i, j) \in \Omega$. Let $\Theta_\mathfrak{I}$ be the index set of $\mathfrak{I}$ and let $\Psi \subseteq \mathbb{Z}^2$. Then we have the equalities
-	\begin{align}
-		\mathbb{P}\left( (\mathfrak{I} \circ \Psi)(i, j) = 1 \right) &= \mathbb{P}\left( \bigcup_{(k, l) \in \Psi} \bigcap_{(\tilde{k}, \tilde{l}) \in \Psi} \{ \mathfrak{I}(i - k + \tilde{k}, j - l + \tilde{l}) = 1 \} \label{eqeventopening} \right) \\
-		\mathbb{P}\left( (\mathfrak{I} \bullet \Psi)(i, j) = 1 \right) &= \mathbb{P}\left( \bigcap_{(k, l) \in \Psi} \bigcup_{(\tilde{k}, \tilde{l}) \in \Psi} \{ \mathfrak{I}(i + k - \tilde{k}, j + l - \tilde{l}) = 1 \} \right) \label{eqeventclosing}
-	\end{align}
+	Let $m, n \in \mathbb{N}$ and $\Psi \subseteq \mathbb{Z}^2$ be a structuring element. Let $(i, j) \in \Omega$. Then the following equalities hold:
+	\begin{equation}
+		\begin{aligned}
+			\big\{ \mathfrak{I} \in \{ 0, 1 \}^{m \times n} &\mid (\mathfrak{I} \circ \Psi)(i, j) = 1 \big\} \\
+			&= \bigcup_{(k, l) \in \Psi} \bigcap_{(\tilde{k}, \tilde{l}) \in \Psi} \left\{ \mathfrak{I} \in \{ 0, 1 \}^{m \times n} \mid \mathfrak{I}(i - k + \tilde{k}, j - l + \tilde{l}) = 1 \right\} \label{eq: openingset}
+		\end{aligned}
+	\end{equation}
+	\begin{equation}
+		\begin{aligned}
+			\big\{ \mathfrak{I} \in \{ 0, 1 \}^{m \times n} &\mid (\mathfrak{I} \bullet \Psi)(i, j) = 1 \big\} \\
+			&= \bigcap_{(k, l) \in \Psi} \bigcup_{(\tilde{k}, \tilde{l}) \in \Psi} \left\{ \mathfrak{I} \in \{ 0, 1 \}^{m \times n} \mid \mathfrak{I}(i + k - \tilde{k}, j + l - \tilde{l}) = 1 \right\} \label{eq: closingset}
+		\end{aligned}
+	\end{equation}
 \end{lemma}
 \begin{proof}
-	Using equation \eqref{eqopening}, we obtain the equivalence
+	Using equation \eqref{eq: opening}, we obtain the equality
 	\begin{align*}
-		\{ (\mathfrak{I} \circ \Psi)(i, j) = 1 \} &\Leftrightarrow \left\{ 1 - \prod_{(k, l) \in \Psi} \left( 1 - \left( \prod_{(\tilde{k}, \tilde{l}) \in \Psi} \mathfrak{I}(i - k + \tilde{k}, j - l + \tilde{l}) \right) \right) = 1 \right\} \\
-		&\Leftrightarrow \left\{ \prod_{(k, l) \in \Psi} \left( 1 - \left( \prod_{(\tilde{k}, \tilde{l}) \in \Psi} \mathfrak{I}(i - k + \tilde{k}, j - l + \tilde{l}) \right) \right) = 0 \right\}
-	\end{align*}
-	The event $\left\{ \prod_{(k, l) \in \Psi} \left( 1 - \left( \prod_{(\tilde{k}, \tilde{l}) \in \Psi} \mathfrak{I}(i - k + \tilde{k}, j - l + \tilde{l}) \right) \right) = 0 \right\}$ occurs, if and only if any of the events $\left\{ 1 - \left( \prod_{(\tilde{k}, \tilde{l}) \in \Psi} \mathfrak{I}(i - k + \tilde{k}, j - l + \tilde{l}) \right) = 0 \right\}$ for $(k, l) \in \Psi$ occurs. Thus, we get the equivalence
-	\begin{align*}
-		\{ (\mathfrak{I} \circ \Psi)(i, j) = 1 \} &\Leftrightarrow \left\{ \prod_{(k, l) \in \Psi} \left( 1 - \left( \prod_{(\tilde{k}, \tilde{l}) \in \Psi} \mathfrak{I}(i - k + \tilde{k}, j - l + \tilde{l}) \right) \right) = 0 \right\} \\
-		&\Leftrightarrow \bigcup_{(k, l) \in \Psi} \left\{ 1 - \left( \prod_{(\tilde{k}, \tilde{l}) \in \Psi} \mathfrak{I}(i - k + \tilde{k}, j - l + \tilde{l}) \right) = 0 \right\} \\
-		&\Leftrightarrow \bigcup_{(k, l) \in \Psi} \left\{ \prod_{(\tilde{k}, \tilde{l}) \in \Psi} \mathfrak{I}(i - k + \tilde{k}, j - l + \tilde{l}) = 1 \right\}
-	\end{align*}
-	For fixed $(k, l) \in \Psi$, the event $\left\{ \prod_{(\tilde{k}, \tilde{l}) \in \Psi} \mathfrak{I}(i - k + \tilde{k}, j - l + \tilde{l}) = 1 \right\}$ occurs, if and only if all of the events $\left\{ \mathfrak{I}(i - k + \tilde{k}, j - l + \tilde{l}) = 1 \right\}$ for $(\tilde{k}, \tilde{l}) \in B$ occur. This yields the equivalence
-	\begin{align*}
-		\{ \mathfrak{I}_{A \circ \Psi}(i, j) = 1 \} &\Leftrightarrow \bigcup_{(k, l) \in \Psi} \left\{ \prod_{(\tilde{k}, \tilde{l}) \in \Psi} \mathfrak{I}(i - k + \tilde{k}, j - l + \tilde{l}) = 1 \right\} \\
-		&\Leftrightarrow \bigcup_{(k, l) \in \Psi} \bigcap_{(\tilde{k}, \tilde{l}) \in \Psi} \{ \mathfrak{I}(i - k + \tilde{k}, j - l + \tilde{l}) = 1 \}
+		\big\{ \mathfrak{I} &\in \{ 0, 1 \}^{m \times n} \mid (\mathfrak{I} \circ \Psi)(i, j) = 1 \big\} \\
+		&= \left\{ \mathfrak{I} \in \{ 0, 1 \}^{m \times n} \mid 1 - \prod_{(k, l) \in \Psi} \left( 1 - \left( \prod_{(\tilde{k}, \tilde{l}) \in \Psi} \mathfrak{I}(i - k + \tilde{k}, j - l + \tilde{l}) \right) \right) = 1 \right\} \\
+		&= \left\{ \mathfrak{I} \in \{ 0, 1 \}^{m \times n} \mid \prod_{(k, l) \in \Psi} \left( 1 - \left( \prod_{(\tilde{k}, \tilde{l}) \in \Psi} \mathfrak{I}(i - k + \tilde{k}, j - l + \tilde{l}) \right) \right) = 0 \right\}.
 	\end{align*}
 	
-	This proves the first equation. The proof of the second equation is analogous.
+	Now, we see, that $\prod_{(k, l) \in \Psi} \left( 1 - \left( \prod_{(\tilde{k}, \tilde{l}) \in \Psi} \mathfrak{I}(i - k + \tilde{k}, j - l + \tilde{l}) \right) \right) = 0$, if and only if $1 - \left( \prod_{(\tilde{k}, \tilde{l}) \in \Psi} \mathfrak{I}(i - k + \tilde{k}, j - l + \tilde{l}) \right) = 0$ for any $(k, l) \in \Psi$. Thus, we get the equality
+	\begin{align*}
+		\big\{ \mathfrak{I} &\in \{ 0, 1 \}^{m \times n} \mid (\mathfrak{I} \circ \Psi)(i, j) = 1 \big\} \\
+		&= \left\{ \mathfrak{I} \in \{ 0, 1 \}^{m \times n} \mid \prod_{(k, l) \in \Psi} \left( 1 - \left( \prod_{(\tilde{k}, \tilde{l}) \in \Psi} \mathfrak{I}(i - k + \tilde{k}, j - l + \tilde{l}) \right) \right) = 0 \right\} \\
+		&= \bigcup_{(k, l) \in \Psi} \left\{ \mathfrak{I} \in \{ 0, 1 \}^{m \times n} \mid 1 - \left( \prod_{(\tilde{k}, \tilde{l}) \in \Psi} \mathfrak{I}(i - k + \tilde{k}, j - l + \tilde{l}) \right) = 0 \right\} \\
+		&= \bigcup_{(k, l) \in \Psi} \left\{ \mathfrak{I} \in \{ 0, 1 \}^{m \times n} \mid \prod_{(\tilde{k}, \tilde{l}) \in \Psi} \mathfrak{I}(i - k + \tilde{k}, j - l + \tilde{l}) = 1 \right\}.
+	\end{align*}
+	
+	For fixed $(k, l) \in \Psi$, we have $\prod_{(\tilde{k}, \tilde{l}) \in \Psi} \mathfrak{I}(i - k + \tilde{k}, j - l + \tilde{l}) = 1$, if and only if $\mathfrak{I}(i - k + \tilde{k}, j - l + \tilde{l}) = 1$ for all $(\tilde{k}, \tilde{l}) \in B$. This yields the equality
+	\begin{align*}
+		\big\{ \mathfrak{I} &\in \{ 0, 1 \}^{m \times n} \mid (\mathfrak{I} \circ \Psi)(i, j) = 1 \big\} \\
+		&= \bigcup_{(k, l) \in \Psi} \left\{ \mathfrak{I} \in \{ 0, 1 \}^{m \times n} \mid \prod_{(\tilde{k}, \tilde{l}) \in \Psi} \mathfrak{I}(i - k + \tilde{k}, j - l + \tilde{l}) = 1 \right\} \\
+		&= \bigcup_{(k, l) \in \Psi} \bigcap_{(\tilde{k}, \tilde{l}) \in \Psi} \left\{ \mathfrak{I} \in \{ 0, 1 \}^{m \times n} \mid \mathfrak{I}(i - k + \tilde{k}, j - l + \tilde{l}) = 1 \right\}.
+	\end{align*}
+	
+	This proves the first equality. The second equality can be proven similarly.
 \end{proof}
 
 \newpage
@@ -1123,105 +1184,129 @@ We want to express the probabilities of $(\mathfrak{I} \circ \Psi)(i, j) = 1$ an
 
 Before we proceed to prove the main results of this paper, we want to look at examples of binary opening and closing. In the following figures, we display pixels with value one as black. Pixels that were changed by the morphological operations from one to zero will be displayed as transparent and pixels that were changed from zero to one will be displayed as gray.
 
-In figure \ref{exampleopeningbefore} we see an example of a binary image. We want to examine the effect of morphological opening on this image. We use a $3 \times 3$ pixel structuring element. Applying morphological erosion sets all but one pixel to zero, as can be seen in figure \ref{exampleopeningerosion}.
+In figure \ref{fig: exampleopening} we see an example of binary morphological opening. We want to examine the effect of morphological opening on the image in \ref{fig: openingbefore}. We use a $3 \times 3$ pixel structuring element. Applying morphological erosion sets all but one pixel to zero, as can be seen in figure \ref{fig: openingerosion}.
 
-% ------------------------------------------------------------------------
-
-% Draw opening example before any morphological operations:
-\begin{figure}[h]
+\begin{figure}[ht]
 	\centering
-	\begin{tikzpicture}
-		\draw[help lines, step=1] (-4, -4) grid (4, 4);
-		\foreach \x in {(-3, -1), (-2, -1), (-2, 0), (-2, 1), (-1, -2), (-1, -1), (-1, 0), (-1, 1), (-1, 2), (0, -2), (0, -1), (0, 0), (0, 1), (2, -3), (2, -2), (3, -3), (3, -2)}
-			\filldraw[black] \x rectangle + (1, 1);
-	\end{tikzpicture}
-	\caption{Binary image, where the pixels with value one are black.}
-	\label{exampleopeningbefore}
+	\begin{subfigure}[t]{0.45\linewidth}
+		\centering
+		\begin{tikzpicture}[scale=0.45]
+			\draw[help lines, step=1] (-4, -4) grid (4, 4);
+			\foreach \x in {(-3, -1), (-2, -1), (-2, 0), (-2, 1), (-1, -2), (-1, -1), (-1, 0), (-1, 1), (-1, 2), (0, -2), (0, -1), (0, 0), (0, 1), (2, -3), (2, -2), (3, -3), (3, -2)}
+				\filldraw[black] \x rectangle + (1, 1);
+		\end{tikzpicture}
+		\caption{Binary image, where the pixels with value one are black.}
+		\label{fig: openingbefore}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[t]{0.45\linewidth}
+		\centering
+		\begin{tikzpicture}[scale=0.45]
+			\draw[help lines, step=1] (-4, -4) grid (4, 4);
+			\foreach \x in {(-3, -1), (-2, -1), (-2, 0), (-2, 1), (-1, -2), (-1, -1), (-1, 0), (-1, 1), (-1, 2), (0, -2), (0, -1), (0, 0), (0, 1), (2, -3), (2, -2), (3, -3), (3, -2)}
+				\filldraw[gray, opacity=0.5] \x rectangle + (1, 1);
+			\foreach \x in {(-1, 0)}
+				\filldraw[black] \x rectangle + (1, 1);
+		\end{tikzpicture}
+		\caption{Result of binary erosion of the image with a $3 \times 3$ pixel structuring element. The transparent pixels are now set to zero.}
+		\label{fig: openingerosion}
+	\end{subfigure}
+	\vfill
+	\begin{subfigure}[t]{0.45\linewidth}
+		\centering
+		\begin{tikzpicture}[scale=0.45]
+			\draw[help lines, step=1] (-4, -4) grid (4, 4);
+			\foreach \x in {(-3, -1), (-1, -2), (-1, 2), (0, -2), (2, -3), (2, -2), (3, -3), (3, -2)}
+				\filldraw[gray, opacity=0.5] \x rectangle + (1, 1);
+			\foreach \x in {(-2, -1), (-2, 0), (-2, 1), (-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 0), (0, 1)}
+				\filldraw[gray] \x rectangle + (1, 1);
+			\foreach \x in {(-1, 0)}
+				\filldraw[black] \x rectangle + (1, 1);
+		\end{tikzpicture}
+		\caption{Image after binary opening, i.e. erosion and dilation. The gray pixels were set to one again.}
+		\label{fig: openingdilation}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[t]{0.45\linewidth}
+		\centering
+		\begin{tikzpicture}[scale=0.45]
+			\draw[help lines, step=1] (-4, -4) grid (4, 4);
+			\foreach \x in {(-2, -1), (-2, 0), (-2, 1), (-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 0), (0, 1)}
+				\filldraw[black] \x rectangle + (1, 1);
+		\end{tikzpicture}
+		\caption{Result of opening. Outliers have been eliminated and edges have been smoothed.}
+		\label{fig: openingafter}
+	\end{subfigure}
+	\caption{Example of binary morphological opening.}
+	\label{fig: exampleopening}
 \end{figure}
 
-Now, we apply morphological dilation to the eroded image. The result can be seen in figure \ref{exampleopeningopening}. The $2 \times 2$ pixel square has been eliminated, since it is smaller than the structuring element, that was used. Also, the edges of the larger connected region have been smoothed.
+Now, we apply morphological dilation to the eroded image. In figure \ref{fig: openingdilation} the changes are highlighted and the result can be seen in figure \ref{fig: openingafter}. The $2 \times 2$ pixel square has been eliminated, since it is smaller than the structuring element, that was used. Also, the edges of the larger connected region have been smoothed.
 
 This effect of morphological opening makes it a great tool for the smoothing of edges and outlier elimination.\\
 
-% Draw opening example after binary erosion:
-\begin{figure}[t!]
-	\centering
-	\begin{tikzpicture}
-		\draw[help lines, step=1] (-4, -4) grid (4, 4);
-		\foreach \x in {(-3, -1), (-2, -1), (-2, 0), (-2, 1), (-1, -2), (-1, -1), (-1, 0), (-1, 1), (-1, 2), (0, -2), (0, -1), (0, 0), (0, 1), (2, -3), (2, -2), (3, -3), (3, -2)}
-			\filldraw[gray, opacity=0.5] \x rectangle + (1, 1);
-		\foreach \x in {(-1, 0)}
-			\filldraw[black] \x rectangle + (1, 1);
-	\end{tikzpicture}
-	\caption{Result of binary erosion of the image from figure \ref{exampleopeningbefore} with a $3 \times 3$ pixel structuring element. The transparent pixels are now set to zero.}
-	\label{exampleopeningerosion}
-\end{figure}
-
-% Draw opening example after binary opening:
-\begin{figure}[h!]
-	\centering
-	\begin{tikzpicture}
-		\draw[help lines, step=1] (-4, -4) grid (4, 4);
-		\foreach \x in {(-3, -1), (-1, -2), (-1, 2), (0, -2), (2, -3), (2, -2), (3, -3), (3, -2)}
-			\filldraw[gray, opacity=0.5] \x rectangle + (1, 1);
-		\foreach \x in {(-2, -1), (-2, 0), (-2, 1), (-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 0), (0, 1)}
-			\filldraw[gray] \x rectangle + (1, 1);
-		\foreach \x in {(-1, 0)}
-			\filldraw[black] \x rectangle + (1, 1);
-	\end{tikzpicture}
-	\caption{Binary image from figure \ref{exampleopeningbefore} after binary opening, i.e. erosion and dilation. The gray pixels were set to one again. Outliers have been eliminated and edges have been smoothed.}
-	\label{exampleopeningopening}
-\end{figure}
-
 % ------------------------------------------------------------------------
 
-Figure \ref{exampleclosingbefore} shows another example of a binary image. We want to perform morphological closing of this image. Again, we use a $3 \times 3$ pixel structuring element. First, morphological dilation is applied. The result of this can be seen in figure \ref{exampleclosingdilation}. The surrounding pixels of the four pixels, that had a value of one in the original image, have also been set to one by this morphological operation.
+Figure \ref{fig: exampleclosing} shows an example of binary morphological closing. We want to perform morphological closing of the image in \ref{fig: closingbefore}. Again, we use a $3 \times 3$ pixel structuring element. First, morphological dilation is applied. The result of this can be seen in figure \ref{fig: closingdilation}. The surrounding pixels of the four pixels, that had a value of one in the original image, have also been set to one by this morphological operation.
 
-% Draw closing example before any morphological operations:
-\begin{figure}[h]
+\begin{figure}[ht]
 	\centering
-	\begin{tikzpicture}
-		\draw[help lines, step=1] (-4, -4) grid (4, 4);
-		\foreach \x in {(-2, 0), (-2, 2), (1, 1), (1, -2)}
-			\filldraw[black] \x rectangle + (1, 1);
-	\end{tikzpicture}
-	\caption{Binary image, where the pixels with value one are black.}
-	\label{exampleclosingbefore}
+	\begin{subfigure}[t]{0.45\linewidth}
+		\centering
+		\begin{tikzpicture}[scale=0.45]
+			\draw[help lines, step=1] (-4, -4) grid (4, 4);
+			\foreach \x in {(-2, 0), (-2, 2), (1, 1), (1, -2)}
+				\filldraw[black] \x rectangle + (1, 1);
+		\end{tikzpicture}
+		\caption{Binary image, where the pixels with value one are black.}
+		\label{fig: closingbefore}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[t]{0.45\linewidth}
+		\centering
+		\begin{tikzpicture}[scale=0.45]
+			\draw[help lines, step=1] (-4, -4) grid (4, 4);
+			\foreach \x in {(-3, -1), (-3, 0), (-3, 1), (-3, 2), (-3, 3), (-2, -1), (-2, 0), (-2, 1), (-2, 2), (-2, 3), (-1, -1), (-1, 0), (-1, 1), (-1, 2), (-1, 3), (0, -3), (0, -2), (0, -1), (0, 0), (0, 1), (0, 2), (1, -3), (1, -2), (1, -1), (1, 0), (1, 1), (1, 2), (2, -3), (2, -2), (2, -1), (2, 0), (2, 1), (2, 2)}
+				\filldraw[gray] \x rectangle + (1, 1);
+			\foreach \x in {(-2, 0), (-2, 2), (1, 1), (1, -2)}
+				\filldraw[black] \x rectangle + (1, 1);
+		\end{tikzpicture}
+		\caption{Image after binary dilation with a $3 \times 3$ pixel structuring element. The gray pixels are now set to one.}
+		\label{fig: closingdilation}
+	\end{subfigure}
+	\vfill
+	\begin{subfigure}[t]{0.45\linewidth}
+		\centering
+		\begin{tikzpicture}[scale=0.45]
+			\draw[help lines, step=1] (-4, -4) grid (4, 4);
+			\foreach \x in {(-3, -1), (-3, 0), (-3, 1), (-3, 2), (-3, 3), (-2, -1), (-2, 3), (-1, -1), (-1, 2), (-1, 3), (0, -3), (0, -2), (0, -1), (0, 2), (1, -3), (1, 2), (2, -3), (2, -2), (2, -1), (2, 0), (2, 1), (2, 2)}
+				\filldraw[gray, opacity=0.5] \x rectangle + (1, 1);
+			\foreach \x in {(-2, 0), (-2, 1), (-2, 2), (-1, 0), (-1, 1), (0, 0), (0, 1), (1, -2), (1, -1), (1, 0), (1, 1)}
+				\filldraw[gray] \x rectangle + (1, 1);
+			\foreach \x in {(-2, 0), (-2, 2), (1, 1), (1, -2)}
+				\filldraw[black] \x rectangle + (1, 1);
+		\end{tikzpicture}
+		\caption{Image after binary closing, i.e. dilation and erosion. The transparent pixels are set to zero again.}
+		\label{fig: closingerosion}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[t]{0.45\linewidth}
+		\centering
+		\begin{tikzpicture}[scale=0.45]
+			\draw[help lines, step=1] (-4, -4) grid (4, 4);
+			\foreach \x in {(-2, 0), (-2, 1), (-2, 2), (-1, 0), (-1, 1), (0, 0), (0, 1), (1, -2), (1, -1), (1, 0), (1, 1)}
+				\filldraw[black] \x rectangle + (1, 1);
+		\end{tikzpicture}
+		\caption{Result of closing. The gaps between pixels have been filled.}
+		\label{fig: closingafter}
+	\end{subfigure}
+	\caption{Example of binary morphological closing.}
+	\label{fig: exampleclosing}
 \end{figure}
 
-In a second step, morphological erosion is applied to the dilated image. The result can be seen in figure \ref{exampleclosingclosing}. The outer pixels are set to zero again, while the gaps between the four pixels, that had a value of one in the original image, have been filled.
+In a second step, morphological erosion is applied to the dilated image. Figure \ref{fig: closingerosion} highlights the changes of this step and the final result can be seen in figure \ref{fig: closingafter}. The outer pixels are set to zero again, while the gaps between the four pixels, that had a value of one in the original image, have been filled.
 
 For this reason, morphological closing is frequently used as a tool to fill gaps in binary images.
-
-% Draw closing example after binary dilation:
-\begin{figure}[t!]
-	\centering
-	\begin{tikzpicture}
-		\draw[help lines, step=1] (-4, -4) grid (4, 4);
-		\foreach \x in {(-3, -1), (-3, 0), (-3, 1), (-3, 2), (-3, 3), (-2, -1), (-2, 0), (-2, 1), (-2, 2), (-2, 3), (-1, -1), (-1, 0), (-1, 1), (-1, 2), (-1, 3), (0, -3), (0, -2), (0, -1), (0, 0), (0, 1), (0, 2), (1, -3), (1, -2), (1, -1), (1, 0), (1, 1), (1, 2), (2, -3), (2, -2), (2, -1), (2, 0), (2, 1), (2, 2)}
-			\filldraw[gray] \x rectangle + (1, 1);
-		\foreach \x in {(-2, 0), (-2, 2), (1, 1), (1, -2)}
-			\filldraw[black] \x rectangle + (1, 1);
-	\end{tikzpicture}
-	\caption{The image from figure \ref{exampleclosingbefore} after binary dilation with a $3 \times 3$ pixel structuring element. The gray pixels are now set to one.}
-	\label{exampleclosingdilation}
-\end{figure}
-
-% Draw closing example after binary closing:
-\begin{figure}[h!]
-	\centering
-	\begin{tikzpicture}
-		\draw[help lines, step=1] (-4, -4) grid (4, 4);
-		\foreach \x in {(-3, -1), (-3, 0), (-3, 1), (-3, 2), (-3, 3), (-2, -1), (-2, 3), (-1, -1), (-1, 2), (-1, 3), (0, -3), (0, -2), (0, -1), (0, 2), (1, -3), (1, 2), (2, -3), (2, -2), (2, -1), (2, 0), (2, 1), (2, 2)}
-			\filldraw[gray, opacity=0.5] \x rectangle + (1, 1);
-		\foreach \x in {(-2, 0), (-2, 1), (-2, 2), (-1, 0), (-1, 1), (0, 0), (0, 1), (1, -2), (1, -1), (1, 0), (1, 1)}
-			\filldraw[gray] \x rectangle + (1, 1);
-		\foreach \x in {(-2, 0), (-2, 2), (1, 1), (1, -2)}
-			\filldraw[black] \x rectangle + (1, 1);
-	\end{tikzpicture}
-	\caption{The result of binary closing of the image in figure \ref{exampleclosingbefore}, i.e. dilation and erosion. The transparent pixels are set to zero again. The gaps between pixels have been filled.}
-	\label{exampleclosingclosing}
-\end{figure}
 
 % ------------------------------------------------------------------------
 
@@ -1229,47 +1314,50 @@ Altogether, both morphological opening and closing are effective tools to smooth
 
 \newpage
 
-\section{Main results}\label{sectionmainresults}
+\section{Main results}\label{section: mainresults}
 
-In sections \ref{sectionstatisticalsignificance} and \ref{sectionpower} we examined the probabilities of type I and II errors in the statistical test developed in section \ref{sectionstatisticalmodel}. We are interested in the change of these probabilities when morphological opening and closing are applied to the binarized image obtained as the outcome of the statistical test. One property of morphological opening and closing is $\Theta \circ \Psi \subseteq \Theta \subseteq \Theta \bullet \Psi$ for any structuring element $\Psi$. From this fact, we can deduce, that morphological opening will lower the probabiliy of a type I error, but increase the probability of a type II error. Morphological closing, on the other hand, will have the opposite effect. While this serves as a qualitative argument for the employment of these operators, we aim at quantifying this change of the probabilities. For this, we use a square structuring element, since we have the prior information, that the region of interest in the image is rectangular.
-The next theorem states the change of the probability of a type I error after opening and after opening and closing with a square structuring element.
+In Sections \ref{section: boundtypeIerror} and \ref{section: analyzetypeIIerror} we examined the probabilities of type I and II errors in the statistical test developed in section \ref{section: statisticalmodel}. We are interested in the change of these probabilities when morphological opening and closing are applied to the binarized image obtained as the outcome of the statistical test. One property of morphological opening and closing is $\Theta \circ \Psi \subseteq \Theta \subseteq \Theta \bullet \Psi$ for any structuring element $\Psi$. From this fact, we can deduce, that morphological opening will lower the probabiliy of a type I error, but increase the probability of a type II error. Morphological closing, on the other hand, will have the opposite effect. While this serves as a qualitative argument for the employment of these operators, we aim at quantifying this change of the probabilities. 
 
-\begin{theorem}
+We use a square structuring element, since we have the prior information, that the region of interest in the image is rectangular.
+
+The changes of the probability of a type I error after opening and after opening and closing with a square structuring element are quantified in the following theorem.
+
+\begin{theorem}\label{thm: typeIinequalities}
 	Let $m, n \in \mathbb{N}$, $c \in \mathbb{R} \setminus \{ 0 \}$ and $\Omega = \left\{ 1, \dots, m \right\} \times \left\{ 1, \dots, n \right\}$.
 	
-	Assume that $F$ follows the statistical model given in \eqref{image} and let $T(i, j)$ be the test statistic as defined in \eqref{teststatistic} and $H_0(i, j)$ be the null hypothesis as defined in \eqref{nullhypothesis}. Let $\alpha \in (0, 1)$ and $t_\alpha$ a threshold, such that
-	\begin{equation*}
-		\max \left\{ \mathbb{P}_V\left( \norm{\Delta^+ F(i, j)} \geq t_\alpha \right), \mathbb{P}_V\left( \norm{\Delta^- F(i, j)} \geq t_\alpha \right) \right\} \leq \alpha
-	\end{equation*}
-	for all $V \in \mathcal{H}_0(i, j)$. Let $\mathfrak{I}_\alpha$ be the binary image defined by
+	Assume that $F$ follows the statistical model given in \eqref{statmodel2} and let $T(i, j)$ be the test statistic as defined in \eqref{teststatistic} and $H_0(i, j)$ be the null hypothesis as defined in \eqref{nullhypothesis}.
+	
+	Let $\alpha \in (0, 1)$ and $t_\alpha$ a threshold, such that $\mathbb{P}_V( \norm{\Delta^+ F(i, j)} \geq t_\alpha ) \leq \alpha$ for every $V \in \mathcal{H}_0^+(i, j)$ and $\mathbb{P}_V( \norm{\Delta^- F(i, j)} \geq t_\alpha ) \leq \alpha$ for every $V \in \mathcal{H}_0^-(i, j)$.
+	
+	Let $\mathfrak{I}_\alpha$ be the binary image defined by
 	\begin{equation}
 		\mathfrak{I}_\alpha(i, j) = \mathds{1}_{ \{ T(i, j) \geq t_\alpha \} }
 	\end{equation}
 	for all $(i, j) \in \Omega$.
 	
-	Let $\varphi \in \mathbb{N}$ be odd. Let $\Phi_\varphi = \{ -\frac{\varphi - 1}{2}, -\frac{\varphi - 3}{2}, \dots, \frac{\varphi - 3}{2}, \frac{\varphi - 1}{2} \}$ and $\Psi_\varphi = \Phi_\varphi \times \Phi_\varphi$ be a structuring element. Let $(i, j) \in \Omega$ and $V \in \mathcal{H}_0(i, j)$.
+	Let $\varphi \in \mathbb{N}$ be odd. Let $\Phi_\varphi = \left\{ -\frac{\varphi - 1}{2}, -\frac{\varphi - 3}{2}, \dots, \frac{\varphi - 3}{2}, \frac{\varphi - 1}{2} \right\}$ and $\Psi_\varphi = \Phi_\varphi \times \Phi_\varphi$ be a structuring element. Let $(i, j) \in \Omega$ and $V \in \mathcal{H}_0(i, j)$.
 	Then the following inequalities hold:
 	\begin{align}
-		\mathbb{P}_V( (\mathfrak{I}_\alpha \circ \Psi_\varphi)(i, j) = 1 ) &\leq \varphi \alpha^{\frac{\varphi + 1}{2}} \label{ineqtypeIopening} \\
-		\mathbb{P}_V( ((\mathfrak{I}_\alpha \circ \Psi_\varphi) \bullet \Psi_\varphi)(i, j) = 1 ) &\leq \varphi^3 \alpha^{\frac{\varphi + 1}{2}} \label{ineqtypeIclosing}
+		\mathbb{P}_V\left( (\mathfrak{I}_\alpha \circ \Psi_\varphi)(i, j) = 1 \right) &\leq \varphi \alpha^{\frac{\varphi + 1}{2}} \label{ineq: typeIopening} \\
+		\mathbb{P}_V\left( ((\mathfrak{I}_\alpha \circ \Psi_\varphi) \bullet \Psi_\varphi)(i, j) = 1 \right) &\leq \varphi^3 \alpha^{\frac{\varphi + 1}{2}} \label{ineq: typeIclosing}
 	\end{align}
 \end{theorem}
 \begin{proof}
-	We start with the proof of inequality \eqref{ineqtypeIopening}. We aim to find an upper bound for the probability
+	We start with the proof of inequality \eqref{ineq: typeIopening}. We aim to find an upper bound for the probability
 	\begin{equation*}
-		\mathbb{P}_V( (\mathfrak{I}_\alpha \circ \Psi_\varphi)(i, j) = 1 )
+		\mathbb{P}_V\left( (\mathfrak{I}_\alpha \circ \Psi_\varphi)(i, j) = 1 \right)
 	\end{equation*}
 	for $V \in \mathcal{H}_0(i, j)$.
 	
-	We will perform some preparatory work first. As discussed in section \ref{sectiondefinitions}, any matrix $V \in \mathcal{V}_c^{m, n}$ is uniquely defined by the top left corner $(\kappa_1, \lambda_1)$ and bottom right corner $(\kappa_2, \lambda_2)$ of the rROI $\varLambda = \{ \kappa_1, \dots, \kappa_2 \} \times \{ \lambda_1, \dots, \lambda_2 \}$ contained in $V$.
+	We will perform some preparatory work first. As discussed in Section \ref{section: definitions}, any matrix $V \in \mathcal{V}_c^{m, n}$ is uniquely defined by the top left corner $(\kappa_1, \lambda_1)$ and bottom right corner $(\kappa_2, \lambda_2)$ of the rROI $\varLambda = \{ \kappa_1, \dots, \kappa_2 \} \times \{ \lambda_1, \dots, \lambda_2 \}$ contained in $V$.
 	
-	We have assumed, that $V \in \mathcal{H}_0(i, j)$. As we have seen in section \ref{sectionstatisticalmodel} the null hypothesis is equivalent to $(i, j) \notin \varLambda$. If $(i, j) \notin \varLambda$, this implies, that $i < \kappa_1$ or $j < \lambda_1$ or $i > \kappa_2$ or $j > \lambda_2$. These four cases are not mutually exclusive. We have also seen before, that the first two cases imply $\norm{\Delta^- V(i, j)} = 0$ and the latter two imply $\norm{\Delta^+ V(i, j)} = 0$.
+	We have assumed, that $V \in \mathcal{H}_0(i, j)$. As we have seen in Section \ref{section: statisticalmodel} the null hypothesis is equivalent to $(i, j) \notin \varLambda$. If $(i, j) \notin \varLambda$, this implies, that $i < \kappa_1$ or $j < \lambda_1$ or $i > \kappa_2$ or $j > \lambda_2$. These four cases are not mutually exclusive. We have also seen before, that the first two cases imply $\norm{\Delta^- V(i, j)} = 0$ and the latter two imply $\norm{\Delta^+ V(i, j)} = 0$.
 	
 	Based on this knowledge, we can split up the sets $\mathcal{H}_0^+(i, j)$ and $\mathcal{H}_0^-(i, j)$ as defined in \eqref{setH0+} and \eqref{setH0-}. We define the sets
 	\begin{align*}
-		\mathcal{H}_0^{(1)}(i, j) &\coloneqq \left\{ V \in \mathcal{V}_c^{m, n} \mid V(\tilde{i}, \tilde{j}) = 0 \textrm{ for all } (\tilde{i}, \tilde{j}) \in \{ 1, \dots, i \} \times \{ 1, \dots, n \} \right\} \\
-		\mathcal{H}_0^{(2)}(i, j) &\coloneqq \left\{ V \in \mathcal{V}_c^{m, n} \mid V(\tilde{i}, \tilde{j}) = 0 \textrm{ for all } (\tilde{i}, \tilde{j}) \in \{ 1, \dots, m \} \times \{ 1, \dots, j \} \right\} \\
-		\mathcal{H}_0^{(3)}(i, j) &\coloneqq \left\{ V \in \mathcal{V}_c^{m, n} \mid V(\tilde{i}, \tilde{j}) = 0 \textrm{ for all } (\tilde{i}, \tilde{j}) \in \{ i, \dots, m \} \times \{ 1, \dots, n \} \right\} \\
+		\mathcal{H}_0^{(1)}(i, j) &\coloneqq \left\{ V \in \mathcal{V}_c^{m, n} \mid V(\tilde{i}, \tilde{j}) = 0 \textrm{ for all } (\tilde{i}, \tilde{j}) \in \{ 1, \dots, i \} \times \{ 1, \dots, n \} \right\}, \\
+		\mathcal{H}_0^{(2)}(i, j) &\coloneqq \left\{ V \in \mathcal{V}_c^{m, n} \mid V(\tilde{i}, \tilde{j}) = 0 \textrm{ for all } (\tilde{i}, \tilde{j}) \in \{ 1, \dots, m \} \times \{ 1, \dots, j \} \right\}, \\
+		\mathcal{H}_0^{(3)}(i, j) &\coloneqq \left\{ V \in \mathcal{V}_c^{m, n} \mid V(\tilde{i}, \tilde{j}) = 0 \textrm{ for all } (\tilde{i}, \tilde{j}) \in \{ i, \dots, m \} \times \{ 1, \dots, n \} \right\}, \\
 		\mathcal{H}_0^{(4)}(i, j) &\coloneqq \left\{ V \in \mathcal{V}_c^{m, n} \mid V(\tilde{i}, \tilde{j}) = 0 \textrm{ for all } (\tilde{i}, \tilde{j}) \in \{ 1, \dots, m \} \times \{ j, \dots, n \} \right\}
 	\end{align*}
 	and get $\mathcal{H}_0^-(i, j) = \mathcal{H}_0^{(1)}(i, j) \cup \mathcal{H}_0^{(2)}(i, j)$ and $\mathcal{H}_0^+(i, j) = \mathcal{H}_0^{(3)}(i, j) \cup \mathcal{H}_0^{(4)}(i, j)$. Furthermore, this implies $\mathcal{H}_0(i, j) = \bigcup_{u = 1}^4 \mathcal{H}_0^{(u)}(i, j)$.
@@ -1278,54 +1366,54 @@ The next theorem states the change of the probability of a type I error after op
 	
 	Assume the first case, i.e. $V \in \mathcal{H}_0^{(1)}(i, j)$. This implies that
 	\begin{equation*}
-		\norm{\Delta^- V(i, 1)} = \ldots = \norm{\Delta^- V(i, n)} = 0
+		\norm{\Delta^- V(i, 1)} = \ldots = \norm{\Delta^- V(i, n)} = 0.
 	\end{equation*}
 	
-	In a first step, we use equation \eqref{eqeventopening} and the fact, that $\Psi_\varphi = \Phi_\varphi \times \Phi_\varphi$ to write the left hand side of inequality \eqref{ineqtypeIopening} as
+	In a first step, we use equation \eqref{eq: openingset} and the fact, that $\Psi_\varphi = \Phi_\varphi \times \Phi_\varphi$ to write the left hand side of inequality \eqref{ineq: typeIopening} as
 	\begin{align*}
-		\mathbb{P}_V&( (\mathfrak{I}_\alpha \circ \Psi_\varphi)(i, j) = 1 ) \\
-		&= \mathbb{P}_V\left( \bigcup_{(k, l) \in \Psi_\varphi} \bigcap_{(\tilde{k}, \tilde{l}) \in \Psi_\varphi} \{ \mathfrak{I}_\alpha(i - k + \tilde{k}, j - l + \tilde{l}) = 1 \} \right) \\
-		&= \mathbb{P}_V\left( \bigcup_{k, l \in \Phi_\varphi} \bigcap_{\tilde{k}, \tilde{l} \in \Phi_\varphi} \{ \mathfrak{I}_\alpha(i - k + \tilde{k}, j - l + \tilde{l}) = 1 \} \right)
+		\mathbb{P}_V&\left( (\mathfrak{I}_\alpha \circ \Psi_\varphi)(i, j) = 1 \right) \\
+		&= \mathbb{P}_V\left( \bigcup_{(k, l) \in \Psi_\varphi} \bigcap_{(\tilde{k}, \tilde{l}) \in \Psi_\varphi} \left\{ \mathfrak{I}_\alpha(i - k + \tilde{k}, j - l + \tilde{l}) = 1 \right\} \right) \\
+		&= \mathbb{P}_V\left( \bigcup_{k, l \in \Phi_\varphi} \bigcap_{\tilde{k}, \tilde{l} \in \Phi_\varphi} \left\{ \mathfrak{I}_\alpha(i - k + \tilde{k}, j - l + \tilde{l}) = 1 \right\} \right).
 	\end{align*}
 	
-	Using sub-additivity we can bound this further from above by writing it as a sum over $l \in \Phi_\varphi$ and get
+	Using sub-additivity we can bound this from above by writing it as a sum over $l \in \Phi_\varphi$ and get
 	\begin{align*}
-		\mathbb{P}_V&( (\mathfrak{I}_\alpha \circ \Psi_\varphi)(i, j) = 1 ) \\
-		&\leq \sum_{l \in \Phi_\varphi} \mathbb{P}_V\left( \bigcup_{k \in \Phi_\varphi} \bigcap_{\tilde{k}, \tilde{l} \in \Phi_\varphi} \{ \mathfrak{I}_\alpha(i - k + \tilde{k}, j - l + \tilde{l}) = 1 \} \right)
+		\mathbb{P}_V&\left( (\mathfrak{I}_\alpha \circ \Psi_\varphi)(i, j) = 1 \right) \\
+		&\leq \sum_{l \in \Phi_\varphi} \mathbb{P}_V\left( \bigcup_{k \in \Phi_\varphi} \bigcap_{\tilde{k}, \tilde{l} \in \Phi_\varphi} \left\{ \mathfrak{I}_\alpha(i - k + \tilde{k}, j - l + \tilde{l}) = 1 \right\} \right).
 	\end{align*}
 	
 	By dropping every term except for $\tilde{k} = k$ in the intersection inside, we obtain
 	\begin{align*}
-		\mathbb{P}_V&( (\mathfrak{I}_\alpha \circ \Psi_\varphi)(i, j) = 1 ) \\
-		&\leq \sum_{l \in \Phi_\varphi} \mathbb{P}_V\left( \bigcup_{k \in \Phi_\varphi} \bigcap_{\tilde{k} = k, \tilde{l} \in \Phi_\varphi} \{ \mathfrak{I}_\alpha(i - k + \tilde{k}, j - l + \tilde{l}) = 1 \} \right) \\
-		&= \sum_{l \in \Phi_\varphi} \mathbb{P}_V\left( \bigcup_{k \in \Phi_\varphi} \bigcap_{\tilde{l} \in \Phi_\varphi} \{ \mathfrak{I}_\alpha(i, j - l + \tilde{l}) = 1 \} \right)
+		\mathbb{P}_V&\left( (\mathfrak{I}_\alpha \circ \Psi_\varphi)(i, j) = 1 \right) \\
+		&\leq \sum_{l \in \Phi_\varphi} \mathbb{P}_V\left( \bigcup_{k \in \Phi_\varphi} \bigcap_{\tilde{k} = k, \tilde{l} \in \Phi_\varphi} \left\{ \mathfrak{I}_\alpha(i - k + \tilde{k}, j - l + \tilde{l}) = 1 \right\} \right) \\
+		&= \sum_{l \in \Phi_\varphi} \mathbb{P}_V\left( \bigcup_{k \in \Phi_\varphi} \bigcap_{\tilde{l} \in \Phi_\varphi} \left\{ \mathfrak{I}_\alpha(i, j - l + \tilde{l}) = 1 \right\} \right).
 	\end{align*}
 	
 	The events inside the probability do not depend on $k \in \Phi_\varphi$ anymore, which yields
 	\begin{equation*}
-		\bigcup_{k \in \Phi_\varphi} \bigcap_{\tilde{l} \in \Phi_\varphi} \{ \mathfrak{I}_\alpha(i, j - l + \tilde{l}) = 1 \} = \bigcap_{\tilde{l} \in \Phi_\varphi} \{ \mathfrak{I}_\alpha(i, j - l + \tilde{l}) = 1 \}
+		\bigcup_{k \in \Phi_\varphi} \bigcap_{\tilde{l} \in \Phi_\varphi} \left\{ \mathfrak{I}_\alpha(i, j - l + \tilde{l}) = 1 \right\} = \bigcap_{\tilde{l} \in \Phi_\varphi} \left\{ \mathfrak{I}_\alpha(i, j - l + \tilde{l}) = 1 \right\}.
 	\end{equation*}
 	
 	By plugging this in, we obtain
 	\begin{equation*}
-		\mathbb{P}_V( (\mathfrak{I}_\alpha \circ \Psi_\varphi)(i, j) = 1 ) \leq \sum_{l \in \Phi_\varphi} \mathbb{P}_V\left( \bigcap_{\tilde{l} \in \Phi_\varphi} \{ \mathfrak{I}_\alpha(i, j - l + \tilde{l}) = 1 \} \right)
+		\mathbb{P}_V\left( (\mathfrak{I}_\alpha \circ \Psi_\varphi)(i, j) = 1 \right) \leq \sum_{l \in \Phi_\varphi} \mathbb{P}_V\left( \bigcap_{\tilde{l} \in \Phi_\varphi} \left\{ \mathfrak{I}_\alpha(i, j - l + \tilde{l}) = 1 \right\} \right).
 	\end{equation*}
 	
 	We have defined the binary $\mathfrak{I}_\alpha$ by setting $\mathfrak{I}_\alpha(i, j) = \mathds{1}_{ \{ T(i, j) \geq t_\alpha \} }$. Using this definition and the definition of $T(i, j)$ we can rewrite the upper bound as
 	\begin{align*}
-		&\sum_{l \in \Phi_\varphi} \mathbb{P}_V\left( \bigcap_{\tilde{l} \in \Phi_\varphi} \{ \mathfrak{I}_\alpha(i, j - l + \tilde{l}) = 1 \} \right) \\
-		&= \sum_{l \in \Phi_\varphi} \mathbb{P}_V\left( \bigcap_{\tilde{l} \in \Phi_\varphi} \{ T(i, j - l + \tilde{l}) \geq t_\alpha \} \right) \\
-		&= \sum_{l \in \Phi_\varphi} \mathbb{P}_V\left( \bigcap_{\tilde{l} \in \Phi_\varphi} \left( \{ \norm{\Delta^+ F(i, j - l + \tilde{l})} \geq t_\alpha \} \cap \{ \norm{\Delta^- F(i, j - l + \tilde{l})} \geq t_\alpha \} \right) \right)
+		&\sum_{l \in \Phi_\varphi} \mathbb{P}_V\left( \bigcap_{\tilde{l} \in \Phi_\varphi} \left\{ \mathfrak{I}_\alpha(i, j - l + \tilde{l}) = 1 \right\} \right) \\
+		&= \sum_{l \in \Phi_\varphi} \mathbb{P}_V\left( \bigcap_{\tilde{l} \in \Phi_\varphi} \left\{ T(i, j - l + \tilde{l}) \geq t_\alpha \right\} \right) \\
+		&= \sum_{l \in \Phi_\varphi} \mathbb{P}_V\left( \bigcap_{\tilde{l} \in \Phi_\varphi} \left( \left\{ \norm{\Delta^+ F(i, j - l + \tilde{l})} \geq t_\alpha \right\} \cap \left\{ \norm{\Delta^- F(i, j - l + \tilde{l})} \geq t_\alpha \right\} \right) \right).
 	\end{align*}
 	
-	By dropping the events $\{ \norm{\Delta^+ F(i, j - l + \tilde{l})} \geq t_\alpha \}$, we get
+	By dropping the events $\left\{ \norm{\Delta^+ F(i, j - l + \tilde{l})} \geq t_\alpha \right\}$, we get
 	\begin{align*}
-		\mathbb{P}_V&( (\mathfrak{I}_\alpha \circ \Psi_\varphi)(i, j) = 1 ) \\
-		&\leq \sum_{l \in \Phi_\varphi} \mathbb{P}_V\left( \bigcap_{\tilde{l} \in \Phi_\varphi} \left( \{ \norm{\Delta^+ F(i, j - l + \tilde{l})} \geq t_\alpha \} \cap \{ \norm{\Delta^- F(i, j - l + \tilde{l})} \geq t_\alpha \} \right) \right) \\
-		&\leq \sum_{l \in \Phi_\varphi} \mathbb{P}_V\left( \bigcap_{\tilde{l} \in \Phi_\varphi} \{ \norm{\Delta^- F(i, j - l + \tilde{l})} \geq t_\alpha \} \right)
+		\mathbb{P}_V&\left( (\mathfrak{I}_\alpha \circ \Psi_\varphi)(i, j) = 1 \right) \\
+		&\leq \sum_{l \in \Phi_\varphi} \mathbb{P}_V\left( \bigcap_{\tilde{l} \in \Phi_\varphi} \left( \left\{ \norm{\Delta^+ F(i, j - l + \tilde{l})} \geq t_\alpha \right\} \cap \left\{ \norm{\Delta^- F(i, j - l + \tilde{l})} \geq t_\alpha \right\} \right) \right) \\
+		&\leq \sum_{l \in \Phi_\varphi} \mathbb{P}_V\left( \bigcap_{\tilde{l} \in \Phi_\varphi} \left\{ \norm{\Delta^- F(i, j - l + \tilde{l})} \geq t_\alpha \right\} \right).
 	\end{align*}
 	
-	We now define a second set $\tilde{\Phi}_\varphi = \{ -\frac{\varphi - 1}{2}, -\frac{\varphi - 5}{2}, \dots, \frac{\varphi - 5}{2}, \frac{\varphi - 1}{2} \}$. We have $\tilde{\Phi}_\varphi \subseteq \Phi_\varphi$. Since $\Delta^- F(i, j)$ only depends on the pixels $(i, j), (i - 1, j), (i, j - 1)$, the set $\{ \norm{\Delta^- F(i, j - l + \tilde{l})} \mid \tilde{l} \in \tilde{\Phi}_\varphi \}$ is a set of independent random variables for fixed $l \in \Phi_\varphi$, see figure \ref{independentpoints}.
+	We now define a second set $\tilde{\Phi}_\varphi = \left\{ -\frac{\varphi - 1}{2}, -\frac{\varphi - 5}{2}, \dots, \frac{\varphi - 5}{2}, \frac{\varphi - 1}{2} \right\}$. We have $\tilde{\Phi}_\varphi \subseteq \Phi_\varphi$. Since $\Delta^- F(i, j)$ only depends on the pixels $(i, j), (i - 1, j)$ and $(i, j - 1)$, the set $\left\{ \norm{\Delta^- F(i, j - l + \tilde{l})} \mid \tilde{l} \in \tilde{\Phi}_\varphi \right\}$ is a set of independent random variables for fixed $l \in \Phi_\varphi$, see figure \ref{fig: independentpoints}.
 	
 	% Draw picture of independent pixels:
 	\begin{figure}[h]
@@ -1356,27 +1444,27 @@ The next theorem states the change of the probability of a type I error after op
 			\node at (-5.5, 3.5) {$\vdots$};
 		\end{tikzpicture}
 		\caption{The random variable $\norm{\Delta^- F(i, j)}$ only depends on the green pixels, $\norm{\Delta^- F(i, j - 2)}$ depends on the red pixels and $\norm{\Delta^- F(i, j + 2)}$ on the blue pixels. Since these are all distinct from another, the random variables are independent.}
-		\label{independentpoints}
+		\label{fig: independentpoints}
 	\end{figure}
 	
 	We drop the terms in $\Phi_\varphi \setminus \tilde{\Phi}_\varphi$ and use the independence to obtain
 	\begin{align*}
-		\mathbb{P}_V( (\mathfrak{I}_\alpha \circ \Psi_\varphi)(i, j) = 1 ) &\leq \sum_{l \in \Phi_\varphi} \mathbb{P}_V\left( \bigcap_{\tilde{l} \in \Phi_\varphi} \{ \norm{\Delta^- F(i, j - l + \tilde{l})} \geq t_\alpha \} \right) \\
-		&\leq \sum_{l \in \Phi_\varphi} \mathbb{P}_V\left( \bigcap_{\tilde{l} \in \tilde{\Phi}_\varphi} \{ \norm{\Delta^- F(i, j - l + \tilde{l})} \geq t_\alpha \} \right) \\
-		&= \sum_{l \in \Phi_\varphi} \prod_{\tilde{l} \in \tilde{\Phi}_\varphi} \mathbb{P}_V\left( \norm{\Delta^- F(i, j - l + \tilde{l})} \geq t_\alpha \right)
+		\mathbb{P}_V\left( (\mathfrak{I}_\alpha \circ \Psi_\varphi)(i, j) = 1 \right) &\leq \sum_{l \in \Phi_\varphi} \mathbb{P}_V\left( \bigcap_{\tilde{l} \in \Phi_\varphi} \left\{ \norm{\Delta^- F(i, j - l + \tilde{l})} \geq t_\alpha \right\} \right) \\
+		&\leq \sum_{l \in \Phi_\varphi} \mathbb{P}_V\left( \bigcap_{\tilde{l} \in \tilde{\Phi}_\varphi} \left\{ \norm{\Delta^- F(i, j - l + \tilde{l})} \geq t_\alpha \right\} \right) \\
+		&= \sum_{l \in \Phi_\varphi} \prod_{\tilde{l} \in \tilde{\Phi}_\varphi} \mathbb{P}_V\left( \norm{\Delta^- F(i, j - l + \tilde{l})} \geq t_\alpha \right).
 	\end{align*}
 	
-	At the start of this proof, we have decomposed the set $\mathcal{H}_0(i, j)$ into four subsets. This was done by exploiting the prior knowledge, that $V$ contains a rectangular region of interest. We assumed the case $V \in \mathcal{H}_0^{(1)}(i, j)$, which means
+	At the start of this proof, we have decomposed the set $\mathcal{H}_0(i, j)$ into four subsets. This was done by exploiting the prior knowledge, that $V$ contains a rectangular region of interest. We assumed the case $V \in \mathcal{H}_0^{(1)}(i, j) \subseteq \mathcal{H}_0^-(i, j)$, which means
 	\begin{equation*}
-		\norm{\Delta^- V(i, 1)} = \ldots = \norm{\Delta^- V(i, n)} = 0
+		\norm{\Delta^- V(i, 1)} = \ldots = \norm{\Delta^- V(i, n)} = 0.
 	\end{equation*}
 	
-	This implies, that for fixed $l \in \Phi_\varphi$ the null hypotheses $H_0(i, j - l + \tilde{l})$ are true for all $\tilde{l} \in \tilde{\Phi}_\varphi$ and hence $V \in \bigcap_{\tilde{l} \in \tilde{\Phi}_\varphi} \mathcal{H}_0(i, j - l + \tilde{l})$. Furthermore, we have assumed, that the threshold $t_\alpha$ was chosen, such that for $V \in \mathcal{H}_0(i, j)$ we have $\mathbb{P}_V\left( \norm{\Delta^- F(i, j)} \geq t_\alpha \right) \leq \alpha$. Such a threshold can be obtained by using Lemma \ref{lemtypeIbound} and Theorem \ref{thmeqcdf}. This knowledge yields the upper bound
+	This implies, that for fixed $l \in \Phi_\varphi$ the null hypotheses $H_0(i, j - l + \tilde{l})$ are true for all $\tilde{l} \in \tilde{\Phi}_\varphi$ and hence $V \in \bigcap_{\tilde{l} \in \tilde{\Phi}_\varphi} \mathcal{H}_0(i, j - l + \tilde{l})$. Furthermore, we have assumed, that the threshold $t_\alpha$ was chosen, such that for $V \in \mathcal{H}_0^-(i, j)$ we have $\mathbb{P}_V\left( \norm{\Delta^- F(i, j)} \geq t_\alpha \right) \leq \alpha$. Such a threshold can be obtained by using Lemma \ref{lem: typeIbound} and Theorem \ref{thm: cdf}. This knowledge yields the upper bound
 	\begin{align*}
-		\mathbb{P}_V( (\mathfrak{I}_\alpha \circ \Psi_\varphi)(i, j) = 1 ) &\leq \sum_{l \in \Phi_\varphi} \prod_{\tilde{l} \in \tilde{\Phi}_\varphi} \mathbb{P}_V\left( \norm{\Delta^- F(i, j - l + \tilde{l})} \geq t_\alpha \right) \\
+		\mathbb{P}_V\left( (\mathfrak{I}_\alpha \circ \Psi_\varphi)(i, j) = 1 \right) &\leq \sum_{l \in \Phi_\varphi} \prod_{\tilde{l} \in \tilde{\Phi}_\varphi} \mathbb{P}_V\left( \norm{\Delta^- F(i, j - l + \tilde{l})} \geq t_\alpha \right) \\
 		&\leq \sum_{l \in \Phi_\varphi} \prod_{\tilde{l} \in \tilde{\Phi}_\varphi} \alpha \\
 		&= \abs{\Phi_\varphi} \alpha^{\abs{\tilde{\Phi}_\varphi}} \\
-		&= \varphi \alpha^{\frac{\varphi + 1}{2}}
+		&= \varphi \alpha^{\frac{\varphi + 1}{2}}.
 	\end{align*}
 	
 	This proves the first inequality for the first case. The other three cases can be proven analogously by swapping the roles of $k$ or $\tilde{k}$ with $l$ or $\tilde{l}$, respectively and/or by replacing $\Delta^-$ by $\Delta^+$. This finishes the proof of the first inequality.\\
@@ -1392,48 +1480,46 @@ The next theorem states the change of the probability of a type I error after op
 	
 	Set $k_0 = -\frac{\varphi - 1}{2}$ and $l_0 = 0$. Then $(k_0, l_0) \in \Psi_\varphi$ and we get that the null hypotheses $H_0(i + k_0 - \tilde{k}, j + l_0 - \tilde{l})$ are true for all $\tilde{k}, \tilde{l} \in \Phi_\varphi$. Hence, we have $V \in \bigcap_{\tilde{k}, \tilde{l} \in \Phi_\varphi} \mathcal{H}_0(i + k_0 - \tilde{k}, j - \tilde{l})$ as well as $\norm{\Delta^- V(i + k_0 - \tilde{k}, j + l_0 - \tilde{l})} = 0$ for all $\tilde{k}, \tilde{l} \in \Phi_\varphi$.
 	
-	Define $\mathfrak{K}_\alpha = \mathfrak{I}_\alpha \circ \Psi_\varphi$. We use equation \eqref{eqeventclosing} and $\Psi_\varphi = \Phi_\varphi \times \Phi_\varphi$ to write the left hand side of inequality \eqref{ineqtypeIclosing} as
+	Define $\mathfrak{K}_\alpha = \mathfrak{I}_\alpha \circ \Psi_\varphi$. We use equation \eqref{eq: closingset} and $\Psi_\varphi = \Phi_\varphi \times \Phi_\varphi$ to write the left hand side of inequality \eqref{ineq: typeIclosing} as
 	\begin{align*}
-		\mathbb{P}_V&( (\mathfrak{K}_\alpha \bullet \Psi_\varphi)(i, j) = 1 ) \\
-		&= \mathbb{P}_V\left( \bigcap_{(k, l) \in \Psi_\varphi} \bigcup_{(\tilde{k}, \tilde{l}) \in \Psi_\varphi} \{ \mathfrak{K}_\alpha(i + k - \tilde{k}, j + l - \tilde{l}) = 1 \} \right) \\
-		&= \mathbb{P}_V\left( \bigcap_{k, l \in \Phi_\varphi} \bigcup_{\tilde{k}, \tilde{l} \in \Phi_\varphi} \{ \mathfrak{K}_\alpha(i + k - \tilde{k}, j + l - \tilde{l}) = 1 \} \right)
+		\mathbb{P}_V&\left( (\mathfrak{K}_\alpha \bullet \Psi_\varphi)(i, j) = 1 \right) \\
+		&= \mathbb{P}_V\left( \bigcap_{(k, l) \in \Psi_\varphi} \bigcup_{(\tilde{k}, \tilde{l}) \in \Psi_\varphi} \left\{ \mathfrak{K}_\alpha(i + k - \tilde{k}, j + l - \tilde{l}) = 1 \right\} \right) \\
+		&= \mathbb{P}_V\left( \bigcap_{k, l \in \Phi_\varphi} \bigcup_{\tilde{k}, \tilde{l} \in \Phi_\varphi} \left\{ \mathfrak{K}_\alpha(i + k - \tilde{k}, j + l - \tilde{l}) = 1 \right\} \right).
 	\end{align*}
 	
 	By dropping every term in the intersection except for $k = k_0$ and $l = l_0$ we can bound this from above by
 	\begin{align*}
-		\mathbb{P}_V( (\mathfrak{K}_\alpha \bullet \Psi_\varphi)(i, j) = 1 ) &= \mathbb{P}_V\left( \bigcap_{k, l \in \Phi_\varphi} \bigcup_{\tilde{k}, \tilde{l} \in \Phi_\varphi} \{ \mathfrak{K}_\alpha(i + k - \tilde{k}, j + l - \tilde{l}) = 1 \} \right) \\
-		&\leq \mathbb{P}_V\left( \bigcup_{\tilde{k}, \tilde{l} \in \Phi_\varphi} \{ \mathfrak{K}_\alpha(i + k_0 - \tilde{k}, j + l_0 - \tilde{l}) = 1 \} \right) \\
-		&= \mathbb{P}_V\left( \bigcup_{\tilde{k}, \tilde{l} \in \Phi_\varphi} \{ \mathfrak{K}_\alpha(i + k_0 - \tilde{k}, j - \tilde{l}) = 1 \} \right)
+		\mathbb{P}_V\left( (\mathfrak{K}_\alpha \bullet \Psi_\varphi)(i, j) = 1 \right) &= \mathbb{P}_V\left( \bigcap_{k, l \in \Phi_\varphi} \bigcup_{\tilde{k}, \tilde{l} \in \Phi_\varphi} \left\{ \mathfrak{K}_\alpha(i + k - \tilde{k}, j + l - \tilde{l}) = 1 \right\} \right) \\
+		&\leq \mathbb{P}_V\left( \bigcup_{\tilde{k}, \tilde{l} \in \Phi_\varphi} \left\{ \mathfrak{K}_\alpha(i + k_0 - \tilde{k}, j + l_0 - \tilde{l}) = 1 \right\} \right) \\
+		&= \mathbb{P}_V\left( \bigcup_{\tilde{k}, \tilde{l} \in \Phi_\varphi} \left\{ \mathfrak{K}_\alpha(i + k_0 - \tilde{k}, j - \tilde{l}) = 1 \right\} \right).
 	\end{align*}
 	
 	Using sub-additivity to write this as the sum over all $\tilde{k}, \tilde{l} \in \Phi_\varphi$ yields
 	\begin{equation*}
-		\mathbb{P}_V( (\mathfrak{K}_\alpha \bullet \Psi_\varphi)(i, j) = 1 ) \leq \sum_{\tilde{k}, \tilde{l} \in \Phi_\varphi} \mathbb{P}_V\left( \mathfrak{K}_\alpha(i + k_0 - \tilde{k}, j - \tilde{l}) = 1 \right)
+		\mathbb{P}_V\left( (\mathfrak{K}_\alpha \bullet \Psi_\varphi)(i, j) = 1 \right) \leq \sum_{\tilde{k}, \tilde{l} \in \Phi_\varphi} \mathbb{P}_V\left( \mathfrak{K}_\alpha(i + k_0 - \tilde{k}, j - \tilde{l}) = 1 \right).
 	\end{equation*}
 	
 	Plugging in the definition of $\mathfrak{K}_\alpha$ we obtain
 	\begin{equation*}
-		\mathbb{P}_V( (\mathfrak{K}_\alpha \bullet \Psi_\varphi)(i, j) = 1 ) \leq \sum_{\tilde{k}, \tilde{l} \in \Phi_\varphi} \mathbb{P}_V\left( (\mathfrak{I}_\alpha \circ \Psi_\varphi)(i + k_0 - \tilde{k}, j - \tilde{l}) = 1 \right)
+		\mathbb{P}_V\left( (\mathfrak{K}_\alpha \bullet \Psi_\varphi)(i, j) = 1 \right) \leq \sum_{\tilde{k}, \tilde{l} \in \Phi_\varphi} \mathbb{P}_V\left( (\mathfrak{I}_\alpha \circ \Psi_\varphi)(i + k_0 - \tilde{k}, j - \tilde{l}) = 1 \right).
 	\end{equation*}
 	
-	As we have seen, the null hypotheses $H_0(i + k_0 - \tilde{k}, j + l_0 - \tilde{l})$ are true for all $\tilde{k}, \tilde{l} \in \Phi_\varphi$, which implies $V \in \bigcap_{\tilde{k}, \tilde{l} \in \Phi_\varphi} \mathcal{H}_0(i + k_0 - \tilde{k}, j - \tilde{l})$.
-	
-	Thus, we can use inequality \eqref{ineqtypeIopening} to get the upper bound
+	As we have seen, the null hypotheses $H_0(i + k_0 - \tilde{k}, j + l_0 - \tilde{l})$ are true for all $\tilde{k}, \tilde{l} \in \Phi_\varphi$, which implies $V \in \bigcap_{\tilde{k}, \tilde{l} \in \Phi_\varphi} \mathcal{H}_0(i + k_0 - \tilde{k}, j - \tilde{l})$. Thus, we can use inequality \eqref{ineq: typeIopening} to get the upper bound
 	\begin{align*}
-		\mathbb{P}_V( (\mathfrak{K}_\alpha \bullet \Psi_\varphi)(i, j) = 1 ) &\leq \sum_{\tilde{k}, \tilde{l} \in \Phi_\varphi} \mathbb{P}_V\left( (\mathfrak{I}_\alpha \circ \Psi_\varphi)(i + k_0 - \tilde{k}, j - \tilde{l}) = 1 \right) \\
+		\mathbb{P}_V\left( (\mathfrak{K}_\alpha \bullet \Psi_\varphi)(i, j) = 1 \right) &\leq \sum_{\tilde{k}, \tilde{l} \in \Phi_\varphi} \mathbb{P}_V\left( (\mathfrak{I}_\alpha \circ \Psi_\varphi)(i + k_0 - \tilde{k}, j - \tilde{l}) = 1 \right) \\
 		&\leq \sum_{\tilde{k}, \tilde{l} \in \Phi_\varphi} \varphi \alpha^{\frac{\varphi + 1}{2}} \\
-		&= \varphi^3 \alpha^{\frac{\varphi + 1}{2}}
+		&= \varphi^3 \alpha^{\frac{\varphi + 1}{2}}.
 	\end{align*}
 	
 	This proves the inequality in the first case. The other cases are proven analogously by taking $k_0 = 0, l_0 = -\frac{\varphi - 1}{2}$ in the second case, $k_0 = \frac{\varphi - 1}{2}, l_0 = 0$ in the third case and $k_0 = 0, l_0 = \frac{\varphi - 1}{2}$ in the fourth case. In the second and fourth case, the roles of $\Delta^+$ and $\Delta^-$ are swapped. This finishes the proof of the second inequality and thus the proof of the theorem.
 \end{proof}
 
-\newpage
+Similar to the previous theorem, we want to quantify the change of the probabilities of a type II error, when morphological opening and closing are applied. We will need the additional assumption, that the region of interest is sufficiently large, i.e. larger than the structuring element. Otherwise, even if there are no errors in the binarization through the statistical test, morphological opening will classify all pixels as background and thus the probability of a type II error cannot be bound anymore.
 
-\begin{theorem}
+\begin{theorem}\label{thm: typeIIinequalities}
 	Let $m, n \in \mathbb{N}$, $c \in \mathbb{R} \setminus \{ 0 \}$ and $\Omega = \left\{ 1, \dots, m \right\} \times \left\{ 1, \dots, n \right\}$.
 	
-	Assume that $F$ follows the statistical model given in \eqref{image} and let $T(i, j)$ be the test statistic as defined in \eqref{teststatistic} and $H_1(i, j)$ be the alternative hypothesis as defined in \eqref{alternativehypothesis}. Let $t$ be a threshold, such that
+	Assume that $F$ follows the statistical model given in \eqref{statmodel2} and let $T(i, j)$ be the test statistic as defined in \eqref{teststatistic} and $H_1(i, j)$ be the alternative hypothesis as defined in \eqref{alternativehypothesis}. Let $t$ be a threshold, such that
 	\begin{equation*}
 		\mathbb{P}_V\left( T(i, j) \leq t \right) \leq \beta
 	\end{equation*}
@@ -1448,18 +1534,18 @@ The next theorem states the change of the probability of a type I error after op
 	Denote by $\varLambda = \{ \kappa_1, \dots, \kappa_2 \} \times \{ \lambda_1, \dots, \lambda_2 \}$ the rROI contained in $V$. Let $\min \{ \kappa_2 - \kappa_1 + 1, \lambda_2 - \lambda_1 + 1 \} \geq \varphi$.
 	Then the following inequalities hold:
 	\begin{align}
-		\mathbb{P}_V( (\mathfrak{I} \circ \Psi_\varphi)(i, j) = 0 ) &\leq \varphi^2 \beta \label{ineqtypeIIopening} \\
-		\mathbb{P}_V( ((\mathfrak{I} \circ \Psi_\varphi) \bullet \Psi_\varphi)(i, j) = 0 ) &\leq \varphi^2 \beta \label{ineqtypeIIclosing}
+		\mathbb{P}_V\left( (\mathfrak{I} \circ \Psi_\varphi)(i, j) = 0 \right) &\leq \varphi^2 \beta \label{ineq: typeIIopening} \\
+		\mathbb{P}_V\left( ((\mathfrak{I} \circ \Psi_\varphi) \bullet \Psi_\varphi)(i, j) = 0 \right) &\leq \varphi^2 \beta \label{ineq: typeIIclosing}
 	\end{align}
 \end{theorem}
 \begin{proof}
-	We start by proving inequality \eqref{ineqtypeIIopening}. We use a similar approach as in the proof of inequality \eqref{ineqtypeIclosing} by finding indices $(k_0, l_0) \in \Psi_\varphi$, such that the alternative hypotheses $H_1(i - k_0 + \tilde{k}, j - l_0 + \tilde{l})$ are true for all $\tilde{k}, \tilde{l} \in \Phi_\varphi$. Define
+	We start by proving inequality \eqref{ineq: typeIIopening}. We use a similar approach as in the proof of inequality \eqref{ineq: typeIclosing} by finding indices $(k_0, l_0) \in \Psi_\varphi$, such that the alternative hypotheses $H_1(i - k_0 + \tilde{k}, j - l_0 + \tilde{l})$ are true for all $\tilde{k}, \tilde{l} \in \Phi_\varphi$. Define
 	\begin{align*}
-		k_0 &= \min \left\{ i - \kappa_1 - \frac{\varphi - 1}{2}, 0 \right\} - \min \left\{ \kappa_2 - i - \frac{\varphi - 1}{2}, 0 \right\} \\
-		l_0 &= \min \left\{ j - \lambda_1 - \frac{\varphi - 1}{2}, 0 \right\} - \min \left\{ \lambda_2 - j - \frac{\varphi - 1}{2}, 0 \right\}
+		k_0 &= \min \left\{ i - \kappa_1 - \frac{\varphi - 1}{2}, 0 \right\} - \min \left\{ \kappa_2 - i - \frac{\varphi - 1}{2}, 0 \right\}, \\
+		l_0 &= \min \left\{ j - \lambda_1 - \frac{\varphi - 1}{2}, 0 \right\} - \min \left\{ \lambda_2 - j - \frac{\varphi - 1}{2}, 0 \right\}.
 	\end{align*}
 	
-	First, we show, that $k_0$ can only take the values $i - \kappa_1 - \frac{\varphi - 1}{2}$, $- \kappa_2 + i + \frac{\varphi - 1}{2}$ or $0$. Then we distinguish the three possbile cases to show, that $\kappa_1 \leq i - k_0 + \tilde{k} \leq \kappa_2$ in every case. Similarly, we obtain $\lambda_1 \leq j - l_0 + \tilde{l} \leq \lambda_2$ and hence the alternative hypotheses $H_1(i - k_0 + \tilde{k}, j - l_0 + \tilde{l})$ are true for all $\tilde{k}, \tilde{l} \in \Phi_\varphi$.
+	First we show, that $k_0$ can only take the values $i - \kappa_1 - \frac{\varphi - 1}{2}$, $- \kappa_2 + i + \frac{\varphi - 1}{2}$ or $0$. Then we distinguish the three possbile cases to show, that $\kappa_1 \leq i - k_0 + \tilde{k} \leq \kappa_2$ in every case. Similarly, we obtain $\lambda_1 \leq j - l_0 + \tilde{l} \leq \lambda_2$ and hence the alternative hypotheses $H_1(i - k_0 + \tilde{k}, j - l_0 + \tilde{l})$ are true for all $\tilde{k}, \tilde{l} \in \Phi_\varphi$.
 	
 	If $i - \kappa_1 - \frac{\varphi - 1}{2} \leq 0$, by using the assumption $\kappa_2 - \kappa_1 + 1 \geq \varphi$ we obtain
 	\begin{align*}
@@ -1479,7 +1565,7 @@ The next theorem states the change of the probability of a type I error after op
 	
 	Assume $k_0 = 0$. This implies $i - \kappa_1 - \frac{\varphi - 1}{2} \geq 0$ as well as $\kappa_2 - i - \frac{\varphi - 1}{2} \geq 0$ and thus for $\tilde{k} \in \Phi_\varphi$ we get
 	\begin{equation*}
-		\kappa_1 \leq i - \frac{\varphi - 1}{2} \leq i + \tilde{k} = i - k_0 + \tilde{k} = i + \tilde{k} \leq i + \frac{\varphi - 1}{2} \leq \kappa_2
+		\kappa_1 \leq i - \frac{\varphi - 1}{2} \leq i + \tilde{k} = i - k_0 + \tilde{k} = i + \tilde{k} \leq i + \frac{\varphi - 1}{2} \leq \kappa_2.
 	\end{equation*}
 	
 	Now assume $k_0 = i - \kappa_1 - \frac{\varphi - 1}{2}$. Then $i - k_0 + \tilde{k} = \kappa_1 + \frac{\varphi - 1}{2} + \tilde{k}$. Using $\kappa_2 - \kappa_1 + 1 \geq \varphi$ yields for every $\tilde{k} \in \Phi_\varphi$
@@ -1498,35 +1584,35 @@ The next theorem states the change of the probability of a type I error after op
 		&= \kappa_2 - \frac{\varphi - 1}{2} - \frac{\varphi - 1}{2} \\
 		&\leq \kappa_2 - \frac{\varphi - 1}{2} + \tilde{k} \\
 		&\leq \kappa_2 - \frac{\varphi - 1}{2} + \frac{\varphi - 1}{2} \\
-		&= \kappa_2
+		&= \kappa_2.
 	\end{align*}
 	
 	Thus, the alternative hyptheses $H_1(i - k_0 + \tilde{k}, j - l_0 + \tilde{l})$ are true for all $\tilde{k}, \tilde{l} \in \Phi_\varphi$, which implies $V \in \bigcap_{\tilde{k}, \tilde{l} \in \Phi_\varphi} \mathcal{H}_1(i - k_0 + \tilde{k}, j - l_0 + \tilde{l})$.
 	
-	Using this, we can prove inequality \eqref{ineqtypeIIopening}. We start by using equation \eqref{eqeventopening} and $\Psi_\varphi = \Phi_\varphi \times \Phi_\varphi$ to write the left hand side of inequality \eqref{ineqtypeIIopening} as
+	Using this, we can prove inequality \eqref{ineq: typeIIopening}. We start by using equation \eqref{eq: openingset} and $\Psi_\varphi = \Phi_\varphi \times \Phi_\varphi$ to write the left hand side of inequality \eqref{ineq: typeIIopening} as
 	\begin{align*}
-		\mathbb{P}_V( (\mathfrak{I} \circ \Psi_\varphi)(i, j) = 0 ) &= \mathbb{P}_V\left( \bigcap_{(k, l) \in \Psi_\varphi} \bigcup_{(\tilde{k}, \tilde{l}) \in \Psi_\varphi} \{ \mathfrak{I}(i - k + \tilde{k}, j - l + \tilde{l}) = 0 \} \right) \\
-		&= \mathbb{P}_V\left( \bigcap_{k, l \in \Phi_\varphi} \bigcup_{\tilde{k}, \tilde{l} \in \Phi_\varphi} \{ \mathfrak{I}(i - k + \tilde{k}, j - l + \tilde{l}) = 0 \} \right)
+		\mathbb{P}_V\left( (\mathfrak{I} \circ \Psi_\varphi)(i, j) = 0 \right) &= \mathbb{P}_V\left( \bigcap_{(k, l) \in \Psi_\varphi} \bigcup_{(\tilde{k}, \tilde{l}) \in \Psi_\varphi} \left\{ \mathfrak{I}(i - k + \tilde{k}, j - l + \tilde{l}) = 0 \right\} \right) \\
+		&= \mathbb{P}_V\left( \bigcap_{k, l \in \Phi_\varphi} \bigcup_{\tilde{k}, \tilde{l} \in \Phi_\varphi} \left\{ \mathfrak{I}(i - k + \tilde{k}, j - l + \tilde{l}) = 0 \right\} \right).
 	\end{align*}
 	
-	We drop every term in the intersection except $k = k_0, l = l_0$ to bound this further by
+	We drop every term in the intersection except $k = k_0, l = l_0$ to bound this by
 	\begin{align*}
-		\mathbb{P}_V( (\mathfrak{I} \circ \Psi_\varphi)(i, j) = 0 ) &= \mathbb{P}_V\left( \bigcap_{k, l \in \Phi_\varphi} \bigcup_{\tilde{k}, \tilde{l} \in \Phi_\varphi} \{ \mathfrak{I}(i - k + \tilde{k}, j - l + \tilde{l}) = 0 \} \right) \\
-		&\leq \mathbb{P}_V\left( \bigcup_{\tilde{k}, \tilde{l} \in \Phi_\varphi} \{ \mathfrak{I}(i - k_0 + \tilde{k}, j - l_0 + \tilde{l}) = 0 \} \right)
+		\mathbb{P}_V\left( (\mathfrak{I} \circ \Psi_\varphi)(i, j) = 0 \right) &= \mathbb{P}_V\left( \bigcap_{k, l \in \Phi_\varphi} \bigcup_{\tilde{k}, \tilde{l} \in \Phi_\varphi} \left\{ \mathfrak{I}(i - k + \tilde{k}, j - l + \tilde{l}) = 0 \right\} \right) \\
+		&\leq \mathbb{P}_V\left( \bigcup_{\tilde{k}, \tilde{l} \in \Phi_\varphi} \left\{ \mathfrak{I}(i - k_0 + \tilde{k}, j - l_0 + \tilde{l}) = 0 \right\} \right).
 	\end{align*}
 	
 	We use sub-additivity to write this as the sum over all $\tilde{k}, \tilde{l} \in \Phi_\varphi$ and obtain
 	\begin{equation*}
-		\mathbb{P}_V( (\mathfrak{I} \circ \Psi_\varphi)(i, j) = 0 ) \leq \sum_{\tilde{k}, \tilde{l} \in \Phi_\varphi} \mathbb{P}_V\left( \mathfrak{I}(i - k_0 + \tilde{k}, j - l_0 + \tilde{l}) = 0 \right)
+		\mathbb{P}_V\left( (\mathfrak{I} \circ \Psi_\varphi)(i, j) = 0 \right) \leq \sum_{\tilde{k}, \tilde{l} \in \Phi_\varphi} \mathbb{P}_V\left( \mathfrak{I}(i - k_0 + \tilde{k}, j - l_0 + \tilde{l}) = 0 \right).
 	\end{equation*}
 	
 	Using the fact, that $V \in \bigcap_{\tilde{k}, \tilde{l} \in \Phi_\varphi} \mathcal{H}_1(i - k_0 + \tilde{k}, j - l_0 + \tilde{l})$ as well as the definition of $\mathfrak{I}$ and the choice of the threshold $t$ we get the upper bound
 	\begin{align*}
-		\mathbb{P}_V( (\mathfrak{I} \circ \Psi_\varphi)(i, j) = 0 ) &\leq \sum_{\tilde{k}, \tilde{l} \in \Phi_\varphi} \mathbb{P}_V\left( \mathfrak{I}(i - k_0 + \tilde{k}, j - l_0 + \tilde{l}) = 0 \right) \\
+		\mathbb{P}_V\left( (\mathfrak{I} \circ \Psi_\varphi)(i, j) = 0 \right) &\leq \sum_{\tilde{k}, \tilde{l} \in \Phi_\varphi} \mathbb{P}_V\left( \mathfrak{I}(i - k_0 + \tilde{k}, j - l_0 + \tilde{l}) = 0 \right) \\
 		&= \sum_{\tilde{k}, \tilde{l} \in \Phi_\varphi} \mathbb{P}_V\left( T(i - k_0 + \tilde{k}, j - l_0 + \tilde{l}) \leq t \right) \\
 		&\leq \sum_{\tilde{k}, \tilde{l} \in \Phi_\varphi} \beta \\
 		&= \abs{\Phi_\varphi}^2 \beta \\
-		&= \varphi^2 \beta
+		&= \varphi^2 \beta.
 	\end{align*}
 	
 	This finishes the proof of the first inequality.\\
@@ -1534,35 +1620,354 @@ The next theorem states the change of the probability of a type I error after op
 	
 	To prove the second inequality, we define $\mathfrak{K} = \mathfrak{I} \circ \Psi_\varphi$. We aim to find an upper bound for the probability
 	\begin{equation*}
-		\mathbb{P}_V( (\mathfrak{K} \bullet \Psi_\varphi)(i, j) = 0 )
+		\mathbb{P}_V\left( (\mathfrak{K} \bullet \Psi_\varphi)(i, j) = 0 \right)
 	\end{equation*}
-	for $V \in \mathcal{H}_1(i, j)$. We use equation \eqref{eqeventclosing} and $\Psi_\varphi = \Phi_\varphi \times \Phi_\varphi$ and get
+	for $V \in \mathcal{H}_1(i, j)$. We use equation \eqref{eq: closingset} and $\Psi_\varphi = \Phi_\varphi \times \Phi_\varphi$ and get
 	\begin{align*}
-		\mathbb{P}_V( (\mathfrak{K} \bullet \Psi_\varphi)(i, j) = 0 ) &= \mathbb{P}_V\left( \bigcup_{(k, l) \in \Psi_\varphi} \bigcap_{(\tilde{k}, \tilde{l}) \in \Psi_\varphi} \{ \mathfrak{K}(i + k - \tilde{k}, j + l - \tilde{l}) = 0 \} \right) \\
-		&= \mathbb{P}_V\left( \bigcup_{k, l \in \Phi_\varphi} \bigcap_{\tilde{k}, \tilde{l} \in \Phi_\varphi} \{ \mathfrak{K}(i + k - \tilde{k}, j + l - \tilde{l}) = 0 \} \right)
+		\mathbb{P}_V\left( (\mathfrak{K} \bullet \Psi_\varphi)(i, j) = 0 \right) &= \mathbb{P}_V\left( \bigcup_{(k, l) \in \Psi_\varphi} \bigcap_{(\tilde{k}, \tilde{l}) \in \Psi_\varphi} \left\{ \mathfrak{K}(i + k - \tilde{k}, j + l - \tilde{l}) = 0 \right\} \right) \\
+		&= \mathbb{P}_V\left( \bigcup_{k, l \in \Phi_\varphi} \bigcap_{\tilde{k}, \tilde{l} \in \Phi_\varphi} \left\{ \mathfrak{K}(i + k - \tilde{k}, j + l - \tilde{l}) = 0 \right\} \right).
 	\end{align*}
 	
 	We drop every term in the intersection except for $\tilde{k} = k, \tilde{l} = l$. This increases the probability and we obtain
 	\begin{align*}
-		\mathbb{P}_V( (\mathfrak{K} \bullet \Psi_\varphi)(i, j) = 0 ) &= \mathbb{P}_V\left( \bigcup_{(k, l) \in \Psi_\varphi} \bigcap_{(\tilde{k}, \tilde{l}) \in \Psi_\varphi} \{ \mathfrak{K}(i + k - \tilde{k}, j + l - \tilde{l}) = 0 \} \right) \\
-		&\leq \mathbb{P}_V\left( \bigcup_{k, l \in \Phi_\varphi} \bigcap_{\tilde{k} = k, \tilde{l} = l} \{ \mathfrak{K}(i + k - \tilde{k}, j + l - \tilde{l}) = 0 \} \right) \\
-		&= \mathbb{P}_V\left( \bigcup_{k, l \in \Phi_\varphi} \{ \mathfrak{K}(i, j) = 0 \} \right) \\
-		&= \mathbb{P}_V\left( \mathfrak{K}(i, j) = 0 \right)
+		\mathbb{P}_V\left( (\mathfrak{K} \bullet \Psi_\varphi)(i, j) = 0 \right) &= \mathbb{P}_V\left( \bigcup_{(k, l) \in \Psi_\varphi} \bigcap_{(\tilde{k}, \tilde{l}) \in \Psi_\varphi} \left\{ \mathfrak{K}(i + k - \tilde{k}, j + l - \tilde{l}) = 0 \right\} \right) \\
+		&\leq \mathbb{P}_V\left( \bigcup_{k, l \in \Phi_\varphi} \bigcap_{\tilde{k} = k, \tilde{l} = l} \left\{ \mathfrak{K}(i + k - \tilde{k}, j + l - \tilde{l}) = 0 \right\} \right) \\
+		&= \mathbb{P}_V\left( \bigcup_{k, l \in \Phi_\varphi} \left\{ \mathfrak{K}(i, j) = 0 \right\} \right) \\
+		&= \mathbb{P}_V\left( \mathfrak{K}(i, j) = 0 \right).
 	\end{align*}
 	
 	Plugging in the definition of $\mathfrak{K}$ this inequality becomes
 	\begin{equation*}
-		\mathbb{P}_V( (\mathfrak{K} \bullet \Psi_\varphi)(i, j) = 0 ) \leq \mathbb{P}_V( (\mathfrak{I} \circ \Psi_\varphi)(i, j) = 0 )
+		\mathbb{P}_V\left( (\mathfrak{K} \bullet \Psi_\varphi)(i, j) = 0 \right) \leq \mathbb{P}_V\left( (\mathfrak{I} \circ \Psi_\varphi)(i, j) = 0 \right).
 	\end{equation*}
 	
-	Since $V \in \mathcal{H}_1(i, j)$, we can apply inequality \eqref{ineqtypeIIopening} and obtain the upper bound
+	Since $V \in \mathcal{H}_1(i, j)$, we can apply inequality \eqref{ineq: typeIIopening} and obtain the upper bound
 	\begin{align*}
-		\mathbb{P}_V( (\mathfrak{K} \bullet \Psi_\varphi)(i, j) = 0 ) &\leq \mathbb{P}_V( (\mathfrak{I} \circ \Psi_\varphi)(i, j) = 0 ) \\
-		&\leq \varphi^2 \beta
+		\mathbb{P}_V\left( (\mathfrak{K} \bullet \Psi_\varphi)(i, j) = 0 \right) &\leq \mathbb{P}_V\left( (\mathfrak{I} \circ \Psi_\varphi)(i, j) = 0 \right) \\
+		&\leq \varphi^2 \beta.
 	\end{align*}
 	
 	This proves the second inequality and thus finishes the proof.
 \end{proof}
+
+\begin{remark}
+	The bounds in the previous theorem hold for all pixels within the region of interest, i.e. also for the edges and corners of the region of interest.
+	
+	For pixels with a sufficient distance from the edges of the region of interest, we can also prove the upper bound
+	\begin{equation*}
+		\mathbb{P}_V\left( ((\mathfrak{I} \circ \Psi_\varphi) \bullet \Psi_\varphi)(i, j) = 0 \right) \leq \varphi^{10} \beta^4.
+	\end{equation*}
+	
+	A proof can be found in the appendix. This only improves the bound for very small values of $\beta$.
+\end{remark}
+
+We employ morphological closing to reduce the number of type II errors. This is not represented in the upper bound in inequality \eqref{ineq: typeIIclosing}. This is due to the fact, that the pixels are not independent anymore after morphological opening has been applied. Furthermore, applying morphological closing after morphological opening does not necessarily result in a lower amount of type II errors compared to the amount of such errors through binarization. Especially for bigger values of $\sigma$, this effect becomes clear. This behaviour can be observed in the simulation results.
+
+\newpage
+
+\section{Simulation results}\label{section: simulationresults}
+
+
+
+
+
+
+\begin{figure}[H]
+	\centering
+	\begin{subfigure}[t]{0.49\linewidth}
+		\centering
+		\begin{tikzpicture}
+			\begin{axis}[
+				legend pos=north west,
+				legend style={nodes={scale=0.5, transform shape}},
+				grid=both,
+				minor grid style={gray!25},
+				major grid style={gray!25},
+				ymin=-0.05,
+				ymax=1.05,
+				width=\linewidth,
+				no marks]
+				\addplot[line width=1pt,dashed,color=blue] table[x=sigma,y=probtypeI,col sep=comma]{CSV/Dimensions/resultsErrorTestCasesTypeI_128x128.csv};
+				\addlegendentry{Binarization}
+				\addplot[line width=1pt,dashed,color=red] table[x=sigma,y=probtypeI,col sep=comma]{CSV/Dimensions/resultsErrorTestCasesTypeI_128x128_o.csv};
+				\addlegendentry{Opening}
+				\addplot[line width=1pt,dashed,color=gray] table[x=sigma,y=probtypeI,col sep=comma]{CSV/Dimensions/resultsErrorTestCasesTypeI_128x128_oc.csv};
+				\addlegendentry{Opening \& Closing}
+			\end{axis}
+		\end{tikzpicture}
+		\caption{Proportion of type I errors for images with size $128 \times 128$.}
+		\label{fig: simulationresultstypeI_128}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[t]{0.49\linewidth}
+		\centering
+		\begin{tikzpicture}
+			\begin{axis}[
+				legend pos=north west,
+				legend style={nodes={scale=0.5, transform shape}},
+				grid=both,
+				minor grid style={gray!25},
+				major grid style={gray!25},
+				ymin=-0.05,
+				ymax=1.05,
+				width=\linewidth,
+				no marks]
+				\addplot[line width=1pt,dashed,color=blue] table[x=sigma,y=probtypeII,col sep=comma]{CSV/Dimensions/resultsErrorTestCasesTypeII_128x128.csv};
+				\addlegendentry{Binarization}
+				\addplot[line width=1pt,dashed,color=red] table[x=sigma,y=probtypeII,col sep=comma]{CSV/Dimensions/resultsErrorTestCasesTypeII_128x128_o.csv};
+				\addlegendentry{Opening}
+				\addplot[line width=1pt,dashed,color=gray] table[x=sigma,y=probtypeII,col sep=comma]{CSV/Dimensions/resultsErrorTestCasesTypeII_128x128_oc.csv};
+				\addlegendentry{Opening \& Closing}
+			\end{axis}
+		\end{tikzpicture}
+		\caption{Proportion of type II errors for images with size $128 \times 128$.}
+		\label{fig: simulationresultstypeII_128}
+	\end{subfigure}
+	\vfill
+	\begin{subfigure}[t]{0.49\linewidth}
+		\centering
+		\begin{tikzpicture}
+			\begin{axis}[
+				legend pos=north west,
+				legend style={nodes={scale=0.5, transform shape}},
+				grid=both,
+				minor grid style={gray!25},
+				major grid style={gray!25},
+				ymin=-0.05,
+				ymax=1.05,
+				width=\linewidth,
+				no marks]
+				\addplot[line width=1pt,dashed,color=blue] table[x=sigma,y=probtypeI,col sep=comma]{CSV/Dimensions/resultsErrorTestCasesTypeI_256x256.csv};
+				\addlegendentry{Binarization}
+				\addplot[line width=1pt,dashed,color=red] table[x=sigma,y=probtypeI,col sep=comma]{CSV/Dimensions/resultsErrorTestCasesTypeI_256x256_o.csv};
+				\addlegendentry{Opening}
+				\addplot[line width=1pt,dashed,color=gray] table[x=sigma,y=probtypeI,col sep=comma]{CSV/Dimensions/resultsErrorTestCasesTypeI_256x256_oc.csv};
+				\addlegendentry{Opening \& Closing}
+			\end{axis}
+		\end{tikzpicture}
+		\caption{Proportion of type I errors for images with size $256 \times 256$.}
+		\label{fig: simulationresultstypeI_256}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[t]{0.49\linewidth}
+		\centering
+		\begin{tikzpicture}
+			\begin{axis}[
+				legend pos=north west,
+				legend style={nodes={scale=0.5, transform shape}},
+				grid=both,
+				minor grid style={gray!25},
+				major grid style={gray!25},
+				ymin=-0.05,
+				ymax=1.05,
+				width=\linewidth,
+				no marks]
+				\addplot[line width=1pt,dashed,color=blue] table[x=sigma,y=probtypeII,col sep=comma]{CSV/Dimensions/resultsErrorTestCasesTypeII_256x256.csv};
+				\addlegendentry{Binarization}
+				\addplot[line width=1pt,dashed,color=red] table[x=sigma,y=probtypeII,col sep=comma]{CSV/Dimensions/resultsErrorTestCasesTypeII_256x256_o.csv};
+				\addlegendentry{Opening}
+				\addplot[line width=1pt,dashed,color=gray] table[x=sigma,y=probtypeII,col sep=comma]{CSV/Dimensions/resultsErrorTestCasesTypeII_256x256_oc.csv};
+				\addlegendentry{Opening \& Closing}
+			\end{axis}
+		\end{tikzpicture}
+		\caption{Proportion of type II errors for images with size $256 \times 256$.}
+		\label{fig: simulationresultstypeII_256}
+	\end{subfigure}
+	\vfill
+	\begin{subfigure}[t]{0.49\linewidth}
+		\centering
+		\begin{tikzpicture}
+			\begin{axis}[
+				legend pos=north west,
+				legend style={nodes={scale=0.5, transform shape}},
+				grid=both,
+				minor grid style={gray!25},
+				major grid style={gray!25},
+				ymin=-0.05,
+				ymax=1.05,
+				width=\linewidth,
+				no marks]
+				\addplot[line width=1pt,dashed,color=blue] table[x=sigma,y=probtypeI,col sep=comma]{CSV/Dimensions/resultsErrorTestCasesTypeI_512x512.csv};
+				\addlegendentry{Binarization}
+				\addplot[line width=1pt,dashed,color=red] table[x=sigma,y=probtypeI,col sep=comma]{CSV/Dimensions/resultsErrorTestCasesTypeI_512x512_o.csv};
+				\addlegendentry{Opening}
+				\addplot[line width=1pt,dashed,color=gray] table[x=sigma,y=probtypeI,col sep=comma]{CSV/Dimensions/resultsErrorTestCasesTypeI_512x512_oc.csv};
+				\addlegendentry{Opening \& Closing}
+			\end{axis}
+		\end{tikzpicture}
+		\caption{Proportion of type I errors for images with size $512 \times 512$.}
+		\label{fig: simulationresultstypeI_512}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[t]{0.49\linewidth}
+		\centering
+		\begin{tikzpicture}
+			\begin{axis}[
+				legend pos=north west,
+				legend style={nodes={scale=0.5, transform shape}},
+				grid=both,
+				minor grid style={gray!25},
+				major grid style={gray!25},
+				ymin=-0.05,
+				ymax=1.05,
+				width=\linewidth,
+				no marks]
+				\addplot[line width=1pt,dashed,color=blue] table[x=sigma,y=probtypeII,col sep=comma]{CSV/Dimensions/resultsErrorTestCasesTypeII_512x512.csv};
+				\addlegendentry{Binarization}
+				\addplot[line width=1pt,dashed,color=red] table[x=sigma,y=probtypeII,col sep=comma]{CSV/Dimensions/resultsErrorTestCasesTypeII_512x512_o.csv};
+				\addlegendentry{Opening}
+				\addplot[line width=1pt,dashed,color=gray] table[x=sigma,y=probtypeII,col sep=comma]{CSV/Dimensions/resultsErrorTestCasesTypeII_512x512_oc.csv};
+				\addlegendentry{Opening \& Closing}
+			\end{axis}
+		\end{tikzpicture}
+		\caption{Proportion of type II errors for images with size $512 \times 512$.}
+		\label{fig: simulationresultstypeII_512}
+	\end{subfigure}
+	\caption{Proportion of type I \& II errors after binarization, opening and closing. The $x$-axes display the standard deviation $\sigma$ and the $y$-axes the proportion of falsely classified pixels. For sizes $128 \times 128$, $256 \times 256$, $512 \times 512$ the images were randomly generated with 5 images per size. For each image 50 different noises were randomly generated. We used a $3 \times 3$ pixel structuring element and chose $\alpha = 0.05$.}
+	\label{fig: simulationresults}
+\end{figure}
+
+
+
+
+
+
+
+
+
+In figure \ref{fig: simulationresults} we see the proportion of falsely classified pixels after binarization through the statistical test, opening and closing. We randomly generated 15 images with a rectangular region of interest with a checkerboard pattern. We created 5 images each for sizes $128 \times 128$, $256 \times 256$ and $512 \times 512$ pixels. After binarization, the proportion of background pixels that were falsely classified as foreground is low and below the chosen statistical significance of $\alpha = 0.05$. It is almost constant across all values of the standard deviation $\sigma$. We performed opening and closing with a $3 \times 3$ pixel strucutring element. Opening reduces the proportion of falsely classified background pixels to almost zero. Applying closing does not change that.
+
+In contrast to that, the proportion of falsely classified foreground pixels is almost zero for low standard deviations $\sigma$ but greatly increases, as $\sigma$ increases. For high values of $\sigma$ opening greatly increases the proportion of falsely classified foreground pixels. Closing fixes this only to a certain extent. For values up to $\sigma = 68$ it reduces the proportion of type II errors below that of binarization. For higher values of $\sigma$ this improvement can not be observed and the effect of closing becomes negligible.
+
+Using a relaxed statistical significance $\tilde{\alpha} = \left( \frac{\alpha}{\varphi^3} \right)^{\frac{2}{\varphi + 1}}$ to calculate the thresholding parameter $t_{\tilde{\alpha}}$, yields
+\begin{equation*}
+	\mathbb{P}_V\left( ((\mathfrak{I}_{\tilde{\alpha}} \circ \Psi_\varphi) \bullet \Psi_\varphi)(i, j) = 1 \right) \leq \varphi^3 \left( \left( \frac{\alpha}{\varphi^3} \right)^{\frac{2}{\varphi + 1}} \right)^{\frac{\varphi + 1}{2}} \leq \alpha
+\end{equation*}
+by inequality \eqref{ineq: typeIclosing}. This way, we can bound the probability of a type I error after opening and closing below a given statistical significance. As can be seen in figure \ref{fig: simulationresults_relaxed}, this approach still keeps the proportion of type I errors after opening and closing below the given statistical significance, while it decreases the number of type II errors for higher values of $\sigma$. This allows the proportion of type II errors after opening and closing to be lower than that of binarization up to $\sigma = 78$.
+
+\begin{figure}[h!]
+	\centering
+	\begin{subfigure}[t]{0.7\linewidth}
+		\centering
+		\begin{tikzpicture}
+			\begin{axis}[
+				legend pos=north west,
+				xlabel=Standard deviation $\sigma$,
+				ylabel=Proportion of type I errors,
+				grid=both,
+				minor grid style={gray!25},
+				major grid style={gray!25},
+				ymin=-0.05,
+				ymax=1.05,
+				width=\linewidth,
+				no marks]
+				\addplot[line width=1pt,dashed,color=blue] table[x=sigma,y=probtypeI,col sep=comma]{CSV/resultsErrorTestCasesTypeI.csv};
+				\addlegendentry{Binarization}
+				\addplot[line width=1pt,dashed,color=red] table[x=sigma,y=probtypeI,col sep=comma]{CSV/resultsErrorTestCasesTypeI_o.csv};
+				\addlegendentry{Opening}
+				\addplot[line width=1pt,dashed,color=gray] table[x=sigma,y=probtypeI,col sep=comma]{CSV/resultsErrorTestCasesTypeI_oc.csv};
+				\addlegendentry{Opening \& Closing}
+			\end{axis}
+		\end{tikzpicture}
+		\caption{Proportion of type I errors after binarization, opening and closing.}
+		\label{fig: simulationresultstypeI}
+	\end{subfigure}
+	\vfill
+	\begin{subfigure}[t]{0.7\linewidth}
+		\centering
+		\begin{tikzpicture}
+			\begin{axis}[
+				legend pos=north west,
+				xlabel=Standard deviation $\sigma$,
+				ylabel=Proportion of type II errors,
+				grid=both,
+				minor grid style={gray!25},
+				major grid style={gray!25},
+				ymin=-0.05,
+				ymax=1.05,
+				width=\linewidth,
+				no marks]
+				\addplot[line width=1pt,dashed,color=blue] table[x=sigma,y=probtypeII,col sep=comma]{CSV/resultsErrorTestCasesTypeII.csv};
+				\addlegendentry{Binarization}
+				\addplot[line width=1pt,dashed,color=red] table[x=sigma,y=probtypeII,col sep=comma]{CSV/resultsErrorTestCasesTypeII_o.csv};
+				\addlegendentry{Opening}
+				\addplot[line width=1pt,dashed,color=gray] table[x=sigma,y=probtypeII,col sep=comma]{CSV/resultsErrorTestCasesTypeII_oc.csv};
+				\addlegendentry{Opening \& Closing}
+			\end{axis}
+		\end{tikzpicture}
+		\caption{Proportion of type II errors after binarization, opening and closing.}
+		\label{fig: simulationresultstypeII}
+	\end{subfigure}
+	\caption{Proportion of type I \& II errors after binarization, opening and closing. For sizes $128 \times 128$, $256 \times 256$, $512 \times 512$ the images were randomly generated with 5 images per size. For each images 50 different noises were randomly generated. We choose $\alpha = 0.05$.}
+	\label{fig: simulationresults}
+\end{figure}
+
+\begin{figure}[h!]
+	\centering
+	\begin{subfigure}[t]{0.7\linewidth}
+		\centering
+		\begin{tikzpicture}
+			\begin{axis}[
+				legend pos=north west,
+				xlabel=Standard deviation $\sigma$,
+				ylabel=Proportion of type I errors,
+				grid=both,
+				minor grid style={gray!25},
+				major grid style={gray!25},
+				ymin=-0.05,
+				ymax=1.05,
+				width=\linewidth,
+				no marks]
+				\addplot[line width=1pt,dashed,color=blue] table[x=sigma,y=probtypeI,col sep=comma]{CSV/resultsErrorTestCasesTypeI_relaxed.csv};
+				\addlegendentry{Binarization}
+				\addplot[line width=1pt,dashed,color=red] table[x=sigma,y=probtypeI,col sep=comma]{CSV/resultsErrorTestCasesTypeI_o_relaxed.csv};
+				\addlegendentry{Opening}
+				\addplot[line width=1pt,dashed,color=gray] table[x=sigma,y=probtypeI,col sep=comma]{CSV/resultsErrorTestCasesTypeI_oc_relaxed.csv};
+				\addlegendentry{Opening \& Closing}
+			\end{axis}
+		\end{tikzpicture}
+		\caption{Proportion of type I errors after binarization, opening and closing.}
+		\label{fig: simulationresultstypeI_relaxed}
+	\end{subfigure}
+	\vfill
+	\begin{subfigure}[t]{0.7\linewidth}
+		\centering
+		\begin{tikzpicture}
+			\begin{axis}[
+				legend pos=north west,
+				xlabel=Standard deviation $\sigma$,
+				ylabel=Proportion of type II errors,
+				grid=both,
+				minor grid style={gray!25},
+				major grid style={gray!25},
+				ymin=-0.05,
+				ymax=1.05,
+				width=\linewidth,
+				no marks]
+				\addplot[line width=1pt,dashed,color=blue] table[x=sigma,y=probtypeII,col sep=comma]{CSV/resultsErrorTestCasesTypeII_relaxed.csv};
+				\addlegendentry{Binarization}
+				\addplot[line width=1pt,dashed,color=red] table[x=sigma,y=probtypeII,col sep=comma]{CSV/resultsErrorTestCasesTypeII_o_relaxed.csv};
+				\addlegendentry{Opening}
+				\addplot[line width=1pt,dashed,color=gray] table[x=sigma,y=probtypeII,col sep=comma]{CSV/resultsErrorTestCasesTypeII_oc_relaxed.csv};
+				\addlegendentry{Opening \& Closing}
+			\end{axis}
+		\end{tikzpicture}
+		\caption{Proportion of type II errors after binarization, opening and closing.}
+		\label{fig: simulationresultstypeII_relaxed}
+	\end{subfigure}
+	\caption{Proportion of type I \& II errors after binarization, opening and closing. For sizes $128 \times 128$, $256 \times 256$, $512 \times 512$ the images were randomly generated with 5 images per size. For each images 50 different noises were randomly generated. We choose a relaxed statistical significance $\tilde{\alpha} = \left( \frac{0.05}{3^3} \right)^{\frac{2}{3 + 1}}$.}
+	\label{fig: simulationresults_relaxed}
+\end{figure}
+
+\newpage
+
+\section{Conclusion}\label{section: conclusion}
+
+Theorems \ref{thm: typeIinequalities} and \ref{thm: typeIIinequalities} give us a better understanding of the effects of morphological opening and closing on the error probabilities, when testing for a region of interest. The results were obtained by exploiting the prior knowledge of some properties of the region of interest. Namely, we used the fact, the the region of interest is rectangular and has a checkerboard pattern.
+
+Especially the exponent $\frac{\varphi + 1}{2}$ in inequality \eqref{ineq: typeIopening} is of high interest. For a background pixel to be falsely identified as foreground after opening, at least $\frac{\varphi + 1}{2}$ many pixels background pixels have to be falsely categorized by the binarization through the statistical test. This is the \emph{minimum number of independent points in a structuring element} that can lead to a false categorization of a pixel. With this connection in mind, the techniques to prove the main results of this paper might present themselves useful in other cases as well.
+
+It is also important to note, that the main results only considered the categorization of a single pixel. Since we perform tests for all pixels at once, the analysis of techniques from multiple testing in connection with morphological operations would be an interesting field of study to expand the results of this paper.
 
 \newpage
 
@@ -1599,21 +2004,129 @@ The next theorem states the change of the probability of a type I error after op
 }
 
 \begin{appendix}
+	\section{Additional proofs}
+	
+	\begin{theorem}
+		Let $m, n \in \mathbb{N}$, $c \in \mathbb{R} \setminus \{ 0 \}$ and $\Omega = \left\{ 1, \dots, m \right\} \times \left\{ 1, \dots, n \right\}$.
+		
+		Assume that $F$ follows the statistical model given in \eqref{image} and let $T(i, j)$ be the test statistic as defined in \eqref{teststatistic} and $H_1(i, j)$ be the alternative hypothesis as defined in \eqref{alternativehypothesis}. Let $t$ be a threshold, such that
+		\begin{equation*}
+			\mathbb{P}_V\left( T(i, j) \leq t \right) \leq \beta
+		\end{equation*}
+		for all $V \in \mathcal{H}_1(i, j)$. Let $\mathfrak{I}$ be the binary image defined by
+		\begin{equation}
+			\mathfrak{I}(i, j) = \mathds{1}_{ \{ T(i, j) \geq t \} }
+		\end{equation}
+		for all $(i, j) \in \Omega$.
+		
+		Let $\varphi \in \mathbb{N}$ be odd. Let $\Phi_\varphi = \{ -\frac{\varphi - 1}{2}, -\frac{\varphi - 3}{2}, \dots, \frac{\varphi - 3}{2}, \frac{\varphi - 1}{2} \}$ and $\Psi_\varphi = \Phi_\varphi \times \Phi_\varphi$ be a structuring element. Let $(i, j) \in \Omega$ and $V \in \mathcal{H}_1(i, j)$.
+		
+		Denote by $\varLambda = \{ \kappa_1, \dots, \kappa_2 \} \times \{ \lambda_1, \dots, \lambda_2 \}$ the rROI contained in $V$. Let $\min \{ \kappa_2 - \kappa_1 + 1, \lambda_2 - \lambda_1 + 1 \} \geq \varphi$.
+		Then the following inequalities hold:
+		\begin{align}
+			\mathbb{P}_V( (\mathfrak{I} \circ \Psi_\varphi)(i, j) = 0 ) &\leq \varphi^2 \beta \label{ineqtypeIIopening} \\
+			\mathbb{P}_V( ((\mathfrak{I} \circ \Psi_\varphi) \bullet \Psi_\varphi)(i, j) = 0 ) &\leq \varphi^2 \beta \label{ineqtypeIIclosing}
+		\end{align}
+	\end{theorem}
+	\begin{proof}
+		We use $\Psi_\varphi = \Phi_\varphi \times \Phi_\varphi$ and get
+		\begin{align*}
+			\mathbb{P}&_V( ((\mathfrak{I} \circ \Psi_\varphi) \bullet \Psi_\varphi)(i, j) = 0 ) \\
+			&= \mathbb{P}_V\left( \bigcup_{(k, l) \in \Psi_\varphi} \bigcap_{(\tilde{k}, \tilde{l}) \in \Psi_\varphi} \bigcap_{(r, s) \in \Psi_\varphi} \bigcup_{(\tilde{r}, \tilde{s}) \in \Psi_\varphi} \{ \mathfrak{I}(i + k - \tilde{k} - r + \tilde{r}, j + l - \tilde{l} - s + \tilde{s}) = 0 \} \right) \\
+			&= \mathbb{P}_V\left( \bigcup_{k, l \in \Phi_\varphi} \bigcap_{\tilde{k}, \tilde{l} \in \Phi_\varphi} \bigcap_{r, s \in \Phi_\varphi} \bigcup_{\tilde{r}, \tilde{s} \in \Phi_\varphi} \{ \mathfrak{I}(i + k - \tilde{k} - r + \tilde{r}, j + l - \tilde{l} - s + \tilde{s}) = 0 \} \right)
+		\end{align*}
+		
+		Using sub-additivity we obtain
+		\begin{align*}
+			\mathbb{P}&_V( ((\mathfrak{I} \circ \Psi_\varphi) \bullet \Psi_\varphi)(i, j) = 0 ) \\
+			&= \mathbb{P}_V\left( \bigcup_{k, l \in \Phi_\varphi} \bigcap_{\tilde{k}, \tilde{l} \in \Phi_\varphi} \bigcap_{r, s \in \Phi_\varphi} \bigcup_{\tilde{r}, \tilde{s} \in \Phi_\varphi} \{ \mathfrak{I}(i + k - \tilde{k} - r + \tilde{r}, j + l - \tilde{l} - s + \tilde{s}) = 0 \} \right) \\
+			&\leq \sum_{k, l \in \Phi_\varphi} \mathbb{P}_V\left( \bigcap_{\tilde{k}, \tilde{l} \in \Phi_\varphi} \bigcap_{r, s \in \Phi_\varphi} \bigcup_{\tilde{r}, \tilde{s} \in \Phi_\varphi} \{ \mathfrak{I}(i + k - \tilde{k} - r + \tilde{r}, j + l - \tilde{l} - s + \tilde{s}) = 0 \} \right)
+		\end{align*}
+		
+		We can pull the two intersections together and get
+		\begin{align*}
+			\mathbb{P}&_V( ((\mathfrak{I} \circ \Psi_\varphi) \bullet \Psi_\varphi)(i, j) = 0 ) \\
+			&\leq \sum_{k, l \in \Phi_\varphi} \mathbb{P}_V\left( \bigcap_{\tilde{k}, \tilde{l} \in \Phi_\varphi} \bigcap_{r, s \in \Phi_\varphi} \bigcup_{\tilde{r}, \tilde{s} \in \Phi_\varphi} \{ \mathfrak{I}(i + k - \tilde{k} - r + \tilde{r}, j + l - \tilde{l} - s + \tilde{s}) = 0 \} \right) \\
+			&= \sum_{k, l \in \Phi_\varphi} \mathbb{P}_V\left( \bigcap_{\tilde{k}, \tilde{l}, r, s \in \Phi_\varphi} \bigcup_{\tilde{r}, \tilde{s} \in \Phi_\varphi} \{ \mathfrak{I}(i + k - \tilde{k} - r + \tilde{r}, j + l - \tilde{l} - s + \tilde{s}) = 0 \} \right)
+		\end{align*}
+		
+		We drop every term in the intersection besides $r - \tilde{k}, s - \tilde{l} \in \{ - ( \varphi - 1 ), \varphi - 1 \}$. This yields
+		\begin{align*}
+			\mathbb{P}&_V( ((\mathfrak{I} \circ \Psi_\varphi) \bullet \Psi_\varphi)(i, j) = 0 ) \\
+			&\leq \sum_{k, l \in \Phi_\varphi} \mathbb{P}_V\left( \bigcap_{\tilde{k}, \tilde{l}, r, s \in \Phi_\varphi} \bigcup_{\tilde{r}, \tilde{s} \in \Phi_\varphi} \{ \mathfrak{I}(i + k - \tilde{k} - r + \tilde{r}, j + l - \tilde{l} - s + \tilde{s}) = 0 \} \right) \\
+			&\leq \sum_{k, l \in \Phi_\varphi} \mathbb{P}_V\left( \bigcap_{r - \tilde{k}, s - \tilde{l} \in \{ - ( \varphi - 1 ), \varphi - 1 \}} \bigcup_{\tilde{r}, \tilde{s} \in \Phi_\varphi} \{ \mathfrak{I}(i + k - \tilde{k} - r + \tilde{r}, j + l - \tilde{l} - s + \tilde{s}) = 0 \} \right)
+		\end{align*}
+		
+		The sets $\bigcup_{\tilde{r}, \tilde{s} \in \Phi_\varphi} \{ \mathfrak{I}(i + k - \tilde{k} - r + \tilde{r}, j + l - \tilde{l} - s + \tilde{s}) = 0 \}$ are mutually independent for $r - \tilde{k}, s - \tilde{l} \in \{ - ( \varphi - 1 ), \varphi - 1 \}$ and fixed $k, l \in \Phi_\varphi$. Thus we obtain
+		\begin{align*}
+			\mathbb{P}&_V( ((\mathfrak{I} \circ \Psi_\varphi) \bullet \Psi_\varphi)(i, j) = 0 ) \\
+			&\leq \sum_{k, l \in \Phi_\varphi} \mathbb{P}_V\left( \bigcap_{r - \tilde{k}, s - \tilde{l} \in \{ - ( \varphi - 1 ), \varphi - 1 \}} \bigcup_{\tilde{r}, \tilde{s} \in \Phi_\varphi} \{ \mathfrak{I}(i + k - \tilde{k} - r + \tilde{r}, j + l - \tilde{l} - s + \tilde{s}) = 0 \} \right) \\
+			&= \sum_{k, l \in \Phi_\varphi} \prod_{r - \tilde{k}, s - \tilde{l} \in \{ - ( \varphi - 1 ), \varphi - 1 \}} \mathbb{P}_V\left( \bigcup_{\tilde{r}, \tilde{s} \in \Phi_\varphi} \{ \mathfrak{I}(i + k - \tilde{k} - r + \tilde{r}, j + l - \tilde{l} - s + \tilde{s}) = 0 \} \right)
+		\end{align*}
+		
+		Again, by using sub-additivy, we get
+		\begin{align*}
+			\mathbb{P}&_V( ((\mathfrak{I} \circ \Psi_\varphi) \bullet \Psi_\varphi)(i, j) = 0 ) \\
+			&\leq \sum_{k, l \in \Phi_\varphi} \prod_{r - \tilde{k}, s - \tilde{l} \in \{ - ( \varphi - 1 ), \varphi - 1 \}} \mathbb{P}_V\left( \bigcup_{\tilde{r}, \tilde{s} \in \Phi_\varphi} \{ \mathfrak{I}(i + k - \tilde{k} - r + \tilde{r}, j + l - \tilde{l} - s + \tilde{s}) = 0 \} \right) \\
+			&= \sum_{k, l \in \Phi_\varphi} \prod_{r - \tilde{k}, s - \tilde{l} \in \{ - ( \varphi - 1 ), \varphi - 1 \}} \sum_{\tilde{r}, \tilde{s} \in \Phi_\varphi} \mathbb{P}_V\left( \{ \mathfrak{I}(i + k - \tilde{k} - r + \tilde{r}, j + l - \tilde{l} - s + \tilde{s}) = 0 \} \right)
+		\end{align*}
+		
+		Using the assumption $\mathbb{P}_V\left( T(i, j) \leq t \right) \leq \beta$ we obtain the upper bound
+		\begin{align*}
+			\mathbb{P}&_V( ((\mathfrak{I} \circ \Psi_\varphi) \bullet \Psi_\varphi)(i, j) = 0 ) \\
+			&\leq \sum_{k, l \in \Phi_\varphi} \prod_{r - \tilde{k}, s - \tilde{l} \in \{ - ( \varphi - 1 ), \varphi - 1 \}} \sum_{\tilde{r}, \tilde{s} \in \Phi_\varphi} \mathbb{P}_V\left( \{ \mathfrak{I}(i + k - \tilde{k} - r + \tilde{r}, j + l - \tilde{l} - s + \tilde{s}) = 0 \} \right) \\
+			&\leq \sum_{k, l \in \Phi_\varphi} \prod_{r - \tilde{k}, s - \tilde{l} \in \{ - ( \varphi - 1 ), \varphi - 1 \}} \sum_{\tilde{r}, \tilde{s} \in \Phi_\varphi} \beta \\
+			&= \sum_{k, l \in \Phi_\varphi} \prod_{r - \tilde{k}, s - \tilde{l} \in \{ - ( \varphi - 1 ), \varphi - 1 \}} \varphi^2 \beta \\
+			&= \sum_{k, l \in \Phi_\varphi} ( \varphi^2 \beta )^4 \\
+			&= \varphi^2 ( \varphi^2 \beta )^4 \\
+			&= \varphi^{10} \beta^4
+		\end{align*}
+		
+		This finishes the proof.
+	\end{proof}
+	
+	\newpage
+	
+	\begin{figure}[h!]
+		\centering
+		\resizebox{\textwidth}{!}{
+			\begin{tikzpicture}
+				\foreach \i in {-6, ..., 6}
+					\foreach \j in {-6, ..., 6}
+						\filldraw[black, opacity=0.7] (\i, \j) rectangle + (1, 1);
+				\foreach \i in {-4, ..., 4}
+					\foreach \j in {-4, ..., 4}
+						\filldraw[black] (\i, \j) rectangle + (1, 1);
+				\foreach \x in {(-3, -3), (-3, 1), (1, -3), (1, 1)}
+					\filldraw[blue] \x rectangle + (3, 3);
+				\foreach \x in {(-2, -2), (-2, 2), (2, -2), (2, 2)}
+					\filldraw[red] \x rectangle + (1, 1);
+				\draw[help lines, step=1] (-9, -9) grid (10, 10);
+				\filldraw[green] (0, 0) rectangle + (1, 1);
+				\node at (0.5, 0.5) {$(i, j)$};
+				\node at (-8.5, 9.5) {$(1, 1)$};
+				\node at (-7.5, 9.5) {$(1, 2)$};
+				\node at (-6.5, 9.5) {$\dots$};
+				\node at (-8.5, 8.5) {$(2, 1)$};
+				\node at (-8.5, 7.5) {$\vdots$};
+			\end{tikzpicture}
+		}
+		\caption{The black area is the pixels that contribute to $(\mathfrak{I} \circ \Psi_\varphi) \bullet \Psi_\varphi)(i, j)$. The blue squares are mutually independent. The red pixels are the pixels that we reduce the intersection in the proof to.}
+		\label{fig: powerindependentpoints}
+	\end{figure}
+	
+	\newpage
+	
 	\section{Algorithms}
 	
 	\lstinputlisting[caption=\emph{MATLAB} implementation of a trial and error algorithm to find a threshold for the statistical test.]{ROI-Detection/CDFThreshold/Threshold.m}
+	
+	\lstinputlisting[caption=\emph{MATLAB} implementation of simulation algorithm to find upper and lower bounds for the probability of a type II error in the statistical test.]{ROI-Detection/Power/PowerSim.m}
 \end{appendix}
 
-
 \newpage
 
 % ------------------------------------------------------------------------
-
-
-
-% ------------------------------------------------------------------------
-
-\newpage
 
 \addcontentsline{toc}{section}{References}
 \bibliography{References}
@@ -1633,7 +2146,7 @@ The next theorem states the change of the probability of a type I error after op
 %	$\overline{~~~~~~~~~\mbox{(Dominik Blank)}~~~~~~~~~}$
 %\end{flushright}
 
-
+% ------------------------------------------------------------------------
 
 
 

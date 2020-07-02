@@ -1,4 +1,4 @@
-function [ROI_Picture, tlc, brc] = ROI_Generator(M, N, min_size, c_bg)
+function [V, tlc, brc] = ROI_Generator(M, N, min_size, c_bg)
 %ROI_GENERATOR Generate random rectangle with checkerboard pattern
 % INPUT
 % -----
@@ -18,7 +18,7 @@ if (~exist('c_bg', 'var'))
 end
 
 % Initialize the picture with constant background:
-ROI_Picture = ones(M, N) * c_bg;
+V = ones(M, N) * c_bg;
 
 % Generate random bounds for the ROI:
 tlc(1) = randi(M - min_size);
@@ -30,9 +30,9 @@ brc(2) = randi([tlc(2) + min_size N]);
 for i = tlc(1):brc(1)
     for j = tlc(2):brc(2)
         if mod(i+j, 2) == 0
-            ROI_Picture(i, j) = 0;
+            V(i, j) = 0;
         elseif mod(i+j, 2) == 1
-            ROI_Picture(i, j) = 255;
+            V(i, j) = 2 * c_bg;
         end
     end
 end

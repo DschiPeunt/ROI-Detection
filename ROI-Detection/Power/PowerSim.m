@@ -1,11 +1,4 @@
 function [lowerBound, upperBound] = PowerSim(alpha, nr, max_sigma, c_bg)
-%POWERSIM Simulate random variables to obtain bounds for the power
-% Input:
-% ------
-% t: threshold for a given statistical significance alpha
-% nr: number of simulations to perform
-% max_sigma: maximal standard deviation for which to simulate the RVs
-% c_bg: grayscale value for the image background (optional)
 
 % Check whether an alternative background grayvalue was given:
 if (~exist('c_bg', 'var'))

@@ -22,5 +22,5 @@ ylabel('power')
 % ------------------------------------------------------------------------
 
 % Write to .csv file:
-% csvwrite('resultsPowerSimLowerBound.csv', [sigma_range' lowerBound'])
-% csvwrite('resultsPowerSimUpperBound.csv', [sigma_range' upperBound'])
+% csvwrite('resultsPowerSimLowerBound5percent.csv', [sigma_range' lowerBound'])
+% csvwrite('resultsPowerSimUpperBound5percent.csv', [sigma_range' upperBound'])
