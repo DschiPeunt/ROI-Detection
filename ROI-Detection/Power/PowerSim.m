@@ -1,9 +1,7 @@
-function [lowerBound, upperBound] = PowerSim(alpha, nr, max_sigma, c_bg)
+function [lowerBound, upperBound] = PowerSim(alpha, nr, max_sigma)
 
-% Check whether an alternative background grayvalue was given:
-if (~exist('c_bg', 'var'))
-    c_bg = 127.5;
-end
+% Set the background grayvalue:
+c_bg = 127.5;
 
 % Set increment size for threshold algorithm:
 increment = 0.0001;

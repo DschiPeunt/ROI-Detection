@@ -1,16 +1,11 @@
-function cases = ErrorTestCases(dims, nr_pictures, cases, alpha, max_nr_noise, max_sigma)
-%ERRORTESTCASES Determine errors in predetermined test cases
-% INPUT
-% -----
+function cases = ErrorTestCases(dims, nr_pictures, cases, alpha, phi, max_nr_noise, max_sigma)
 % dims: vector with different sizes of the test cases
 % nr_pictures: number of pictures for each entry in dims
 % cases: structure with test cases
 % alpha: statistical significance
+% phi: side length of structuring element
 % max_nr_noise: amount of noises to test
 % max_sigma: up to which standard deviation to test the errors
-
-% Define side length of structuring element:
-phi = 3;
 
 % Define structuring element:
 SE = strel('square', phi);
@@ -18,18 +13,20 @@ SE = strel('square', phi);
 % Set increment size for threshold algorithm:
 increment = 0.0001;
 
-% Determine relaxed significance:
-alpha_rel_o = power(alpha / phi, 2 / (phi + 1));
-% alpha_rel_oc = power(alpha / phi^3, 2 / (phi + 1));
-
 % Calculate threshold based on alpha:
-[t_alpha, alpha_real] = Threshold(alpha_rel_o, increment);
+[t_alpha, alpha_real] = Threshold(alpha, increment);
 
 % Loop over dimensions:
 for i = 1 : size(dims, 2)
     
     % Generate name of the substructure of the dimension:
     dim_name = strcat('pxl', num2str(dims(i)), 'x', num2str(dims(i)));
+    
+    % Initialize variables to save results:
+    cases.(dim_name).('total') = 0;
+    cases.(dim_name).('err') = 0;
+    cases.(dim_name).('err_o') = 0;
+    cases.(dim_name).('err_oc') = 0;
     
     for j = 1 : nr_pictures
         
@@ -88,10 +85,10 @@ for i = 1 : size(dims, 2)
         end
         
         % Save results:
-        cases.(dim_name).(strcat('total', num2str(j))) = total * max_nr_noise;
-        cases.(dim_name).(strcat('err', num2str(j))) = err;
-        cases.(dim_name).(strcat('err_o', num2str(j))) = err_o;
-        cases.(dim_name).(strcat('err_oc', num2str(j))) = err_oc;
+        cases.(dim_name).('total') = cases.(dim_name).('total') + total * max_nr_noise;
+        cases.(dim_name).('err') = cases.(dim_name).('err') + err;
+        cases.(dim_name).('err_o') = cases.(dim_name).('err_o') + err_o;
+        cases.(dim_name).('err_oc') = cases.(dim_name).('err_oc') + err_oc;
         
     end
 end

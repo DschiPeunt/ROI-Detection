@@ -111,7 +111,7 @@ Dr. Robin \textsc{Richter}
 {\large Göttingen, \today}\\[2cm] % Date, change the \today to a set date if you want to be precise
 
 \begin{abstract}
-	Morphological operations play an important role in fingerprint recognition. In this paper, we examine their effect on error probabilities in a restricted statistical model.
+	Morphological operations play an important role in fingerprint recognition. In this paper, we quantify their impact for a simplified statistical model.
 \end{abstract}
 \end{titlepage}
 
@@ -1667,14 +1667,23 @@ We employ morphological closing to reduce the number of type II errors. This is 
 
 \section{Simulation results}\label{section: simulationresults}
 
+For simulation, we randomly generated 5 images with a rectangular region of interest with a checkerboard pattern for each image size $128 \times 128$, $256 \times 256$ and $512 \times 512$ pixels. For each image we randomly generated $50$ different noise terms.
 
+In figure \ref{fig: simulationresults} we see the proportion of falsely classified pixels after binarization through the statistical test, opening and closing. After binarization, the proportion of background pixels that were falsely classified as foreground is below the chosen statistical significance $\alpha = 0.05$. It is almost constant across all values of the standard deviation $\sigma$. We performed opening and closing with a $3 \times 3$ pixel structuring element. Opening reduces the proportion of falsely classified background pixels to almost zero. Applying closing does not change that.
 
+In contrast to that, the proportion of falsely classified foreground pixels is almost zero for low standard deviations $\sigma$ but greatly increases, as $\sigma$ increases. For high values of $\sigma$ opening greatly increases the proportion of falsely classified foreground pixels. Closing fixes this only to a certain extent. For values up to $\sigma = 65$ for $128 \times 128$ pixels, $\sigma = 67$ for $256 \times 256$ pixels and $\sigma = 68$ for $512 \times 512$ pixels it reduces the proportion of type II errors below that of binarization. For higher values of $\sigma$ this improvement can not be observed and the effect of closing becomes negligible.
 
+Using a relaxed statistical significance $\tilde{\alpha} = \left( \frac{\alpha}{\varphi^3} \right)^{\frac{2}{\varphi + 1}}$ to calculate the thresholding parameter $t_{\tilde{\alpha}}$, yields
+\begin{equation*}
+	\mathbb{P}_V\left( ((\mathfrak{I}_{\tilde{\alpha}} \circ \Psi_\varphi) \bullet \Psi_\varphi)(i, j) = 1 \right) \leq \varphi^3 \left( \left( \frac{\alpha}{\varphi^3} \right)^{\frac{2}{\varphi + 1}} \right)^{\frac{\varphi + 1}{2}} \leq \alpha
+\end{equation*}
+by inequality \eqref{ineq: typeIclosing}. This way, we can bound the probability of a type I error after opening and closing below a given statistical significance $\alpha$. The results of this approach are displayed in figure \ref{fig: simulationresults_relaxed}. The proportion of type I errors after opening and closing is below the given statistical significance, while the number of type II errors for higher values of $\sigma$ has decreased. This allows the proportion of type II errors after opening and closing to be lower than that of binarization up to $\sigma = 74$ for $128 \times 128$ pixels, $\sigma = 77$ for $256 \times 256$ pixels and $\sigma = 79$ for $512 \times 512$ pixels.
 
+Simulations for larger structuring elements as well as for $\alpha = 0.01$ and the code used for the simulation can be found in the appendix.
 
 \begin{figure}[H]
 	\centering
-	\begin{subfigure}[t]{0.49\linewidth}
+	\begin{subfigure}[t]{0.48\linewidth}
 		\centering
 		\begin{tikzpicture}
 			\begin{axis}[
@@ -1699,7 +1708,7 @@ We employ morphological closing to reduce the number of type II errors. This is 
 		\label{fig: simulationresultstypeI_128}
 	\end{subfigure}
 	\hfill
-	\begin{subfigure}[t]{0.49\linewidth}
+	\begin{subfigure}[t]{0.48\linewidth}
 		\centering
 		\begin{tikzpicture}
 			\begin{axis}[
@@ -1724,7 +1733,7 @@ We employ morphological closing to reduce the number of type II errors. This is 
 		\label{fig: simulationresultstypeII_128}
 	\end{subfigure}
 	\vfill
-	\begin{subfigure}[t]{0.49\linewidth}
+	\begin{subfigure}[t]{0.48\linewidth}
 		\centering
 		\begin{tikzpicture}
 			\begin{axis}[
@@ -1749,7 +1758,7 @@ We employ morphological closing to reduce the number of type II errors. This is 
 		\label{fig: simulationresultstypeI_256}
 	\end{subfigure}
 	\hfill
-	\begin{subfigure}[t]{0.49\linewidth}
+	\begin{subfigure}[t]{0.48\linewidth}
 		\centering
 		\begin{tikzpicture}
 			\begin{axis}[
@@ -1774,7 +1783,7 @@ We employ morphological closing to reduce the number of type II errors. This is 
 		\label{fig: simulationresultstypeII_256}
 	\end{subfigure}
 	\vfill
-	\begin{subfigure}[t]{0.49\linewidth}
+	\begin{subfigure}[t]{0.48\linewidth}
 		\centering
 		\begin{tikzpicture}
 			\begin{axis}[
@@ -1799,7 +1808,7 @@ We employ morphological closing to reduce the number of type II errors. This is 
 		\label{fig: simulationresultstypeI_512}
 	\end{subfigure}
 	\hfill
-	\begin{subfigure}[t]{0.49\linewidth}
+	\begin{subfigure}[t]{0.48\linewidth}
 		\centering
 		\begin{tikzpicture}
 			\begin{axis}[
@@ -1827,33 +1836,14 @@ We employ morphological closing to reduce the number of type II errors. This is 
 	\label{fig: simulationresults}
 \end{figure}
 
-
-
-
-
-
-
-
-
-In figure \ref{fig: simulationresults} we see the proportion of falsely classified pixels after binarization through the statistical test, opening and closing. We randomly generated 15 images with a rectangular region of interest with a checkerboard pattern. We created 5 images each for sizes $128 \times 128$, $256 \times 256$ and $512 \times 512$ pixels. After binarization, the proportion of background pixels that were falsely classified as foreground is low and below the chosen statistical significance of $\alpha = 0.05$. It is almost constant across all values of the standard deviation $\sigma$. We performed opening and closing with a $3 \times 3$ pixel strucutring element. Opening reduces the proportion of falsely classified background pixels to almost zero. Applying closing does not change that.
-
-In contrast to that, the proportion of falsely classified foreground pixels is almost zero for low standard deviations $\sigma$ but greatly increases, as $\sigma$ increases. For high values of $\sigma$ opening greatly increases the proportion of falsely classified foreground pixels. Closing fixes this only to a certain extent. For values up to $\sigma = 68$ it reduces the proportion of type II errors below that of binarization. For higher values of $\sigma$ this improvement can not be observed and the effect of closing becomes negligible.
-
-Using a relaxed statistical significance $\tilde{\alpha} = \left( \frac{\alpha}{\varphi^3} \right)^{\frac{2}{\varphi + 1}}$ to calculate the thresholding parameter $t_{\tilde{\alpha}}$, yields
-\begin{equation*}
-	\mathbb{P}_V\left( ((\mathfrak{I}_{\tilde{\alpha}} \circ \Psi_\varphi) \bullet \Psi_\varphi)(i, j) = 1 \right) \leq \varphi^3 \left( \left( \frac{\alpha}{\varphi^3} \right)^{\frac{2}{\varphi + 1}} \right)^{\frac{\varphi + 1}{2}} \leq \alpha
-\end{equation*}
-by inequality \eqref{ineq: typeIclosing}. This way, we can bound the probability of a type I error after opening and closing below a given statistical significance. As can be seen in figure \ref{fig: simulationresults_relaxed}, this approach still keeps the proportion of type I errors after opening and closing below the given statistical significance, while it decreases the number of type II errors for higher values of $\sigma$. This allows the proportion of type II errors after opening and closing to be lower than that of binarization up to $\sigma = 78$.
-
-\begin{figure}[h!]
+\begin{figure}[H]
 	\centering
-	\begin{subfigure}[t]{0.7\linewidth}
+	\begin{subfigure}[t]{0.48\linewidth}
 		\centering
 		\begin{tikzpicture}
 			\begin{axis}[
 				legend pos=north west,
-				xlabel=Standard deviation $\sigma$,
-				ylabel=Proportion of type I errors,
+				legend style={nodes={scale=0.5, transform shape}},
 				grid=both,
 				minor grid style={gray!25},
 				major grid style={gray!25},
@@ -1861,25 +1851,49 @@ by inequality \eqref{ineq: typeIclosing}. This way, we can bound the probability
 				ymax=1.05,
 				width=\linewidth,
 				no marks]
-				\addplot[line width=1pt,dashed,color=blue] table[x=sigma,y=probtypeI,col sep=comma]{CSV/resultsErrorTestCasesTypeI.csv};
+				\addplot[line width=1pt,dashed,color=blue] table[x=sigma,y=probtypeI,col sep=comma]{CSV/Dimensions/resultsErrorTestCasesTypeI_128x128_relaxed.csv};
 				\addlegendentry{Binarization}
-				\addplot[line width=1pt,dashed,color=red] table[x=sigma,y=probtypeI,col sep=comma]{CSV/resultsErrorTestCasesTypeI_o.csv};
+				\addplot[line width=1pt,dashed,color=red] table[x=sigma,y=probtypeI,col sep=comma]{CSV/Dimensions/resultsErrorTestCasesTypeI_128x128_o_relaxed.csv};
 				\addlegendentry{Opening}
-				\addplot[line width=1pt,dashed,color=gray] table[x=sigma,y=probtypeI,col sep=comma]{CSV/resultsErrorTestCasesTypeI_oc.csv};
+				\addplot[line width=1pt,dashed,color=gray] table[x=sigma,y=probtypeI,col sep=comma]{CSV/Dimensions/resultsErrorTestCasesTypeI_128x128_oc_relaxed.csv};
 				\addlegendentry{Opening \& Closing}
 			\end{axis}
 		\end{tikzpicture}
-		\caption{Proportion of type I errors after binarization, opening and closing.}
-		\label{fig: simulationresultstypeI}
+		\caption{Proportion of type I errors for images with size $128 \times 128$.}
+		\label{fig: simulationresultstypeI_128_relaxed}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[t]{0.48\linewidth}
+		\centering
+		\begin{tikzpicture}
+			\begin{axis}[
+				legend pos=north west,
+				legend style={nodes={scale=0.5, transform shape}},
+				grid=both,
+				minor grid style={gray!25},
+				major grid style={gray!25},
+				ymin=-0.05,
+				ymax=1.05,
+				width=\linewidth,
+				no marks]
+				\addplot[line width=1pt,dashed,color=blue] table[x=sigma,y=probtypeII,col sep=comma]{CSV/Dimensions/resultsErrorTestCasesTypeII_128x128_relaxed.csv};
+				\addlegendentry{Binarization}
+				\addplot[line width=1pt,dashed,color=red] table[x=sigma,y=probtypeII,col sep=comma]{CSV/Dimensions/resultsErrorTestCasesTypeII_128x128_o_relaxed.csv};
+				\addlegendentry{Opening}
+				\addplot[line width=1pt,dashed,color=gray] table[x=sigma,y=probtypeII,col sep=comma]{CSV/Dimensions/resultsErrorTestCasesTypeII_128x128_oc_relaxed.csv};
+				\addlegendentry{Opening \& Closing}
+			\end{axis}
+		\end{tikzpicture}
+		\caption{Proportion of type II errors for images with size $128 \times 128$.}
+		\label{fig: simulationresultstypeII_128_relaxed}
 	\end{subfigure}
 	\vfill
-	\begin{subfigure}[t]{0.7\linewidth}
+	\begin{subfigure}[t]{0.48\linewidth}
 		\centering
 		\begin{tikzpicture}
 			\begin{axis}[
 				legend pos=north west,
-				xlabel=Standard deviation $\sigma$,
-				ylabel=Proportion of type II errors,
+				legend style={nodes={scale=0.5, transform shape}},
 				grid=both,
 				minor grid style={gray!25},
 				major grid style={gray!25},
@@ -1887,30 +1901,24 @@ by inequality \eqref{ineq: typeIclosing}. This way, we can bound the probability
 				ymax=1.05,
 				width=\linewidth,
 				no marks]
-				\addplot[line width=1pt,dashed,color=blue] table[x=sigma,y=probtypeII,col sep=comma]{CSV/resultsErrorTestCasesTypeII.csv};
+				\addplot[line width=1pt,dashed,color=blue] table[x=sigma,y=probtypeI,col sep=comma]{CSV/Dimensions/resultsErrorTestCasesTypeI_256x256_relaxed.csv};
 				\addlegendentry{Binarization}
-				\addplot[line width=1pt,dashed,color=red] table[x=sigma,y=probtypeII,col sep=comma]{CSV/resultsErrorTestCasesTypeII_o.csv};
+				\addplot[line width=1pt,dashed,color=red] table[x=sigma,y=probtypeI,col sep=comma]{CSV/Dimensions/resultsErrorTestCasesTypeI_256x256_o_relaxed.csv};
 				\addlegendentry{Opening}
-				\addplot[line width=1pt,dashed,color=gray] table[x=sigma,y=probtypeII,col sep=comma]{CSV/resultsErrorTestCasesTypeII_oc.csv};
+				\addplot[line width=1pt,dashed,color=gray] table[x=sigma,y=probtypeI,col sep=comma]{CSV/Dimensions/resultsErrorTestCasesTypeI_256x256_oc_relaxed.csv};
 				\addlegendentry{Opening \& Closing}
 			\end{axis}
 		\end{tikzpicture}
-		\caption{Proportion of type II errors after binarization, opening and closing.}
-		\label{fig: simulationresultstypeII}
+		\caption{Proportion of type I errors for images with size $256 \times 256$.}
+		\label{fig: simulationresultstypeI_256_relaxed}
 	\end{subfigure}
-	\caption{Proportion of type I \& II errors after binarization, opening and closing. For sizes $128 \times 128$, $256 \times 256$, $512 \times 512$ the images were randomly generated with 5 images per size. For each images 50 different noises were randomly generated. We choose $\alpha = 0.05$.}
-	\label{fig: simulationresults}
-\end{figure}
-
-\begin{figure}[h!]
-	\centering
-	\begin{subfigure}[t]{0.7\linewidth}
+	\hfill
+	\begin{subfigure}[t]{0.48\linewidth}
 		\centering
 		\begin{tikzpicture}
 			\begin{axis}[
 				legend pos=north west,
-				xlabel=Standard deviation $\sigma$,
-				ylabel=Proportion of type I errors,
+				legend style={nodes={scale=0.5, transform shape}},
 				grid=both,
 				minor grid style={gray!25},
 				major grid style={gray!25},
@@ -1918,25 +1926,24 @@ by inequality \eqref{ineq: typeIclosing}. This way, we can bound the probability
 				ymax=1.05,
 				width=\linewidth,
 				no marks]
-				\addplot[line width=1pt,dashed,color=blue] table[x=sigma,y=probtypeI,col sep=comma]{CSV/resultsErrorTestCasesTypeI_relaxed.csv};
+				\addplot[line width=1pt,dashed,color=blue] table[x=sigma,y=probtypeII,col sep=comma]{CSV/Dimensions/resultsErrorTestCasesTypeII_256x256_relaxed.csv};
 				\addlegendentry{Binarization}
-				\addplot[line width=1pt,dashed,color=red] table[x=sigma,y=probtypeI,col sep=comma]{CSV/resultsErrorTestCasesTypeI_o_relaxed.csv};
+				\addplot[line width=1pt,dashed,color=red] table[x=sigma,y=probtypeII,col sep=comma]{CSV/Dimensions/resultsErrorTestCasesTypeII_256x256_o_relaxed.csv};
 				\addlegendentry{Opening}
-				\addplot[line width=1pt,dashed,color=gray] table[x=sigma,y=probtypeI,col sep=comma]{CSV/resultsErrorTestCasesTypeI_oc_relaxed.csv};
+				\addplot[line width=1pt,dashed,color=gray] table[x=sigma,y=probtypeII,col sep=comma]{CSV/Dimensions/resultsErrorTestCasesTypeII_256x256_oc_relaxed.csv};
 				\addlegendentry{Opening \& Closing}
 			\end{axis}
 		\end{tikzpicture}
-		\caption{Proportion of type I errors after binarization, opening and closing.}
-		\label{fig: simulationresultstypeI_relaxed}
+		\caption{Proportion of type II errors for images with size $256 \times 256$.}
+		\label{fig: simulationresultstypeII_256_relaxed}
 	\end{subfigure}
 	\vfill
-	\begin{subfigure}[t]{0.7\linewidth}
+	\begin{subfigure}[t]{0.48\linewidth}
 		\centering
 		\begin{tikzpicture}
 			\begin{axis}[
 				legend pos=north west,
-				xlabel=Standard deviation $\sigma$,
-				ylabel=Proportion of type II errors,
+				legend style={nodes={scale=0.5, transform shape}},
 				grid=both,
 				minor grid style={gray!25},
 				major grid style={gray!25},
@@ -1944,18 +1951,43 @@ by inequality \eqref{ineq: typeIclosing}. This way, we can bound the probability
 				ymax=1.05,
 				width=\linewidth,
 				no marks]
-				\addplot[line width=1pt,dashed,color=blue] table[x=sigma,y=probtypeII,col sep=comma]{CSV/resultsErrorTestCasesTypeII_relaxed.csv};
+				\addplot[line width=1pt,dashed,color=blue] table[x=sigma,y=probtypeI,col sep=comma]{CSV/Dimensions/resultsErrorTestCasesTypeI_512x512_relaxed.csv};
 				\addlegendentry{Binarization}
-				\addplot[line width=1pt,dashed,color=red] table[x=sigma,y=probtypeII,col sep=comma]{CSV/resultsErrorTestCasesTypeII_o_relaxed.csv};
+				\addplot[line width=1pt,dashed,color=red] table[x=sigma,y=probtypeI,col sep=comma]{CSV/Dimensions/resultsErrorTestCasesTypeI_512x512_o_relaxed.csv};
 				\addlegendentry{Opening}
-				\addplot[line width=1pt,dashed,color=gray] table[x=sigma,y=probtypeII,col sep=comma]{CSV/resultsErrorTestCasesTypeII_oc_relaxed.csv};
+				\addplot[line width=1pt,dashed,color=gray] table[x=sigma,y=probtypeI,col sep=comma]{CSV/Dimensions/resultsErrorTestCasesTypeI_512x512_oc_relaxed.csv};
 				\addlegendentry{Opening \& Closing}
 			\end{axis}
 		\end{tikzpicture}
-		\caption{Proportion of type II errors after binarization, opening and closing.}
-		\label{fig: simulationresultstypeII_relaxed}
+		\caption{Proportion of type I errors for images with size $512 \times 512$.}
+		\label{fig: simulationresultstypeI_512_relaxed}
 	\end{subfigure}
-	\caption{Proportion of type I \& II errors after binarization, opening and closing. For sizes $128 \times 128$, $256 \times 256$, $512 \times 512$ the images were randomly generated with 5 images per size. For each images 50 different noises were randomly generated. We choose a relaxed statistical significance $\tilde{\alpha} = \left( \frac{0.05}{3^3} \right)^{\frac{2}{3 + 1}}$.}
+	\hfill
+	\begin{subfigure}[t]{0.48\linewidth}
+		\centering
+		\begin{tikzpicture}
+			\begin{axis}[
+				legend pos=north west,
+				legend style={nodes={scale=0.5, transform shape}},
+				grid=both,
+				minor grid style={gray!25},
+				major grid style={gray!25},
+				ymin=-0.05,
+				ymax=1.05,
+				width=\linewidth,
+				no marks]
+				\addplot[line width=1pt,dashed,color=blue] table[x=sigma,y=probtypeII,col sep=comma]{CSV/Dimensions/resultsErrorTestCasesTypeII_512x512_relaxed.csv};
+				\addlegendentry{Binarization}
+				\addplot[line width=1pt,dashed,color=red] table[x=sigma,y=probtypeII,col sep=comma]{CSV/Dimensions/resultsErrorTestCasesTypeII_512x512_o_relaxed.csv};
+				\addlegendentry{Opening}
+				\addplot[line width=1pt,dashed,color=gray] table[x=sigma,y=probtypeII,col sep=comma]{CSV/Dimensions/resultsErrorTestCasesTypeII_512x512_oc_relaxed.csv};
+				\addlegendentry{Opening \& Closing}
+			\end{axis}
+		\end{tikzpicture}
+		\caption{Proportion of type II errors for images with size $512 \times 512$.}
+		\label{fig: simulationresultstypeII_512_relaxed}
+	\end{subfigure}
+	\caption{Proportion of type I \& II errors after binarization, opening and closing. The $x$-axes display the standard deviation $\sigma$ and the $y$-axes the proportion of falsely classified pixels. For sizes $128 \times 128$, $256 \times 256$, $512 \times 512$ the images were randomly generated with 5 images per size. For each image 50 different noises were randomly generated. We used a $3 \times 3$ pixel structuring element and chose a relaxed statistical significance $\tilde{\alpha} = \left( \frac{0.05}{3^3} \right)^{\frac{2}{3 + 1}}$.}
 	\label{fig: simulationresults_relaxed}
 \end{figure}
 
@@ -1963,11 +1995,15 @@ by inequality \eqref{ineq: typeIclosing}. This way, we can bound the probability
 
 \section{Conclusion}\label{section: conclusion}
 
-Theorems \ref{thm: typeIinequalities} and \ref{thm: typeIIinequalities} give us a better understanding of the effects of morphological opening and closing on the error probabilities, when testing for a region of interest. The results were obtained by exploiting the prior knowledge of some properties of the region of interest. Namely, we used the fact, the the region of interest is rectangular and has a checkerboard pattern.
+Theorems \ref{thm: typeIinequalities} and \ref{thm: typeIIinequalities} give us a better understanding of the effects of morphological opening and closing on the error probabilities, when testing for a region of interest. The results were obtained by exploiting the prior knowledge of some properties of the region of interest. Namely, we used the fact, that the region of interest is rectangular and has a checkerboard pattern.
 
-Especially the exponent $\frac{\varphi + 1}{2}$ in inequality \eqref{ineq: typeIopening} is of high interest. For a background pixel to be falsely identified as foreground after opening, at least $\frac{\varphi + 1}{2}$ many pixels background pixels have to be falsely categorized by the binarization through the statistical test. This is the \emph{minimum number of independent points in a structuring element} that can lead to a false categorization of a pixel. With this connection in mind, the techniques to prove the main results of this paper might present themselves useful in other cases as well.
+Especially the exponent $\frac{\varphi + 1}{2}$ in inequality \eqref{ineq: typeIopening} is of high interest. It is worth noting, that we were able to get this exponent, because we chose a perfectly fitting structuring element, i.e. we used a square structuring element for a rectangular region of interest. The choice of the structuring element is substantial. A different shaped structuring element could lead to no improvements of the error probabilities, but since we have $\Theta \circ \Psi \subseteq \Theta$ for any structuring element $\Psi$, the probability of a type I error can not get worse through morphological opening.
 
-It is also important to note, that the main results only considered the categorization of a single pixel. Since we perform tests for all pixels at once, the analysis of techniques from multiple testing in connection with morphological operations would be an interesting field of study to expand the results of this paper.
+Generalizations of the results from Sections \ref{section: statisticalmodel} and \ref{section: boundtypeIerror} to convex regions of interest with a checkerboard pattern are possible. Since these regions of interest are not necessarily rectangular, it is not possible to choose a structuring element, that is well suited for all cases. This means, that the results from Section \ref{section: mainresults} can not be easily generalized. For shapes of the region of interest, where the structuring element can be chosen to be well suited for all cases, results similar to Theorems \ref{thm: typeIinequalities} and \ref{thm: typeIIinequalities} seem possible.
+
+We consider the setting of Theorem \ref{thm: typeIinequalities} again, i.e. a rectangular region of interest. For a background pixel to be falsely identified as foreground after opening, at least $\frac{\varphi + 1}{2}$ many pixels background pixels have to be falsely categorized by the binarization through the statistical test. This is the \emph{minimum number of independent points in a structuring element} that can lead to a false categorization of a background pixel. With this connection in mind, the techniques to prove the main results of this paper might present themselves useful for the aforementioned other shapes of the region of interest.
+
+It is also important to note, that the main results of this paper only considered the categorization of a single pixel. Since we perform tests for all pixels at once, the analysis of techniques from multiple testing in connection with morphological operations would be an interesting field of study to expand the results of this paper. When researching the connection between multiple testing and morphological operations, one might consider morphological operators, that go beyond the scope of this paper. Namely, the convex hull operator is of high interest in the extraction of the region of interest of a fingerprint.
 
 \newpage
 
@@ -2009,7 +2045,7 @@ It is also important to note, that the main results only considered the categori
 	\begin{theorem}
 		Let $m, n \in \mathbb{N}$, $c \in \mathbb{R} \setminus \{ 0 \}$ and $\Omega = \left\{ 1, \dots, m \right\} \times \left\{ 1, \dots, n \right\}$.
 		
-		Assume that $F$ follows the statistical model given in \eqref{image} and let $T(i, j)$ be the test statistic as defined in \eqref{teststatistic} and $H_1(i, j)$ be the alternative hypothesis as defined in \eqref{alternativehypothesis}. Let $t$ be a threshold, such that
+		Assume that $F$ follows the statistical model given in \eqref{statmodel2} and let $T(i, j)$ be the test statistic as defined in \eqref{teststatistic} and $H_1(i, j)$ be the alternative hypothesis as defined in \eqref{alternativehypothesis}. Let $t$ be a threshold, such that
 		\begin{equation*}
 			\mathbb{P}_V\left( T(i, j) \leq t \right) \leq \beta
 		\end{equation*}
@@ -2019,67 +2055,104 @@ It is also important to note, that the main results only considered the categori
 		\end{equation}
 		for all $(i, j) \in \Omega$.
 		
-		Let $\varphi \in \mathbb{N}$ be odd. Let $\Phi_\varphi = \{ -\frac{\varphi - 1}{2}, -\frac{\varphi - 3}{2}, \dots, \frac{\varphi - 3}{2}, \frac{\varphi - 1}{2} \}$ and $\Psi_\varphi = \Phi_\varphi \times \Phi_\varphi$ be a structuring element. Let $(i, j) \in \Omega$ and $V \in \mathcal{H}_1(i, j)$.
+		Let $\varphi \in \mathbb{N}$ be odd. Let $\Phi_\varphi = \{ -\frac{\varphi - 1}{2}, -\frac{\varphi - 3}{2}, \dots, \frac{\varphi - 3}{2}, \frac{\varphi - 1}{2} \}$ and $\Psi_\varphi = \Phi_\varphi \times \Phi_\varphi$ be a structuring element.
 		
-		Denote by $\varLambda = \{ \kappa_1, \dots, \kappa_2 \} \times \{ \lambda_1, \dots, \lambda_2 \}$ the rROI contained in $V$. Let $\min \{ \kappa_2 - \kappa_1 + 1, \lambda_2 - \lambda_1 + 1 \} \geq \varphi$.
-		Then the following inequalities hold:
-		\begin{align}
-			\mathbb{P}_V( (\mathfrak{I} \circ \Psi_\varphi)(i, j) = 0 ) &\leq \varphi^2 \beta \label{ineqtypeIIopening} \\
-			\mathbb{P}_V( ((\mathfrak{I} \circ \Psi_\varphi) \bullet \Psi_\varphi)(i, j) = 0 ) &\leq \varphi^2 \beta \label{ineqtypeIIclosing}
-		\end{align}
+		Denote by $\varLambda = \{ \kappa_1, \dots, \kappa_2 \} \times \{ \lambda_1, \dots, \lambda_2 \}$ the rROI contained in $V$. Let $\min \{ \kappa_2 - \kappa_1 + 1, \lambda_2 - \lambda_1 + 1 \} \geq \varphi$. Let $V \in \mathcal{H}_1(i, j)$ and $(i, j) \in \Omega$ be such, that
+		\begin{equation}
+			\begin{aligned}
+				i - 2 \varphi + 2 &\geq \kappa_1, \\
+				i + 2 \varphi - 2 &\leq \kappa_2, \\
+				j - 2 \varphi + 2 &\geq \lambda_1, \\
+				j + 2 \varphi - 2 &\leq \lambda_2.
+			\end{aligned}
+		\end{equation}
+		Then the following inequalitiy holds:
+		\begin{equation}
+			\mathbb{P}_V\left( ((\mathfrak{I} \circ \Psi_\varphi) \bullet \Psi_\varphi)(i, j) = 0 \right) \leq \varphi^{10} \beta^4
+		\end{equation}
 	\end{theorem}
 	\begin{proof}
-		We use $\Psi_\varphi = \Phi_\varphi \times \Phi_\varphi$ and get
+		The assumptions on $(i, j) \in \Omega$ assure, that the alternative hypotheses $H_1(i + k - \tilde{k} - r + \tilde{r}, j + l - \tilde{l} - s + \tilde{s})$ are true for all $k, l, r, s, \tilde{k}, \tilde{l}, \tilde{r}, \tilde{s} \in \Phi_\varphi$.
+		
+		Using equalities \eqref{eq: openingset} and \eqref{eq: closingset} and $\Psi_\varphi = \Phi_\varphi \times \Phi_\varphi$ yields
 		\begin{align*}
-			\mathbb{P}&_V( ((\mathfrak{I} \circ \Psi_\varphi) \bullet \Psi_\varphi)(i, j) = 0 ) \\
+			\mathbb{P}&_V\left( ((\mathfrak{I} \circ \Psi_\varphi) \bullet \Psi_\varphi)(i, j) = 0 \right) \\
 			&= \mathbb{P}_V\left( \bigcup_{(k, l) \in \Psi_\varphi} \bigcap_{(\tilde{k}, \tilde{l}) \in \Psi_\varphi} \bigcap_{(r, s) \in \Psi_\varphi} \bigcup_{(\tilde{r}, \tilde{s}) \in \Psi_\varphi} \{ \mathfrak{I}(i + k - \tilde{k} - r + \tilde{r}, j + l - \tilde{l} - s + \tilde{s}) = 0 \} \right) \\
-			&= \mathbb{P}_V\left( \bigcup_{k, l \in \Phi_\varphi} \bigcap_{\tilde{k}, \tilde{l} \in \Phi_\varphi} \bigcap_{r, s \in \Phi_\varphi} \bigcup_{\tilde{r}, \tilde{s} \in \Phi_\varphi} \{ \mathfrak{I}(i + k - \tilde{k} - r + \tilde{r}, j + l - \tilde{l} - s + \tilde{s}) = 0 \} \right)
+			&= \mathbb{P}_V\left( \bigcup_{k, l \in \Phi_\varphi} \bigcap_{\tilde{k}, \tilde{l} \in \Phi_\varphi} \bigcap_{r, s \in \Phi_\varphi} \bigcup_{\tilde{r}, \tilde{s} \in \Phi_\varphi} \{ \mathfrak{I}(i + k - \tilde{k} - r + \tilde{r}, j + l - \tilde{l} - s + \tilde{s}) = 0 \} \right).
 		\end{align*}
 		
-		Using sub-additivity we obtain
+		By sub-additivity we obtain
 		\begin{align*}
-			\mathbb{P}&_V( ((\mathfrak{I} \circ \Psi_\varphi) \bullet \Psi_\varphi)(i, j) = 0 ) \\
+			\mathbb{P}&_V\left( ((\mathfrak{I} \circ \Psi_\varphi) \bullet \Psi_\varphi)(i, j) = 0 \right) \\
 			&= \mathbb{P}_V\left( \bigcup_{k, l \in \Phi_\varphi} \bigcap_{\tilde{k}, \tilde{l} \in \Phi_\varphi} \bigcap_{r, s \in \Phi_\varphi} \bigcup_{\tilde{r}, \tilde{s} \in \Phi_\varphi} \{ \mathfrak{I}(i + k - \tilde{k} - r + \tilde{r}, j + l - \tilde{l} - s + \tilde{s}) = 0 \} \right) \\
-			&\leq \sum_{k, l \in \Phi_\varphi} \mathbb{P}_V\left( \bigcap_{\tilde{k}, \tilde{l} \in \Phi_\varphi} \bigcap_{r, s \in \Phi_\varphi} \bigcup_{\tilde{r}, \tilde{s} \in \Phi_\varphi} \{ \mathfrak{I}(i + k - \tilde{k} - r + \tilde{r}, j + l - \tilde{l} - s + \tilde{s}) = 0 \} \right)
+			&\leq \sum_{k, l \in \Phi_\varphi} \mathbb{P}_V\left( \bigcap_{\tilde{k}, \tilde{l} \in \Phi_\varphi} \bigcap_{r, s \in \Phi_\varphi} \bigcup_{\tilde{r}, \tilde{s} \in \Phi_\varphi} \{ \mathfrak{I}(i + k - \tilde{k} - r + \tilde{r}, j + l - \tilde{l} - s + \tilde{s}) = 0 \} \right).
 		\end{align*}
 		
 		We can pull the two intersections together and get
 		\begin{align*}
-			\mathbb{P}&_V( ((\mathfrak{I} \circ \Psi_\varphi) \bullet \Psi_\varphi)(i, j) = 0 ) \\
+			\mathbb{P}&_V\left( ((\mathfrak{I} \circ \Psi_\varphi) \bullet \Psi_\varphi)(i, j) = 0 \right) \\
 			&\leq \sum_{k, l \in \Phi_\varphi} \mathbb{P}_V\left( \bigcap_{\tilde{k}, \tilde{l} \in \Phi_\varphi} \bigcap_{r, s \in \Phi_\varphi} \bigcup_{\tilde{r}, \tilde{s} \in \Phi_\varphi} \{ \mathfrak{I}(i + k - \tilde{k} - r + \tilde{r}, j + l - \tilde{l} - s + \tilde{s}) = 0 \} \right) \\
-			&= \sum_{k, l \in \Phi_\varphi} \mathbb{P}_V\left( \bigcap_{\tilde{k}, \tilde{l}, r, s \in \Phi_\varphi} \bigcup_{\tilde{r}, \tilde{s} \in \Phi_\varphi} \{ \mathfrak{I}(i + k - \tilde{k} - r + \tilde{r}, j + l - \tilde{l} - s + \tilde{s}) = 0 \} \right)
+			&= \sum_{k, l \in \Phi_\varphi} \mathbb{P}_V\left( \bigcap_{\tilde{k}, \tilde{l}, r, s \in \Phi_\varphi} \bigcup_{\tilde{r}, \tilde{s} \in \Phi_\varphi} \{ \mathfrak{I}(i + k - \tilde{k} - r + \tilde{r}, j + l - \tilde{l} - s + \tilde{s}) = 0 \} \right).
 		\end{align*}
 		
-		We drop every term in the intersection besides $r - \tilde{k}, s - \tilde{l} \in \{ - ( \varphi - 1 ), \varphi - 1 \}$. This yields
+		We drop every term in the intersection besides $r + \tilde{k}, s + \tilde{l} \in \{ - ( \varphi - 1 ), \varphi - 1 \}$. This yields
 		\begin{align*}
-			\mathbb{P}&_V( ((\mathfrak{I} \circ \Psi_\varphi) \bullet \Psi_\varphi)(i, j) = 0 ) \\
+			\mathbb{P}&_V\left( ((\mathfrak{I} \circ \Psi_\varphi) \bullet \Psi_\varphi)(i, j) = 0 \right) \\
 			&\leq \sum_{k, l \in \Phi_\varphi} \mathbb{P}_V\left( \bigcap_{\tilde{k}, \tilde{l}, r, s \in \Phi_\varphi} \bigcup_{\tilde{r}, \tilde{s} \in \Phi_\varphi} \{ \mathfrak{I}(i + k - \tilde{k} - r + \tilde{r}, j + l - \tilde{l} - s + \tilde{s}) = 0 \} \right) \\
-			&\leq \sum_{k, l \in \Phi_\varphi} \mathbb{P}_V\left( \bigcap_{r - \tilde{k}, s - \tilde{l} \in \{ - ( \varphi - 1 ), \varphi - 1 \}} \bigcup_{\tilde{r}, \tilde{s} \in \Phi_\varphi} \{ \mathfrak{I}(i + k - \tilde{k} - r + \tilde{r}, j + l - \tilde{l} - s + \tilde{s}) = 0 \} \right)
+			&\leq \sum_{k, l \in \Phi_\varphi} \mathbb{P}_V\left( \bigcap_{r + \tilde{k}, s + \tilde{l} \in \{ - ( \varphi - 1 ), \varphi - 1 \}} \bigcup_{\tilde{r}, \tilde{s} \in \Phi_\varphi} \{ \mathfrak{I}(i + k - \tilde{k} - r + \tilde{r}, j + l - \tilde{l} - s + \tilde{s}) = 0 \} \right).
 		\end{align*}
 		
-		The sets $\bigcup_{\tilde{r}, \tilde{s} \in \Phi_\varphi} \{ \mathfrak{I}(i + k - \tilde{k} - r + \tilde{r}, j + l - \tilde{l} - s + \tilde{s}) = 0 \}$ are mutually independent for $r - \tilde{k}, s - \tilde{l} \in \{ - ( \varphi - 1 ), \varphi - 1 \}$ and fixed $k, l \in \Phi_\varphi$. Thus we obtain
+		\begin{figure}[t!]
+			\centering
+			\resizebox{\textwidth}{!}{
+				\begin{tikzpicture}
+					\foreach \i in {-6, ..., 6}
+						\foreach \j in {-6, ..., 6}
+							\filldraw[black, opacity=0.7] (\i, \j) rectangle + (1, 1);
+					\foreach \i in {-4, ..., 4}
+						\foreach \j in {-4, ..., 4}
+							\filldraw[black] (\i, \j) rectangle + (1, 1);
+					\foreach \x in {(-3, -3), (-3, 1), (1, -3), (1, 1)}
+						\filldraw[blue] \x rectangle + (3, 3);
+					\foreach \x in {(-2, -2), (-2, 2), (2, -2), (2, 2)}
+						\filldraw[red] \x rectangle + (1, 1);
+					\draw[help lines, step=1] (-9, -9) grid (10, 10);
+					\filldraw[green] (0, 0) rectangle + (1, 1);
+					\node at (0.5, 0.5) {$(i, j)$};
+					\node at (-8.5, 9.5) {$(1, 1)$};
+					\node at (-7.5, 9.5) {$(1, 2)$};
+					\node at (-6.5, 9.5) {$\dots$};
+					\node at (-8.5, 8.5) {$(2, 1)$};
+					\node at (-8.5, 7.5) {$\vdots$};
+				\end{tikzpicture}
+			}
+			\caption{The black area are the pixels that contribute to $(\mathfrak{I} \circ \Psi_\varphi) \bullet \Psi_\varphi)(i, j)$. The blue squares are mutually independent. The red pixels are the pixels that we reduce the intersection in the proof to.}
+			\label{fig: powerindependentpoints}
+		\end{figure}
+		
+		The sets $\bigcup_{\tilde{r}, \tilde{s} \in \Phi_\varphi} \{ \mathfrak{I}(i + k - \tilde{k} - r + \tilde{r}, j + l - \tilde{l} - s + \tilde{s}) = 0 \}$ are mutually independent for $r + \tilde{k}, s + \tilde{l} \in \{ - ( \varphi - 1 ), \varphi - 1 \}$ and fixed $k, l \in \Phi_\varphi$, see figure \ref{fig: powerindependentpoints}. Thus we obtain
 		\begin{align*}
-			\mathbb{P}&_V( ((\mathfrak{I} \circ \Psi_\varphi) \bullet \Psi_\varphi)(i, j) = 0 ) \\
-			&\leq \sum_{k, l \in \Phi_\varphi} \mathbb{P}_V\left( \bigcap_{r - \tilde{k}, s - \tilde{l} \in \{ - ( \varphi - 1 ), \varphi - 1 \}} \bigcup_{\tilde{r}, \tilde{s} \in \Phi_\varphi} \{ \mathfrak{I}(i + k - \tilde{k} - r + \tilde{r}, j + l - \tilde{l} - s + \tilde{s}) = 0 \} \right) \\
-			&= \sum_{k, l \in \Phi_\varphi} \prod_{r - \tilde{k}, s - \tilde{l} \in \{ - ( \varphi - 1 ), \varphi - 1 \}} \mathbb{P}_V\left( \bigcup_{\tilde{r}, \tilde{s} \in \Phi_\varphi} \{ \mathfrak{I}(i + k - \tilde{k} - r + \tilde{r}, j + l - \tilde{l} - s + \tilde{s}) = 0 \} \right)
+			\mathbb{P}&_V\left( ((\mathfrak{I} \circ \Psi_\varphi) \bullet \Psi_\varphi)(i, j) = 0 \right) \\
+			&\leq \sum_{k, l \in \Phi_\varphi} \mathbb{P}_V\left( \bigcap_{r + \tilde{k}, s + \tilde{l} \in \{ - ( \varphi - 1 ), \varphi - 1 \}} \bigcup_{\tilde{r}, \tilde{s} \in \Phi_\varphi} \{ \mathfrak{I}(i + k - \tilde{k} - r + \tilde{r}, j + l - \tilde{l} - s + \tilde{s}) = 0 \} \right) \\
+			&= \sum_{k, l \in \Phi_\varphi} \prod_{r + \tilde{k}, s + \tilde{l} \in \{ - ( \varphi - 1 ), \varphi - 1 \}} \mathbb{P}_V\left( \bigcup_{\tilde{r}, \tilde{s} \in \Phi_\varphi} \{ \mathfrak{I}(i + k - \tilde{k} - r + \tilde{r}, j + l - \tilde{l} - s + \tilde{s}) = 0 \} \right).
 		\end{align*}
 		
 		Again, by using sub-additivy, we get
 		\begin{align*}
-			\mathbb{P}&_V( ((\mathfrak{I} \circ \Psi_\varphi) \bullet \Psi_\varphi)(i, j) = 0 ) \\
-			&\leq \sum_{k, l \in \Phi_\varphi} \prod_{r - \tilde{k}, s - \tilde{l} \in \{ - ( \varphi - 1 ), \varphi - 1 \}} \mathbb{P}_V\left( \bigcup_{\tilde{r}, \tilde{s} \in \Phi_\varphi} \{ \mathfrak{I}(i + k - \tilde{k} - r + \tilde{r}, j + l - \tilde{l} - s + \tilde{s}) = 0 \} \right) \\
-			&= \sum_{k, l \in \Phi_\varphi} \prod_{r - \tilde{k}, s - \tilde{l} \in \{ - ( \varphi - 1 ), \varphi - 1 \}} \sum_{\tilde{r}, \tilde{s} \in \Phi_\varphi} \mathbb{P}_V\left( \{ \mathfrak{I}(i + k - \tilde{k} - r + \tilde{r}, j + l - \tilde{l} - s + \tilde{s}) = 0 \} \right)
+			\mathbb{P}&_V\left( ((\mathfrak{I} \circ \Psi_\varphi) \bullet \Psi_\varphi)(i, j) = 0 \right) \\
+			&\leq \sum_{k, l \in \Phi_\varphi} \prod_{r + \tilde{k}, s + \tilde{l} \in \{ - ( \varphi - 1 ), \varphi - 1 \}} \mathbb{P}_V\left( \bigcup_{\tilde{r}, \tilde{s} \in \Phi_\varphi} \{ \mathfrak{I}(i + k - \tilde{k} - r + \tilde{r}, j + l - \tilde{l} - s + \tilde{s}) = 0 \} \right) \\
+			&= \sum_{k, l \in \Phi_\varphi} \prod_{r + \tilde{k}, s + \tilde{l} \in \{ - ( \varphi - 1 ), \varphi - 1 \}} \sum_{\tilde{r}, \tilde{s} \in \Phi_\varphi} \mathbb{P}_V\left( \{ \mathfrak{I}(i + k - \tilde{k} - r + \tilde{r}, j + l - \tilde{l} - s + \tilde{s}) = 0 \} \right).
 		\end{align*}
 		
-		Using the assumption $\mathbb{P}_V\left( T(i, j) \leq t \right) \leq \beta$ we obtain the upper bound
+		We have assumed, that $(i, j) \in \Omega$ is such, that the alternative hypotheses $H_1(i + k - \tilde{k} - r + \tilde{r}, j + l - \tilde{l} - s + \tilde{s})$ are true for all $k, l, r, s, \tilde{k}, \tilde{l}, \tilde{r}, \tilde{s} \in \Phi_\varphi$. Using this assumption and the fact, that $\mathbb{P}_V\left( T(i, j) \leq t \right) \leq \beta$ for $\mathcal{H}_1(i, j)$ we obtain
 		\begin{align*}
-			\mathbb{P}&_V( ((\mathfrak{I} \circ \Psi_\varphi) \bullet \Psi_\varphi)(i, j) = 0 ) \\
-			&\leq \sum_{k, l \in \Phi_\varphi} \prod_{r - \tilde{k}, s - \tilde{l} \in \{ - ( \varphi - 1 ), \varphi - 1 \}} \sum_{\tilde{r}, \tilde{s} \in \Phi_\varphi} \mathbb{P}_V\left( \{ \mathfrak{I}(i + k - \tilde{k} - r + \tilde{r}, j + l - \tilde{l} - s + \tilde{s}) = 0 \} \right) \\
-			&\leq \sum_{k, l \in \Phi_\varphi} \prod_{r - \tilde{k}, s - \tilde{l} \in \{ - ( \varphi - 1 ), \varphi - 1 \}} \sum_{\tilde{r}, \tilde{s} \in \Phi_\varphi} \beta \\
-			&= \sum_{k, l \in \Phi_\varphi} \prod_{r - \tilde{k}, s - \tilde{l} \in \{ - ( \varphi - 1 ), \varphi - 1 \}} \varphi^2 \beta \\
+			\mathbb{P}&_V\left( ((\mathfrak{I} \circ \Psi_\varphi) \bullet \Psi_\varphi)(i, j) = 0 \right) \\
+			&\leq \sum_{k, l \in \Phi_\varphi} \prod_{r + \tilde{k}, s + \tilde{l} \in \{ - ( \varphi - 1 ), \varphi - 1 \}} \sum_{\tilde{r}, \tilde{s} \in \Phi_\varphi} \mathbb{P}_V\left( \{ \mathfrak{I}(i + k - \tilde{k} - r + \tilde{r}, j + l - \tilde{l} - s + \tilde{s}) = 0 \} \right) \\
+			&\leq \sum_{k, l \in \Phi_\varphi} \prod_{r + \tilde{k}, s + \tilde{l} \in \{ - ( \varphi - 1 ), \varphi - 1 \}} \sum_{\tilde{r}, \tilde{s} \in \Phi_\varphi} \beta \\
+			&= \sum_{k, l \in \Phi_\varphi} \prod_{r + \tilde{k}, s + \tilde{l} \in \{ - ( \varphi - 1 ), \varphi - 1 \}} \varphi^2 \beta \\
 			&= \sum_{k, l \in \Phi_\varphi} ( \varphi^2 \beta )^4 \\
 			&= \varphi^2 ( \varphi^2 \beta )^4 \\
-			&= \varphi^{10} \beta^4
+			&= \varphi^{10} \beta^4.
 		\end{align*}
 		
 		This finishes the proof.
@@ -2087,33 +2160,9 @@ It is also important to note, that the main results only considered the categori
 	
 	\newpage
 	
-	\begin{figure}[h!]
-		\centering
-		\resizebox{\textwidth}{!}{
-			\begin{tikzpicture}
-				\foreach \i in {-6, ..., 6}
-					\foreach \j in {-6, ..., 6}
-						\filldraw[black, opacity=0.7] (\i, \j) rectangle + (1, 1);
-				\foreach \i in {-4, ..., 4}
-					\foreach \j in {-4, ..., 4}
-						\filldraw[black] (\i, \j) rectangle + (1, 1);
-				\foreach \x in {(-3, -3), (-3, 1), (1, -3), (1, 1)}
-					\filldraw[blue] \x rectangle + (3, 3);
-				\foreach \x in {(-2, -2), (-2, 2), (2, -2), (2, 2)}
-					\filldraw[red] \x rectangle + (1, 1);
-				\draw[help lines, step=1] (-9, -9) grid (10, 10);
-				\filldraw[green] (0, 0) rectangle + (1, 1);
-				\node at (0.5, 0.5) {$(i, j)$};
-				\node at (-8.5, 9.5) {$(1, 1)$};
-				\node at (-7.5, 9.5) {$(1, 2)$};
-				\node at (-6.5, 9.5) {$\dots$};
-				\node at (-8.5, 8.5) {$(2, 1)$};
-				\node at (-8.5, 7.5) {$\vdots$};
-			\end{tikzpicture}
-		}
-		\caption{The black area is the pixels that contribute to $(\mathfrak{I} \circ \Psi_\varphi) \bullet \Psi_\varphi)(i, j)$. The blue squares are mutually independent. The red pixels are the pixels that we reduce the intersection in the proof to.}
-		\label{fig: powerindependentpoints}
-	\end{figure}
+	\section{Simulations}
+	
+	Blub
 	
 	\newpage
 	
@@ -2121,7 +2170,21 @@ It is also important to note, that the main results only considered the categori
 	
 	\lstinputlisting[caption=\emph{MATLAB} implementation of a trial and error algorithm to find a threshold for the statistical test.]{ROI-Detection/CDFThreshold/Threshold.m}
 	
-	\lstinputlisting[caption=\emph{MATLAB} implementation of simulation algorithm to find upper and lower bounds for the probability of a type II error in the statistical test.]{ROI-Detection/Power/PowerSim.m}
+	\newpage
+	
+	\lstinputlisting[caption=\emph{MATLAB} implementation of simulation algorithm to simulate upper and lower bounds for the probability of a type II error in the statistical test.]{ROI-Detection/Power/PowerSim.m}
+	
+	\newpage
+	
+	\lstinputlisting[caption=\emph{MATLAB} implementation of an algorithm to randomly generate images with a rectangular region of interest with a checkerboard pattern.]{ROI-Detection/ROI_Generator.m}
+	
+	\newpage
+	
+	\lstinputlisting[caption=\emph{MATLAB} implementation of the testing procedure to test for a rectangular region of interest with a checkerboard pattern.]{ROI-Detection/SIMULATION/ROI_Detection.m}
+	
+	\newpage
+	
+	\lstinputlisting[caption=\emph{MATLAB} implementation of the algorithm counting the errors for the randomly generated test images.]{ROI-Detection/SIMULATION/ErrorTestCases.m}
 \end{appendix}
 
 \newpage

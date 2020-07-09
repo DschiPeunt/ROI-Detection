@@ -1,30 +1,24 @@
-function [V, tlc, brc] = ROI_Generator(M, N, min_size, c_bg)
-%ROI_GENERATOR Generate random rectangle with checkerboard pattern
-% INPUT
-% -----
-% M: height/vertical size of the output matrix
-% N: width/horizontal size of the output matrix
+function [V, tlc, brc] = ROI_Generator(m, n, min_size)
+% m: height/vertical size of the output matrix
+% n: width/horizontal size of the output matrix
 % min_size: minimal size of the ROI (optional)
-% c_bg: grayscale value for the image background (optional)
 
 % Check whether a minimal size was given:
 if (~exist('min_size', 'var'))
     min_size = 0;
 end
 
-% Check whether an alternative background grayvalue was given:
-if (~exist('c_bg', 'var'))
-    c_bg = 127.5;
-end
+% Set the background grayvalue:
+c_bg = 127.5;
 
 % Initialize the picture with constant background:
-V = ones(M, N) * c_bg;
+V = ones(m, n) * c_bg;
 
 % Generate random bounds for the ROI:
-tlc(1) = randi(M - min_size);
-tlc(2) = randi(N - min_size);
-brc(1) = randi([tlc(1) + min_size M]);
-brc(2) = randi([tlc(2) + min_size N]);
+tlc(1) = randi(m - min_size);
+tlc(2) = randi(n - min_size);
+brc(1) = randi([tlc(1) + min_size m]);
+brc(2) = randi([tlc(2) + min_size n]);
 
 % Generate ROI pattern:
 for i = tlc(1):brc(1)

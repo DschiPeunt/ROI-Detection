@@ -1,7 +1,4 @@
 function I = ROI_Detection(F, t_alpha, sigma)
-%ROI_DETECTION Extract ROI from a matrix
-% INPUT
-% -----
 % F: square, noisy input image that contains a rectangular ROI
 % t_alpha: threshold based on statistical significance alpha
 % sigma: standard deviation of the noise
