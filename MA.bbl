@@ -1,45 +1,378 @@
-\begin{thebibliography}{1}
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 3.1 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated as
+% required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
 
-\bibitem{BazenGerez}
-Asker Bazen and Sabih Gerez.
-\newblock Segmentation of fingerprint images.
-\newblock 12, 12 2001.
+\datalist[entry]{anyt/global//global/global}
+  \entry{AbramovichBenjamini1996}{article}{}
+    \name{author}{2}{}{%
+      {{hash=AF}{%
+         family={Abramovich},
+         familyi={A\bibinitperiod},
+         given={"Felix},
+         giveni={F\bibinitperiod},
+      }}%
+      {{hash=BY}{%
+         family={Benjamini"},
+         familyi={B\bibinitperiod},
+         given={Yoav},
+         giveni={Y\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{AFBY1}
+    \strng{fullhash}{AFBY1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelalpha}{AB96}
+    \field{sortinit}{A}
+    \field{sortinithash}{A}
+    \verb{doi}
+    \verb "https://doi.org/10.1016/0167-9473(96)00003-5"
+    \endverb
+    \field{issn}{"0167-9473"}
+    \field{number}{"4"}
+    \field{pages}{"351 \bibrangedash  361"}
+    \field{title}{"Adaptive thresholding of wavelet coefficients"}
+    \verb{url}
+    \verb "http://www.sciencedirect.com/science/article/pii/0167947396000035"
+    \endverb
+    \field{volume}{"22"}
+    \field{journaltitle}{"Computational Statistics \& Data Analysis"}
+    \field{year}{"1996"}
+  \endentry
 
-\bibitem{TISP}
-I.S. Gradshteyn and I.M. Ryzhik.
-\newblock {\em Table of Integrals, Series, and Products}, page 699.
-\newblock Academic Press, 7th edition, 2007.
+  \entry{BazenGerez}{article}{}
+    \name{author}{2}{}{%
+      {{hash=BA}{%
+         family={Bazen},
+         familyi={B\bibinitperiod},
+         given={Asker},
+         giveni={A\bibinitperiod},
+      }}%
+      {{hash=GS}{%
+         family={Gerez},
+         familyi={G\bibinitperiod},
+         given={Sabih},
+         giveni={S\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{BAGS1}
+    \strng{fullhash}{BAGS1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelalpha}{BG01}
+    \field{sortinit}{B}
+    \field{sortinithash}{B}
+    \field{title}{Segmentation of Fingerprint Images}
+    \field{volume}{12}
+    \field{month}{12}
+    \field{year}{2001}
+  \endentry
 
-\bibitem{Henry}
-E.~R. Henry.
-\newblock Classification and uses of finger prints.
-\newblock 1900.
+  \entry{TISP}{book}{}
+    \name{author}{2}{}{%
+      {{hash=GI}{%
+         family={Gradshteyn},
+         familyi={G\bibinitperiod},
+         given={I.S.},
+         giveni={I\bibinitperiod},
+      }}%
+      {{hash=RI}{%
+         family={Ryzhik},
+         familyi={R\bibinitperiod},
+         given={I.M.},
+         giveni={I\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {Academic Press}%
+    }
+    \strng{namehash}{GIRI1}
+    \strng{fullhash}{GIRI1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelalpha}{GR07}
+    \field{sortinit}{G}
+    \field{sortinithash}{G}
+    \field{edition}{7th}
+    \field{title}{Table of Integrals, Series, and Products}
+    \field{year}{2007}
+  \endentry
 
-\bibitem{adaboost}
-Eryun Liu, Heng Zhao, Fangfei Guo, Jimin Liang, and Jie Tian.
-\newblock Fingerprint segmentation based on an adaboost classifier.
-\newblock {\em Frontiers of Computer Science in China}, 5:148--157, 06 2011.
+  \entry{Henry}{article}{}
+    \name{author}{1}{}{%
+      {{hash=HER}{%
+         family={Henry},
+         familyi={H\bibinitperiod},
+         given={E.\bibnamedelima R.},
+         giveni={E\bibinitperiod\bibinitdelim R\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{HER1}
+    \strng{fullhash}{HER1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelalpha}{Hen00}
+    \field{sortinit}{H}
+    \field{sortinithash}{H}
+    \field{title}{Classification and uses of finger prints}
+    \field{year}{1900}
+  \endentry
 
-\bibitem{handbookfipri}
-Davide Maltoni, Dario Maio, Anil~K Jain, and Salil Prabhakar.
-\newblock {\em Handbook of fingerprint recognition}.
-\newblock Springer Science \& Business Media, 2009.
+  \entry{adaboost}{article}{}
+    \name{author}{5}{}{%
+      {{hash=LE}{%
+         family={Liu},
+         familyi={L\bibinitperiod},
+         given={Eryun},
+         giveni={E\bibinitperiod},
+      }}%
+      {{hash=ZH}{%
+         family={Zhao},
+         familyi={Z\bibinitperiod},
+         given={Heng},
+         giveni={H\bibinitperiod},
+      }}%
+      {{hash=GF}{%
+         family={Guo},
+         familyi={G\bibinitperiod},
+         given={Fangfei},
+         giveni={F\bibinitperiod},
+      }}%
+      {{hash=LJ}{%
+         family={Liang},
+         familyi={L\bibinitperiod},
+         given={Jimin},
+         giveni={J\bibinitperiod},
+      }}%
+      {{hash=TJ}{%
+         family={Tian},
+         familyi={T\bibinitperiod},
+         given={Jie},
+         giveni={J\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{LE+1}
+    \strng{fullhash}{LEZHGFLJTJ1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelalpha}{Liu+11}
+    \field{sortinit}{L}
+    \field{sortinithash}{L}
+    \verb{doi}
+    \verb 10.1007/s11704-011-9134-x
+    \endverb
+    \field{pages}{148\bibrangedash 157}
+    \field{title}{Fingerprint segmentation based on an AdaBoost classifier}
+    \field{volume}{5}
+    \field{journaltitle}{Frontiers of Computer Science in China}
+    \field{month}{06}
+    \field{year}{2011}
+  \endentry
 
-\bibitem{IntQFunction}
-Albert~H. Nuttall.
-\newblock Some integrals involving the {$Q_M$}-function.
-\newblock 1974.
+  \entry{handbookfipri}{book}{}
+    \name{author}{4}{}{%
+      {{hash=MD}{%
+         family={Maltoni},
+         familyi={M\bibinitperiod},
+         given={Davide},
+         giveni={D\bibinitperiod},
+      }}%
+      {{hash=MD}{%
+         family={Maio},
+         familyi={M\bibinitperiod},
+         given={Dario},
+         giveni={D\bibinitperiod},
+      }}%
+      {{hash=JAK}{%
+         family={Jain},
+         familyi={J\bibinitperiod},
+         given={Anil\bibnamedelima K},
+         giveni={A\bibinitperiod\bibinitdelim K\bibinitperiod},
+      }}%
+      {{hash=PS}{%
+         family={Prabhakar},
+         familyi={P\bibinitperiod},
+         given={Salil},
+         giveni={S\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {Springer Science \& Business Media}%
+    }
+    \strng{namehash}{MD+1}
+    \strng{fullhash}{MDMDJAKPS1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelalpha}{Mal+09}
+    \field{sortinit}{M}
+    \field{sortinithash}{M}
+    \field{title}{Handbook of fingerprint recognition}
+    \field{year}{2009}
+  \endentry
 
-\bibitem{imageprocessing}
-Frank~Y Shih.
-\newblock {\em Image processing and pattern recognition: fundamentals and
-  techniques}.
-\newblock John Wiley \& Sons, 2010.
+  \entry{IntQFunction}{article}{}
+    \name{author}{1}{}{%
+      {{hash=NAH}{%
+         family={Nuttall},
+         familyi={N\bibinitperiod},
+         given={Albert\bibnamedelima H.},
+         giveni={A\bibinitperiod\bibinitdelim H\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{NAH1}
+    \strng{fullhash}{NAH1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelalpha}{Nut74}
+    \field{sortinit}{N}
+    \field{sortinithash}{N}
+    \field{title}{Some integrals involving the {$Q_M$}-function}
+    \field{year}{1974}
+  \endentry
 
-\bibitem{FDB}
-Duy~Hoang Thai, Stephan Huckemann, and Carsten Gottschlich.
-\newblock Filter design and performance evaluation for fingerprint image
-  segmentation.
-\newblock {\em PLOS ONE}, 11(5):1--31, 05 2016.
+  \entry{HMF}{book}{}
+    \name{author}{4}{}{%
+      {{hash=OF}{%
+         family={Olver},
+         familyi={O\bibinitperiod},
+         given={Frank},
+         giveni={F\bibinitperiod},
+      }}%
+      {{hash=LD}{%
+         family={Lozier},
+         familyi={L\bibinitperiod},
+         given={Daniel},
+         giveni={D\bibinitperiod},
+      }}%
+      {{hash=BR}{%
+         family={Boisvert},
+         familyi={B\bibinitperiod},
+         given={Ronald},
+         giveni={R\bibinitperiod},
+      }}%
+      {{hash=CC}{%
+         family={Clark},
+         familyi={C\bibinitperiod},
+         given={Charles},
+         giveni={C\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{OF+1}
+    \strng{fullhash}{OFLDBRCC1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelalpha}{Olv+10}
+    \field{sortinit}{O}
+    \field{sortinithash}{O}
+    \field{title}{NIST Handbook of Mathematical Functions}
+    \field{month}{01}
+    \field{year}{2010}
+  \endentry
 
-\end{thebibliography}
+  \entry{imageprocessing}{book}{}
+    \name{author}{1}{}{%
+      {{hash=SFY}{%
+         family={Shih},
+         familyi={S\bibinitperiod},
+         given={Frank\bibnamedelima Y},
+         giveni={F\bibinitperiod\bibinitdelim Y\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {John Wiley \& Sons}%
+    }
+    \strng{namehash}{SFY1}
+    \strng{fullhash}{SFY1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelalpha}{Shi10}
+    \field{sortinit}{S}
+    \field{sortinithash}{S}
+    \field{title}{Image processing and pattern recognition: fundamentals and
+  techniques}
+    \field{year}{2010}
+  \endentry
+
+  \entry{FDB}{article}{}
+    \name{author}{3}{}{%
+      {{hash=TDH}{%
+         family={Thai},
+         familyi={T\bibinitperiod},
+         given={Duy\bibnamedelima Hoang},
+         giveni={D\bibinitperiod\bibinitdelim H\bibinitperiod},
+      }}%
+      {{hash=HS}{%
+         family={Huckemann},
+         familyi={H\bibinitperiod},
+         given={Stephan},
+         giveni={S\bibinitperiod},
+      }}%
+      {{hash=GC}{%
+         family={Gottschlich},
+         familyi={G\bibinitperiod},
+         given={Carsten},
+         giveni={C\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {Public Library of Science}%
+    }
+    \strng{namehash}{TDHHSGC1}
+    \strng{fullhash}{TDHHSGC1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelalpha}{THG16}
+    \field{sortinit}{T}
+    \field{sortinithash}{T}
+    \field{abstract}{%
+    Fingerprint recognition plays an important role in many commercial
+  applications and is used by millions of people every day, e.g. for unlocking
+  mobile phones. Fingerprint image segmentation is typically the first
+  processing step of most fingerprint algorithms and it divides an image into
+  foreground, the region of interest, and background. Two types of error can
+  occur during this step which both have a negative impact on the recognition
+  performance: ‘true’ foreground can be labeled as background and features
+  like minutiae can be lost, or conversely ‘true’ background can be
+  misclassified as foreground and spurious features can be introduced. The
+  contribution of this paper is threefold: firstly, we propose a novel
+  factorized directional bandpass (FDB) segmentation method for texture
+  extraction based on the directional Hilbert transform of a Butterworth
+  bandpass (DHBB) filter interwoven with soft-thresholding. Secondly, we
+  provide a manually marked ground truth segmentation for 10560 images as an
+  evaluation benchmark. Thirdly, we conduct a systematic performance comparison
+  between the FDB method and four of the most often cited fingerprint
+  segmentation algorithms showing that the FDB segmentation method clearly
+  outperforms these four widely used methods. The benchmark and the
+  implementation of the FDB method are made publicly available.%
+    }
+    \verb{doi}
+    \verb 10.1371/journal.pone.0154160
+    \endverb
+    \field{number}{5}
+    \field{pages}{1\bibrangedash 31}
+    \field{title}{Filter Design and Performance Evaluation for Fingerprint
+  Image Segmentation}
+    \verb{url}
+    \verb https://doi.org/10.1371/journal.pone.0154160
+    \endverb
+    \field{volume}{11}
+    \field{journaltitle}{PLOS ONE}
+    \field{month}{05}
+    \field{year}{2016}
+  \endentry
+\enddatalist
+\endinput
