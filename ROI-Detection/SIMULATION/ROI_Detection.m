@@ -12,10 +12,10 @@ D_plus = discreteDerivative(F, m, n, 'plus');
 D_minus = discreteDerivative(F, m, n, 'minus');
 
 % Calculate test statistic:
-D = min(D_plus, D_minus);
+T = min(D_plus, D_minus);
 
 % Create thresholded binary matrix:
-I = D >= t_alpha * sigma;
+I = T >= t_alpha * sigma;
 
 end
 

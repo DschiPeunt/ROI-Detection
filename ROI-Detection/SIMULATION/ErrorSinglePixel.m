@@ -76,8 +76,8 @@ for a = 1 : size(alphaModes, 2)
                 % Initialize image around the pixel:
                 V = ones(2 * phi + 3, 2 * phi + 3) * c_bg;
                 
-                % Set top left corner of the ROI based position of the pixel to
-                % simulate (Simulated pixel is [phi + 2 phi + 2]):
+                % Set top left corner of the ROI based position of the
+                % pixel to simulate (Simulated pixel is [phi + 2 phi + 2]):
                 switch pixelMode
                     case 'backgroundcorner'
                         tlc = [phi + 3 phi + 3];
@@ -93,8 +93,8 @@ for a = 1 : size(alphaModes, 2)
                         tlc = [1 1];
                 end
                 
-                % Set bottom right corner of the ROI (always [2 * phi + 3, 2 * phi +
-                % 3]):
+                % Set bottom right corner of the ROI (always
+                % [2 * phi + 3, 2 * phi + 3]):
                 brc = [2 * phi + 3 2 * phi + 3];
                 
                 % Determine modulus of the top left corner of the ROI:
