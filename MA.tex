@@ -155,52 +155,32 @@ Fingerprint analysis has played an important role in biometric identification fo
 
 Automated extraction of the ROI is often achieved by the use of thresholding methods, see \cite{FDB}, and morphological operators, see \cite{FDB, BazenGerez, adaboost}. While the thresholding methods provide a binarization of the image to categorize pixels into ROI and background, the use of morphological operators aims at minimizing errors such as falsely classifying a background pixel as ROI or vice versa. The usage of these morphological operators relies on prior information of the fingerprint image, such as convexity and oscillatory behaviour within the ROI.
 
-We interpret the thresholding techniques via statistical testing. When thresholding, one applies some operator and compares the outcome to a threshold, for an example see \cite{AbramovichBenjamini1996}. This is the same procedure as calculating a test statistic and performing a one- or two-sided hypothesis test. In this sense, falsely classifying a background pixel as a foreground pixel and vice versa can be seen as a type I and II error of a statistical test. To this end, the application of morphological operators is an attempt to lower the error rates of the statistical test.
+We interpret the thresholding techniques via statistical testing. When thresholding, one usually applies an operator and compares the outcome to a threshold, for an example see \cite{AbramovichBenjamini1996}. This is the same procedure as calculating a test statistic and performing a one- or two-sided hypothesis test. In this sense, falsely classifying a background pixel as a foreground pixel and vice versa can be seen as a type I and II error of a statistical test. Considering this interpretation, the application of morphological operators is an attempt to lower the error rates of the statistical test.
 
 The interplay of thresholding techniques with post-processing via morphological operators, incorporating prior knowledge, has, to the best of the author's knowledge, not been addressed. This thesis aims at providing a first step towards understanding this interplay by assessing the change of error rates through application of morphological operators.
 
-Our goal is the study of the improvements of the error probabilities for a specific pixel. We limit our research to a simplified model, for which we can bound the probability of a type I error after thresholding. This model assumes a rectangular region of interest with a checkerboard pattern surrounded by a constanst gray background, see Figure \ref{fig: rROI}. We analyze the impact of morphological opening and closing, since these operators only rely on a neighbourhood of the specific pixel we are considering. The model still exhibits convexity of the ROI and an oscillatory pattern within the ROI, as in a fingerprint image.
+In a simplified scenario, the change of upper bounds for the error rates, when morphological opening and closing are applied, is shown. The focus lies on the probabilites of misclassifying a single pixel.
 
-Since we are interested in the change of the error probabilities for a specific pixel, we do not consider methods to test for the whole rectangle, but develop a test for each pixel to decide whether or not it is part of the rectangular region of interest.
+The model is given by an image with constanst gray background and a rectangular region of interest with a checkerboard pattern, see Figure \ref{fig: rROI}. We analyze the impact of morphological opening and closing, since these operators only rely on a neighbourhood of the specific pixel we are considering. The model still exhibits convexity of the ROI and an oscillatory pattern within the ROI, as in a fingerprint image. This admits the use of the discrete derivative operator for the statistical test.
+
+Notably, we are interested in the change of the error probabilities for a specific pixel. Hence, we do not consider methods to test for the whole rectangle, but develop a test for each pixel to decide whether or not it is part of the rectangular region of interest. As an example, testing for the corners of the rectangle might offer better power, when trying to determine the rectangular ROI, but such an approach does not generalize to fingerprint images.
 
 % Draw example of a matrix with a rROI with a checkerboard pattern:
-\begin{figure}[h]
-	\centering
-	\begin{tikzpicture}
-		\foreach \i in {-6, ..., 5}
-			\foreach \j in {-6, ..., 5}
-				\filldraw[gray] (\i, \j) rectangle + (1, 1);
-		\foreach \i in {-4, ..., 1}
-			\foreach \j in {-2, ..., 2}
-			{
-				\pgfmathparse{mod(\i+\j, 2) ? "black" : "white"}
-				\edef\colour{\pgfmathresult}
-				\filldraw[fill=\colour] (\i, \j) rectangle + (1, 1);
-			}
-		\draw[step=1] (-6, -6) grid (6, 6);
-		\node at (-5.5, 5.5) {$(1, 1)$};
-		\node at (-4.5, 5.5) {$(1, 2)$};
-		\node at (-3.5, 5.5) {$\dots$};
-		\node at (-5.5, 4.5) {$(2, 1)$};
-		\node at (-5.5, 3.5) {$\vdots$};
-	\end{tikzpicture}
-	\caption{Example of a matrix, that contains a rROI with a checkerboard pattern. The top left corner of the rROI is $(4, 3)$ and the bottom right corner is $(8, 8)$. Here we have $m = n = 12$.}
-	\label{fig: rROI}
-\end{figure}
+\input{Figures/rROI}
 
 \paragraph{The statistical model}
 
-Let $m, n \in \mathbb{N}$ and $c \in \mathbb{R} \setminus \{ 0 \}$. We assume we are given a noisy image following the statistical model
+Let $m, n \in \mathbb{N}$ and $c \in \mathbb{R} \setminus \{ 0 \}$. We assume a noisy image following the statistical model
 \begin{equation}\label{statmodel}
 	F(i, j) = \underbrace{c + V(i, j)}_{\eqqcolon \tilde{V}(i, j)} + \varepsilon_{i, j}
 \end{equation}
-for all $(i, j) \in \Omega \coloneqq \left\{ 1, \dots, m \right\} \times \left\{ 1, \dots, n \right\}$. We assume, that the values of $V$ alternate between $c$ and $-c$ along the rows and columns of the region of interest, and call the set of all such images $\mathcal{V}_c^{m, n}$. We assume the noise terms $\varepsilon_{i, j} \sim \mathcal{N}(0, \sigma^2)$ to be i.i.d. normally distributed random variables for some $\sigma > 0$.
+for all $(i, j) \in \Omega \coloneqq \left\{ 1, \dots, m \right\} \times \left\{ 1, \dots, n \right\}$. The values of $V$ alternate between $c$ and $-c$ along the rows and columns of the region of interest, and call the set of all such images $\mathcal{V}_c^{m, n}$. The noise terms $\varepsilon_{i, j} \sim \mathcal{N}(0, \sigma^2)$ are assumed to be i.i.d. normally distributed random variables for some $\sigma > 0$.
 
-For visualization we use grayscale images and take $c = 127.5$. Then the values of the image $\tilde{V}$ alternate between $0$ and $255$ along the region of interest, which translates to black and white in a grayscale image. This gives the region of interest of $\tilde{V}$ a classical checkerboard pattern, see Figure \ref{fig: rROI} for an example.
+For visualization we use grayscale images and set $c = 127.5$. Then the values of the image $\tilde{V}$ alternate between black and white within the region of interest. This gives the region of interest of $\tilde{V}$ a classical checkerboard pattern, see Figure \ref{fig: rROI} for an example.
 
-Notably, we make two simplifications in our statistical model. First, we assume the variance $\sigma$ of the noise terms to be known beforehand. Second, we ignore the limitations of grayscale images and let the images in our model take all values in the real numbers.
+Notably, we make two simplifications in our statistical model. First, we assume the variance $\sigma$ of the noise terms to be known beforehand. Second, we ignore the limitations of grayscale images and let the images in our model take all values in the real numbers. When trying to restore a ROI from an actual grayscale fingerprint image, the image, and thus the observed data $F$, would only take values in $\{ 0, \dots, 255 \}$.
 
-The image $F$ is the observed data we are given. The goal is to develop a statistical test for every pixel to determine whether or not the pixel belongs to the region of interest of $V$ and as such reconstructing the unknown $V$ from the noisy data. The pixel $(i, j)$ belonging to the ROI is equivalent to $\min \{ \norm{\Delta^+ V(i, j)}, \norm{\Delta^- V(i, j)} \} \neq 0$, where $\Delta^+$ and $\Delta^-$ denote the forward and backward discrete derivative operator, respectively. Thus, we get the null and alternative hypotheses
+The goal is to develop a statistical test for every pixel to determine whether or not the pixel belongs to the region of interest of $V$ and as such reconstructing the unknown $V$ from the noisy data. By choosing a checkerboard pattern, the discrete derivative operators can be employed to this end. The pixel $(i, j)$ belonging to the ROI is equivalent to $\min \{ \norm{\Delta^+ V(i, j)}, \norm{\Delta^- V(i, j)} \} \neq 0$, where $\Delta^+$ and $\Delta^-$ denote the forward and backward discrete derivative operator, respectively. Thus, we get the null and alternative hypotheses
 \begin{align*}
 	H_0(i, j)&: \min \{ \norm{\Delta^+ V(i, j)}, \norm{\Delta^- V(i, j)} \} = 0, \\
 	H_1(i, j)&: \min \{ \norm{\Delta^+ V(i, j)}, \norm{\Delta^- V(i, j)} \} \neq 0.
@@ -209,25 +189,15 @@ We use
 \begin{equation*}
 	T(i, j) \coloneqq \min \{ \norm{\Delta^+ F(i, j)}, \norm{\Delta^- F(i, j)} \}
 \end{equation*}
-as a test statistic for each pixel $(i, j) \in \Omega$. Based on the null hypotheses, we define the sets
-\begin{equation*}
-	\mathcal{H}_0(i, j) \coloneqq \left\{ V \in \mathcal{V}_c^{m, n} \mid \min \{ \norm{\Delta^+ V(i, j)}, \norm{\Delta^- V(i, j)} \} = 0 \right\}.
-\end{equation*}
+as a test statistic for each pixel $(i, j) \in \Omega$. In the following, we denote by $\mathbb{P}_V( \ldots )$ the probability of an event given a \emph{fixed} image $V$.
 
-Then $H_0(i, j)$ is true, if and only if $V \in \mathcal{H}_0(i, j)$. In the following, we denote by $\mathbb{P}_V( \ldots )$ the probability of an event given a \emph{fixed} image $V$.
+If the null hypothesis $H_0(i, j)$ is true, we have $\norm{\Delta^+ V(i, j)} = 0$ or $\norm{\Delta^- V(i, j)} = 0$.
 
-Let $V \in \mathcal{H}_0(i, j)$. Then we have $\norm{\Delta^+ V(i, j)} = 0$ or $\norm{\Delta^- V(i, j)} = 0$. Based on this fact, we define two subsets of $\mathcal{H}_0(i, j)$ by
-\begin{align*}
-	\mathcal{H}_0^+(i, j) &\coloneqq \left\{ V \in \mathcal{V}_c^{m, n} \mid \norm{\Delta^+ V(i, j)} = 0 \right\}, \\
-	\mathcal{H}_0^-(i, j) &\coloneqq \left\{ V \in \mathcal{V}_c^{m, n} \mid \norm{\Delta^- V(i, j)} = 0 \right\}
-\end{align*}
-and get $\mathcal{H}_0(i, j) = \mathcal{H}_0^+(i, j) \cup \mathcal{H}_0^-(i, j)$. The union is not necessarily disjoint.
-
-For $V \in \mathcal{H}_0^+(i, j)$ we can bound the probability of a type I error by
+For $\norm{\Delta^+ V(i, j)} = 0$ we can bound the probability of a type I error by
 \begin{equation*}
 	\mathbb{P}_V( T(i, j) \geq t ) \leq \mathbb{P}_V( \norm{\Delta^+ F(i, j)} \geq t )
 \end{equation*}
-and for $V \in \mathcal{H}_0^-(i, j)$ by
+and for $\norm{\Delta^- V(i, j)} = 0$ by
 \begin{equation*}
 	\mathbb{P}_V( T(i, j) \geq t ) \leq \mathbb{P}_V( \norm{\Delta^- F(i, j)} \geq t ).
 \end{equation*}
@@ -236,68 +206,77 @@ The right hand side of both inequalities is the same function, which can be comp
 \begin{equation*}
 	\mathbb{P}_V( T(i, j) \geq t_\alpha ) \leq \alpha
 \end{equation*}
-for every $(i, j) \in \Omega$ and $V \in \mathcal{H}_0(i, j)$.
-
-Since this is independent of the specific $V$, it holds for all images $V$ under which the null hypothesis for the pixel $(i, j)$ is true and thus we can bound the probability of falsely categorizing a background pixel as a foreground pixel by a given statistical significance $\alpha \in ( 0, 1 )$.
+for every $(i, j) \in \Omega$, if $H_0(i, j)$ is true. Since this is independent of the specific $V$, it holds for all images $V$ under which the null hypothesis for the pixel $(i, j)$ is true and thus we can bound the probability of falsely categorizing a background pixel as a foreground pixel by a given statistical significance $\alpha \in ( 0, 1 )$.
 
 \paragraph{Main results}
 
-After having established our statistical testing procedure and how a suitable threshold can be computed, we aim at researching the changes of the error probabilities under morphological opening and closing.
+We aim at researching the changes of the upper bounds of the error probabilities under morphological opening and closing.
 
-To this end, let $\mathfrak{I} \in \{ 0, 1 \}^{m \times n}$ be a binary matrix and $\Psi \subseteq \mathbb{Z}^2$ be a \emph{structuring element}, see \cite{imageprocessing}. We denote by $\mathfrak{I} \circ \Psi$ the opening of the binary matrix $\mathfrak{I}$ by $\Psi$ and by $\mathfrak{I} \bullet \Psi$ the closing of the binary matrix $\mathfrak{I}$ by $\Psi$.
+Let $\mathfrak{I} \in \{ 0, 1 \}^{m \times n}$ be a binary matrix and $\Psi \subseteq \mathbb{Z}^2$ be a \emph{structuring element}, see \cite{imageprocessing}, we denote by $\mathfrak{I} \circ \Psi$ the opening of the binary matrix $\mathfrak{I}$ by $\Psi$ and by $\mathfrak{I} \bullet \Psi$ the closing of the binary matrix $\mathfrak{I}$ by $\Psi$.
 
-As the region of interest in our case is rectangular, we use a square structuring element. Using such a square structuring element yields an exponential improvement of probability of a type I error after morphological opening compared to the probability before opening is applied. Applying morphological closing after opening will worsen this probability, but only polynomially. This yields an overall improvement of the probability of a type I error, when applying morphological opening and closing. This result is formalized in the following theorem.
+As the region of interest in our case is rectangular, we use a square structuring element. We show, that using such a square structuring element yields an exponential improvement of the upper bound of the probability of a type I error after morphological opening compared to the upper bound before opening is applied. Applying morphological closing after opening will worsen this bound, but only polynomially. Overall, we obtain a better upper bound for the probability of a type I error, when applying morphological opening and closing. This allows us to lower the threshold $t_\alpha$ in the statistical test, potentially increasing the number of type I errors. Through the improvement of the upper bound, we can still bound the probability of a type I error after morphological opening and closing below a given statistical significance $\alpha$. The following theorem formalizes the change of the upper bounds.
+
 \begin{theorem}
-	Let $m, n \in \mathbb{N}$, $c \in \mathbb{R} \setminus \{ 0 \}$ and $\Omega = \left\{ 1, \dots, m \right\} \times \left\{ 1, \dots, m \right\}$. Assume we are given data
-	\begin{equation*}
-		F(i, j) = c + V(i, j) + \varepsilon_{i, j}
-	\end{equation*}
-	for all $(i, j) \in \Omega$, where the unknown $V$ contains a rectangular region of interest with a checkerboard pattern and $\varepsilon_{i, j} \sim \mathcal{N}(0, \sigma^2)$ are i.i.d. normal distributed random variables for some $\sigma > 0$.
+	Let $\Omega = \left\{ 1, \dots, m \right\} \times \left\{ 1, \dots, m \right\}$. Assume $F$ follows the statistical model given in \eqref{statmodel}.
 	
-	Let $\alpha \in (0, 1)$ and $t_\alpha$ a threshold, such that $\mathbb{P}_V( \norm{\Delta^+ F(i, j)} \geq t_\alpha ) \leq \alpha$ for every $V \in \mathcal{H}_0^+(i, j)$ and $\mathbb{P}_V( \norm{\Delta^- F(i, j)} \geq t_\alpha ) \leq \alpha$ for every $V \in \mathcal{H}_0^-(i, j)$.
+	For a statistical significance $\alpha \in (0, 1)$, let $t_\alpha$ be a threshold, such that $\mathbb{P}_V( \norm{\Delta^+ F(\tilde{i}, \tilde{j})} \geq t_\alpha ) \leq \alpha$, if $\norm{\Delta^+ V(\tilde{i}, \tilde{j})} = 0$, and $\mathbb{P}_V( \norm{\Delta^- F(\tilde{i}, \tilde{j})} \geq t_\alpha ) \leq \alpha$, if $\norm{\Delta^- V(\tilde{i}, \tilde{j})} = 0$, for every $\tilde{i}, \tilde{j} \in \Omega$.
 	
 	Let $\mathfrak{I}_\alpha$ be the binary image defined by
 	\begin{equation*}
-		\mathfrak{I}_\alpha(i, j) = \mathds{1}_{ \{ T(i, j) \geq t_\alpha \} }
+	\mathfrak{I}_\alpha(\tilde{i}, \tilde{j}) = \mathds{1}_{ \{ T(\tilde{i}, \tilde{j}) \geq t_\alpha \} }
 	\end{equation*}
-	for all $(i, j) \in \Omega$.
+	for all $(\tilde{i}, \tilde{j}) \in \Omega$.
 	
-	Let $\varphi \in \mathbb{N}$ be odd. Let $\Phi_\varphi = \{ -\frac{\varphi - 1}{2}, -\frac{\varphi - 3}{2}, \dots, \frac{\varphi - 3}{2}, \frac{\varphi - 1}{2} \}$ and $\Psi_\varphi = \Phi_\varphi \times \Phi_\varphi$ be a structuring element. Let $(i, j) \in \Omega$ and $V \in \mathcal{H}_0(i, j)$.
-	Then the following inequalities hold:
+	Let $\varphi \in \mathbb{N}$ be odd and define the set $\Phi_\varphi = \left\{ -\frac{\varphi - 1}{2}, -\frac{\varphi - 3}{2}, \dots, \frac{\varphi - 3}{2}, \frac{\varphi - 1}{2} \right\}$ and the structuring element $\Psi_\varphi = \Phi_\varphi \times \Phi_\varphi$.
+	
+	Then for $(i, j) \in \Omega$ the following inequalities hold, if $H_0(i, j)$ is true:
 	\begin{align}
-		\mathbb{P}_V\left( (\mathfrak{I}_\alpha \circ \Psi_\varphi)(i, j) = 1 \right) &\leq \varphi \alpha^{\frac{\varphi + 1}{2}} \\
-		\mathbb{P}_V\left( ((\mathfrak{I}_\alpha \circ \Psi_\varphi) \bullet \Psi_\varphi)(i, j) = 1 \right) &\leq \varphi^3 \alpha^{\frac{\varphi + 1}{2}}
+		\mathbb{P}_V\left( (\mathfrak{I}_\alpha \circ \Psi_\varphi)(i, j) = 1 \right) &\leq \varphi \alpha^{\frac{\varphi + 1}{2}} \label{ineq: introtypeIopening} \\
+		\mathbb{P}_V\left( ((\mathfrak{I}_\alpha \circ \Psi_\varphi) \bullet \Psi_\varphi)(i, j) = 1 \right) &\leq \varphi^3 \alpha^{\frac{\varphi + 1}{2}} \label{ineq: introtypeIclosing}
 	\end{align}
 \end{theorem}
 
-We are also interested in the change of the probability of a type II error, when morphological opening and closing are applied. Morphological opening increases this probability polynomially. The application of morphological closing, when applied after opening, does not lower the probability, since the pixels are not independent anymore. This is formalized in the following theorem.
+The question of bounding the probability of a type II error after morphological opening and closing also arises. It turns out, morphological opening increases the upper bound of this probability polynomially. The application of morphological closing, when applied after opening, does not improve the upper bound, since independence of the pixels is not guaranteed anymore. This is formalized in the following theorem.
 
 \begin{theorem}
-	Let $m, n \in \mathbb{N}$, $c \in \mathbb{R} \setminus \{ 0 \}$ and $\Omega = \left\{ 1, \dots, m \right\} \times \left\{ 1, \dots, m \right\}$. Assume we are given data
-	\begin{equation*}
-		F(i, j) = c + V(i, j) + \varepsilon_{i, j}
-	\end{equation*}
-	for all $(i, j) \in \Omega$, where the unknown $V$ contains a rectangular region of interest with a checkerboard pattern and $\varepsilon_{i, j} \sim \mathcal{N}(0, \sigma^2)$ are i.i.d. normal distributed random variables for some $\sigma > 0$.
+	Let $\Omega = \left\{ 1, \dots, m \right\} \times \left\{ 1, \dots, m \right\}$. Assume $F$ follows the statistical model given in \eqref{statmodel}.
 	
 	Let $t$ be a threshold, such that
 	\begin{equation*}
-		\mathbb{P}_V\left( T(i, j) \leq t \right) \leq \beta
+		\mathbb{P}_V\left( T(\tilde{i}, \tilde{j}) \leq t \right) \leq \beta
 	\end{equation*}
-	for all $V \in \mathcal{H}_1(i, j)$. Let $\mathfrak{I}$ be the binary image defined by
-	\begin{equation}
-		\mathfrak{I}(i, j) = \mathds{1}_{ \{ T(i, j) \geq t \} }
-	\end{equation}
-	for all $(i, j) \in \Omega$.
+	for some $\beta \in (0, 1)$, all $(\tilde{i}, \tilde{j}) \in \Omega$ and all $V$, such that $H_1(\tilde{i}, \tilde{j})$ is true.
 	
-	Let $\varphi \in \mathbb{N}$ be odd. Let $\Phi_\varphi = \{ -\frac{\varphi - 1}{2}, -\frac{\varphi - 3}{2}, \dots, \frac{\varphi - 3}{2}, \frac{\varphi - 1}{2} \}$ and $\Psi_\varphi = \Phi_\varphi \times \Phi_\varphi$ be a structuring element. Let $(i, j) \in \Omega$ and $V \in \mathcal{H}_1(i, j)$.
+	Let $\mathfrak{I}$ be the binary image defined by
+	\begin{equation*}
+		\mathfrak{I}(\tilde{i}, \tilde{j}) = \mathds{1}_{ \{ T(\tilde{i}, \tilde{j}) \geq t \} }
+	\end{equation*}
+	for all $(\tilde{i}, \tilde{j}) \in \Omega$.
 	
-	Denote by $\varLambda = \{ \kappa_1, \dots, \kappa_2 \} \times \{ \lambda_1, \dots, \lambda_2 \}$ the rROI contained in $V$. Let $\min \{ \kappa_2 - \kappa_1 + 1, \lambda_2 - \lambda_1 + 1 \} \geq \varphi$.
-	Then the following inequalities hold:
+	Let $\varphi \in \mathbb{N}$ be odd and define the set $\Phi_\varphi = \left\{ -\frac{\varphi - 1}{2}, -\frac{\varphi - 3}{2}, \dots, \frac{\varphi - 3}{2}, \frac{\varphi - 1}{2} \right\}$ and the structuring element $\Psi_\varphi = \Phi_\varphi \times \Phi_\varphi$.
+	
+	Let $(i, j) \in \Omega$ and $V \in \mathcal{H}_1(i, j)$.
+	
+	Assume, that the rectangular region of interest contained in $V$ has side lengths larger than $\varphi$.
+	
+	Then for $(i, j) \in \Omega$ the following inequalities hold, if $H_1(i, j)$ is true:
 	\begin{align}
-		\mathbb{P}_V\left( (\mathfrak{I} \circ \Psi_\varphi)(i, j) = 0 \right) &\leq \varphi^2 \beta \\
-		\mathbb{P}_V\left( ((\mathfrak{I} \circ \Psi_\varphi) \bullet \Psi_\varphi)(i, j) = 0 \right) &\leq \varphi^2 \beta
+		\mathbb{P}_V\left( (\mathfrak{I} \circ \Psi_\varphi)(i, j) = 0 \right) &\leq \varphi^2 \beta \label{ineq: introtypeIIopening} \\
+		\mathbb{P}_V\left( ((\mathfrak{I} \circ \Psi_\varphi) \bullet \Psi_\varphi)(i, j) = 0 \right) &\leq \varphi^2 \beta \label{ineq: introtypeIIclosing}
 	\end{align}
 \end{theorem}
+
+Note, that the bounds in the previous theorems are independent of the specific $(i, j)$. This means, that the bounds also hold for the worst case, i.e. pixels directly at the transition from background to foreground.
+
+We simulate six different positions of $(i, j)$ with respect to the region of interest, see Figure \ref{}. Regardless of the position of the pixel, morphological opening decreases the rate of type I errors as expected from inequality \eqref{ineq: introtypeIopening}. The increase of this rate through morphological closing, suggested by inequality \eqref{ineq: introtypeIclosing}, can not be observed. On the other hand, the rate of type II errors does not increase under morphological opening as much as inequality \eqref{ineq: introtypeIIopening} suggests. The fact, that the upper bound in inequalities \eqref{ineq: introtypeIIopening} and \eqref{ineq: introtypeIIclosing} is the same is well reflected in the simulation results.
+
+\paragraph{Outlook}
+
+The region of interest in this simplified model is convex and has an oscillatory pattern, similar to a fingerprint image. We used the discrete derivative operator to binarize the image and proceeded by applying morphological opening and closing.
+
+The results presented in this thesis do not simply carry over to fingerprints. How the error probabilities can be bounded as well as how a structuring element should be chosen are questions that need to be explored.
+
+Furthermore, we only considered bounds for single pixels. A next step should involve methods from the field of multiple testing to consider the simultaneous test of all pixels in the image.
 
 \paragraph{Outline of the thesis}
 
@@ -517,8 +496,8 @@ The second step is given in the following theorem, where we calculate the cumula
 	\begin{equation}\label{eq: cdf}
 		\begin{aligned}
 			p_\sigma(t) &\coloneqq \frac{1}{\sqrt{3}} \left( \frac{3}{2} - \frac{3}{2} \exp \left( - \frac{t^2}{3 \sigma^2} \right) I_0 \left( \frac{t^2}{6 \sigma^2} \right) \right) - \sqrt{3} \\
-			&\quad - \frac{2 - \sqrt{3}}{2} Q_1 \left( \frac{2 - \sqrt{3}}{6} \frac{t}{\sigma}, \frac{2 + \sqrt{3}}{6} \frac{t}{\sigma} \right) \\
-			&\quad + \frac{2 + \sqrt{3}}{2} Q_1 \left( \frac{2 + \sqrt{3}}{6} \frac{t}{\sigma}, \frac{2 - \sqrt{3}}{6} \frac{t}{\sigma} \right)
+			&\quad - \frac{2 - \sqrt{3}}{2} Q_1 \left( \sqrt{\frac{2 - \sqrt{3}}{6}} \frac{t}{\sigma}, \sqrt{\frac{2 + \sqrt{3}}{6}} \frac{t}{\sigma} \right) \\
+			&\quad + \frac{2 + \sqrt{3}}{2} Q_1 \left( \sqrt{\frac{2 + \sqrt{3}}{6}} \frac{t}{\sigma}, \sqrt{\frac{2 - \sqrt{3}}{6}} \frac{t}{\sigma} \right)
 		\end{aligned}
 	\end{equation}
 	with $I_0$ being the modified Bessel function of the first kind \cite[p.~910-911]{TISP} and $Q_M$ denoting the Marcum $Q$-function \cite{IntQFunction}.
@@ -610,24 +589,33 @@ The second step is given in the following theorem, where we calculate the cumula
 	\end{equation}
 	where $Q_M$ denotes the Marcum $Q$-function. The Marcum $Q$-function is only defined for $M \geq 1$, which made the integration by parts necessary. Applying this equation with $M = 1$ to the integral yields
 	\begin{align*}
-		\int_0^\frac{t^2}{\sigma^2} \exp \left( - \frac{y}{3} \right) I_1 \left( \frac{y}{6} \right) \mathrm{d}y &= 2 \sqrt{3} (2 - \sqrt{3}) \left( 1 - Q_1 \left( \frac{2 - \sqrt{3}}{6} \frac{t}{\sigma}, \frac{2 + \sqrt{3}}{6} \frac{t}{\sigma} \right) \right) \\
-		&\quad - 2 \sqrt{3} (2 + \sqrt{3}) \left( 1 - Q_1 \left( \frac{2 + \sqrt{3}}{6} \frac{t}{\sigma}, \frac{2 - \sqrt{3}}{6} \frac{t}{\sigma} \right) \right).
+		\int_0^\frac{t^2}{\sigma^2} \exp \left( - \frac{y}{3} \right) I_1 \left( \frac{y}{6} \right) \mathrm{d}y &= 2 \sqrt{3} (2 - \sqrt{3}) \left( 1 - Q_1 \left( \sqrt{\frac{2 - \sqrt{3}}{6}} \frac{t}{\sigma}, \sqrt{\frac{2 + \sqrt{3}}{6}} \frac{t}{\sigma} \right) \right) \\
+		&\quad - 2 \sqrt{3} (2 + \sqrt{3}) \left( 1 - Q_1 \left( \sqrt{\frac{2 + \sqrt{3}}{6}} \frac{t}{\sigma}, \sqrt{\frac{2 - \sqrt{3}}{6}} \frac{t}{\sigma} \right) \right).
 	\end{align*}
 	
 	Plugging this in, we obtain the final result
 	\begin{align*}
 		q(t) &= \frac{1}{\sqrt{3}} \left( \frac{3}{2} - \frac{3}{2} \exp \left( - \frac{t^2}{3 \sigma^2} \right) I_0 \left( \frac{t^2}{6 \sigma^2} \right) \right) + \frac{1}{4 \sqrt{3}} \int_0^\frac{t^2}{\sigma^2} \exp \left( - \frac{y}{3} \right) I_1 \left( \frac{y}{6} \right) \mathrm{d}y \\
 		&= \frac{1}{\sqrt{3}} \left( \frac{3}{2} - \frac{3}{2} \exp \left( - \frac{t^2}{3 \sigma^2} \right) I_0 \left( \frac{t^2}{6 \sigma^2} \right) \right) \\
-		&\quad + \frac{2 \sqrt{3}}{4 \sqrt{3}} (2 - \sqrt{3}) \left( 1 - Q_1 \left( \frac{2 - \sqrt{3}}{6} \frac{t}{\sigma}, \frac{2 + \sqrt{3}}{6} \frac{t}{\sigma} \right) \right) \\
-		&\quad - \frac{2 \sqrt{3}}{4 \sqrt{3}} (2 + \sqrt{3}) \left( 1 - Q_1 \left( \frac{2 + \sqrt{3}}{6} \frac{t}{\sigma}, \frac{2 - \sqrt{3}}{6} \frac{t}{\sigma} \right) \right) \\
+		&\quad + \frac{2 \sqrt{3}}{4 \sqrt{3}} (2 - \sqrt{3}) \left( 1 - Q_1 \left( \sqrt{\frac{2 - \sqrt{3}}{6}} \frac{t}{\sigma}, \sqrt{\frac{2 + \sqrt{3}}{6}} \frac{t}{\sigma} \right) \right) \\
+		&\quad - \frac{2 \sqrt{3}}{4 \sqrt{3}} (2 + \sqrt{3}) \left( 1 - Q_1 \left( \sqrt{\frac{2 + \sqrt{3}}{6}} \frac{t}{\sigma}, \sqrt{\frac{2 - \sqrt{3}}{6}} \frac{t}{\sigma} \right) \right) \\
 		&= \frac{1}{\sqrt{3}} \left( \frac{3}{2} - \frac{3}{2} \exp \left( - \frac{t^2}{3 \sigma^2} \right) I_0 \left( \frac{t^2}{6 \sigma^2} \right) \right) - \sqrt{3} \\
-		&\quad - \frac{2 - \sqrt{3}}{2} Q_1 \left( \frac{2 - \sqrt{3}}{6} \frac{t}{\sigma}, \frac{2 + \sqrt{3}}{6} \frac{t}{\sigma} \right) \\
-		&\quad + \frac{2 + \sqrt{3}}{2} Q_1 \left( \frac{2 + \sqrt{3}}{6} \frac{t}{\sigma}, \frac{2 - \sqrt{3}}{6} \frac{t}{\sigma} \right) \\
+		&\quad - \frac{2 - \sqrt{3}}{2} Q_1 \left( \sqrt{\frac{2 - \sqrt{3}}{6}} \frac{t}{\sigma}, \sqrt{\frac{2 + \sqrt{3}}{6}} \frac{t}{\sigma} \right) \\
+		&\quad + \frac{2 + \sqrt{3}}{2} Q_1 \left( \sqrt{\frac{2 + \sqrt{3}}{6}} \frac{t}{\sigma}, \sqrt{\frac{2 - \sqrt{3}}{6}} \frac{t}{\sigma} \right) \\
 		&= p_\sigma(t).
 	\end{align*}
 	
 	This finishes the proof of the first equality of equation \eqref{eq: cdf}. Analogously, we can proof $\mathbb{P}_{V_2}( \norm{\Delta^- F(i, j)} \leq t ) = p_\sigma(t)$, finishing the proof of Theorem~\ref{thm: cdf}.
 \end{proof}
+
+\begin{remark}
+	The Marcum Q-function is defined as
+	\begin{equation*}
+		Q_M(a, b) = \int_b^\infty x \left( \frac{x}{a} \right)^{M-1} \exp \left( -\frac{x^2 + a^2}{2} \right) I_{M-1}(a x) \mathrm{d}x.
+	\end{equation*}
+	
+	The cumulative distribution function of a non-central chi distributed random variable with $k$ degrees of freedom and non-centrality parameter $\lambda$ given by $1 - Q_\frac{k}{2}(\lambda, x)$.
+\end{remark}
 
 \begin{corollary}\label{cor: typeIbound}
 	Let $(i, j) \in \Omega$ and $t \in \mathbb{R}^+$. Assume that $F$ follows the statistical model given in \eqref{statmodel2} and let $T(i, j)$ be defined as in \eqref{teststatistic}. Then
@@ -667,34 +655,8 @@ To this end, we note, that $p_\sigma(t_\alpha \cdot \sigma) = p_1(t_\alpha)$. He
 	\label{alg: threshold}
 \end{algorithm}
 
-\begin{figure}[h!]
-	\centering
-	\begin{tikzpicture}
-		\begin{axis}[
-			xlabel=$t$,
-			ylabel=$p_1(t)$,
-			title={Cumulative distribution function $p_1(t)$},
-			grid=both,
-			minor grid style={gray!25},
-			major grid style={gray!25},
-			width=0.75\linewidth,
-			no marks]
-			\addplot[line width=1pt,solid,color=blue] table[x=x,y=y,col sep=comma]{CSV/CDF.csv};
-			\draw (axis cs: 3.2452, 0) -- (axis cs: 3.2452, 0.95);
-			\draw (axis cs: 0, 0.95) -- (axis cs: 3.2554, 0.95);
-			\draw (axis cs: 4.2703, 0) -- (axis cs: 4.2703, 0.99);
-			\draw (axis cs: 0, 0.99) -- (axis cs: 4.2791, 0.99);
-			\filldraw (axis cs: 3.2452, 0.95) circle (2pt);
-			\filldraw (axis cs: 4.2703, 0.99) circle (2pt);
-			\node[below] at (axis cs: 3.2554, 0) {\small{$t_{0.05}$}};
-			\node[below] at (axis cs: 4.2791, 0) {\small{$t_{0.01}$}};
-			\node[left] at (axis cs: 0, 0.95) {\tiny{$0.95$}};
-			\node[left] at (axis cs: 0, 0.99) {\tiny{$0.99$}};
-		\end{axis}
-	\end{tikzpicture}
-	\caption{Plot of the cumulative distribution function $p_1(t)$. The numerically computed thresholds $t_{0.05} = 3.2452$ and $t_{0.01} = 4.2703$ are marked.}
-	\label{fig: cdf}
-\end{figure}
+% Plot cumulative distribution function:
+\input{Figures/cdf}
 
 
 
@@ -854,33 +816,10 @@ These results are not as strong as the results from Theorem \ref{thm: cdf}, as w
 
 We can simulate random variables $V_1$ and $V_2$ as defined in Theorem \ref{thm: typeIIboundssimulation} and in this way obtain empirical estimates of upper and lower bounds for the probability of a type II error depending on the standard deviation $\sigma$ of the noise term in the statistical model \eqref{statmodel2}.
 
-Figure \ref{fig: simulatedboundstypeIIerror} shows the result of this simulation for the thresholds $t_{0.05} = 3.2452$ and $t_{0.01} = 4.2703$, that were computed in Section \ref{section: boundtypeIerror}. A \emph{MATLAB} implementation of the simulation can be found in Appendix \ref{appendix: algorithms}.
+Figure \ref{fig: simulatedboundstypeIIerror} shows the result of this simulation for the thresholds $t_{0.05} = 3.5844$ and $t_{0.01} = 4.6017$, that were computed in Section \ref{section: boundtypeIerror}. A \emph{MATLAB} implementation of the simulation can be found in Appendix \ref{appendix: algorithms}.
 
-\begin{figure}[h!]
-	\centering
-	\begin{tikzpicture}
-		\begin{axis}[
-			legend pos=south east,
-			xlabel=Standard deviation $\sigma$,
-			ylabel=Probability of a type II error,
-			grid=both,
-			minor grid style={gray!25},
-			major grid style={gray!25},
-			width=\linewidth,
-			no marks]
-			\addplot[line width=1pt,dashed,color=blue] table[x=sigma,y=upperBound,col sep=comma]{CSV/resultsPowerSimBounds_alpha0.01.csv};
-			\addlegendentry{Upper bound for $\alpha = 0.01$}
-			\addplot[line width=1pt,dashed,color=red] table[x=sigma,y=upperBound,col sep=comma]{CSV/resultsPowerSimBounds_alpha0.05.csv};
-			\addlegendentry{Upper bound for $\alpha = 0.05$}
-			\addplot[line width=1pt,dotted,color=blue] table[x=sigma,y=lowerBound,col sep=comma]{CSV/resultsPowerSimBounds_alpha0.01.csv};
-			\addlegendentry{Lower bound for $\alpha = 0.01$}
-			\addplot[line width=1pt,dotted,color=red] table[x=sigma,y=lowerBound,col sep=comma]{CSV/resultsPowerSimBounds_alpha0.05.csv};
-			\addlegendentry{Lower bound for $\alpha = 0.05$}
-		\end{axis}
-	\end{tikzpicture}
-	\caption{Simulated bounds for the probability of a type II error. We use the thresholds $t_{0.05} = 3.2452$ for $\alpha = 0.05$ and $t_{0.01} = 4.2703$ for $\alpha = 0.01$. (Sample size: $1.000.000$)}
-	\label{fig: simulatedboundstypeIIerror}
-\end{figure}
+% Plot simulated bounds for the probability of a type II error:
+\input{Figures/simulatedboundstypeIIerror}
 
 Theorem \ref{thm: typeIIboundsintegration} also yields a second way to numerically obtain upper and lower bounds for the probability of a type II error by numerically integrating the right hand side of equations \eqref{eq: typeIIupperboundintegration} and \eqref{eq: typeIIlowerboundintegration}.
 
@@ -1161,125 +1100,17 @@ In the following Figures, we display examples of binary opening and closing to d
 
 In Figure \ref{fig: exampleopening} we see an example of binary morphological opening, whose effect we want to examine. We use a $3 \times 3$ pixel structuring element.
 
-\begin{figure}[ht]
-	\centering
-	\begin{subfigure}[t]{0.45\linewidth}
-		\centering
-		\begin{tikzpicture}[scale=0.45]
-			\draw[help lines, step=1] (-4, -4) grid (4, 4);
-			\foreach \x in {(-3, -1), (-2, -1), (-2, 0), (-2, 1), (-1, -2), (-1, -1), (-1, 0), (-1, 1), (-1, 2), (0, -2), (0, -1), (0, 0), (0, 1), (2, -3), (2, -2), (3, -3), (3, -2)}
-				\filldraw[black] \x rectangle + (1, 1);
-		\end{tikzpicture}
-		\caption{Binary image.}
-		\label{fig: openingbefore}
-	\end{subfigure}
-	\hfill
-	\begin{subfigure}[t]{0.45\linewidth}
-		\centering
-		\begin{tikzpicture}[scale=0.45]
-			\draw[help lines, step=1] (-4, -4) grid (4, 4);
-			\foreach \x in {(-3, -1), (-2, -1), (-2, 0), (-2, 1), (-1, -2), (-1, -1), (-1, 0), (-1, 1), (-1, 2), (0, -2), (0, -1), (0, 0), (0, 1), (2, -3), (2, -2), (3, -3), (3, -2)}
-				\filldraw[gray, opacity=0.5] \x rectangle + (1, 1);
-			\foreach \x in {(-1, 0)}
-				\filldraw[black] \x rectangle + (1, 1);
-		\end{tikzpicture}
-		\caption{Result of binary erosion of the image with a $3 \times 3$ pixel structuring element. The light gray pixels are now set to zero.}
-		\label{fig: openingerosion}
-	\end{subfigure}
-	\vfill
-	\begin{subfigure}[t]{0.45\linewidth}
-		\centering
-		\begin{tikzpicture}[scale=0.45]
-			\draw[help lines, step=1] (-4, -4) grid (4, 4);
-			\foreach \x in {(-3, -1), (-1, -2), (-1, 2), (0, -2), (2, -3), (2, -2), (3, -3), (3, -2)}
-				\filldraw[gray, opacity=0.5] \x rectangle + (1, 1);
-			\foreach \x in {(-2, -1), (-2, 0), (-2, 1), (-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 0), (0, 1)}
-				\filldraw[gray] \x rectangle + (1, 1);
-			\foreach \x in {(-1, 0)}
-				\filldraw[black] \x rectangle + (1, 1);
-		\end{tikzpicture}
-		\caption{Image after binary opening, i.e. erosion and dilation. The dark gray pixels were set to one again.}
-		\label{fig: openingdilation}
-	\end{subfigure}
-	\hfill
-	\begin{subfigure}[t]{0.45\linewidth}
-		\centering
-		\begin{tikzpicture}[scale=0.45]
-			\draw[help lines, step=1] (-4, -4) grid (4, 4);
-			\foreach \x in {(-2, -1), (-2, 0), (-2, 1), (-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 0), (0, 1)}
-				\filldraw[black] \x rectangle + (1, 1);
-		\end{tikzpicture}
-		\caption{Result of opening. Outliers have been eliminated and edges have been smoothed.}
-		\label{fig: openingafter}
-	\end{subfigure}
-	\caption{Example of binary morphological opening.}
-	\label{fig: exampleopening}
-\end{figure}
+% Draw example of morphological opening:
+\input{Figures/exampleopening}
 
 Edges of the larger connected region have been smoothed, making morphological opening a great tool for the smoothing of edges and outlier elimination \cite[p.~69]{imageprocessing}.\\
 
-% ------------------------------------------------------------------------
-
 Figure \ref{fig: exampleclosing} shows an example of binary morphological closing with a $3 \times 3$ pixel structuring element.
 
-\begin{figure}[ht]
-	\centering
-	\begin{subfigure}[t]{0.45\linewidth}
-		\centering
-		\begin{tikzpicture}[scale=0.45]
-			\draw[help lines, step=1] (-4, -4) grid (4, 4);
-			\foreach \x in {(-2, 0), (-2, 2), (1, 1), (1, -2)}
-				\filldraw[black] \x rectangle + (1, 1);
-		\end{tikzpicture}
-		\caption{Binary image.}
-		\label{fig: closingbefore}
-	\end{subfigure}
-	\hfill
-	\begin{subfigure}[t]{0.45\linewidth}
-		\centering
-		\begin{tikzpicture}[scale=0.45]
-			\draw[help lines, step=1] (-4, -4) grid (4, 4);
-			\foreach \x in {(-3, -1), (-3, 0), (-3, 1), (-3, 2), (-3, 3), (-2, -1), (-2, 0), (-2, 1), (-2, 2), (-2, 3), (-1, -1), (-1, 0), (-1, 1), (-1, 2), (-1, 3), (0, -3), (0, -2), (0, -1), (0, 0), (0, 1), (0, 2), (1, -3), (1, -2), (1, -1), (1, 0), (1, 1), (1, 2), (2, -3), (2, -2), (2, -1), (2, 0), (2, 1), (2, 2)}
-				\filldraw[gray] \x rectangle + (1, 1);
-			\foreach \x in {(-2, 0), (-2, 2), (1, 1), (1, -2)}
-				\filldraw[black] \x rectangle + (1, 1);
-		\end{tikzpicture}
-		\caption{Image after binary dilation with a $3 \times 3$ pixel structuring element. The dark gray pixels are now set to one.}
-		\label{fig: closingdilation}
-	\end{subfigure}
-	\vfill
-	\begin{subfigure}[t]{0.45\linewidth}
-		\centering
-		\begin{tikzpicture}[scale=0.45]
-			\draw[help lines, step=1] (-4, -4) grid (4, 4);
-			\foreach \x in {(-3, -1), (-3, 0), (-3, 1), (-3, 2), (-3, 3), (-2, -1), (-2, 3), (-1, -1), (-1, 2), (-1, 3), (0, -3), (0, -2), (0, -1), (0, 2), (1, -3), (1, 2), (2, -3), (2, -2), (2, -1), (2, 0), (2, 1), (2, 2)}
-				\filldraw[gray, opacity=0.5] \x rectangle + (1, 1);
-			\foreach \x in {(-2, 0), (-2, 1), (-2, 2), (-1, 0), (-1, 1), (0, 0), (0, 1), (1, -2), (1, -1), (1, 0), (1, 1)}
-				\filldraw[gray] \x rectangle + (1, 1);
-			\foreach \x in {(-2, 0), (-2, 2), (1, 1), (1, -2)}
-				\filldraw[black] \x rectangle + (1, 1);
-		\end{tikzpicture}
-		\caption{Image after binary closing, i.e. dilation and erosion. The light gray pixels are set to zero again.}
-		\label{fig: closingerosion}
-	\end{subfigure}
-	\hfill
-	\begin{subfigure}[t]{0.45\linewidth}
-		\centering
-		\begin{tikzpicture}[scale=0.45]
-			\draw[help lines, step=1] (-4, -4) grid (4, 4);
-			\foreach \x in {(-2, 0), (-2, 1), (-2, 2), (-1, 0), (-1, 1), (0, 0), (0, 1), (1, -2), (1, -1), (1, 0), (1, 1)}
-				\filldraw[black] \x rectangle + (1, 1);
-		\end{tikzpicture}
-		\caption{Result of closing. The gaps between pixels have been filled.}
-		\label{fig: closingafter}
-	\end{subfigure}
-	\caption{Example of binary morphological closing.}
-	\label{fig: exampleclosing}
-\end{figure}
+% Draw example of morphological closing:
+\input{Figures/exampleclosing}
 
 Morphological closing is frequently used as a tool to fill gaps in binary images, see Fig. \ref{fig: exampleclosing} and \cite[p.~69]{imageprocessing}.
-
-% ------------------------------------------------------------------------
 
 Altogether, both morphological opening and closing are effective tools to smooth edges. Morphological opening achieves this by eliminating outliers, while morphological closing fills gaps.
 
@@ -1301,9 +1132,9 @@ The changes of the upper bound for the probability of a type I error after openi
 	For a statistical significance $\alpha \in (0, 1)$, let $t_\alpha$ be a threshold, such that $\mathbb{P}_V( \norm{\Delta^+ F(\tilde{i}, \tilde{j})} \geq t_\alpha ) \leq \alpha$ for every $(\tilde{i}, \tilde{j}) \in \Omega$ and $V \in \mathcal{H}_0^+(\tilde{i}, \tilde{j})$ and $\mathbb{P}_V( \norm{\Delta^- F(\tilde{i}, \tilde{j})} \geq t_\alpha ) \leq \alpha$ for every $(\tilde{i}, \tilde{j}) \in \Omega$ and $V \in \mathcal{H}_0^-(\tilde{i}, \tilde{j})$, cf. \eqref{setH0+} and \eqref{setH0-}.
 	
 	Let $\mathfrak{I}_\alpha$ be the binary image defined by
-	\begin{equation}
+	\begin{equation*}
 		\mathfrak{I}_\alpha(\tilde{i}, \tilde{j}) = \mathds{1}_{ \{ T(\tilde{i}, \tilde{j}) \geq t_\alpha \} }
-	\end{equation}
+	\end{equation*}
 	for all $(\tilde{i}, \tilde{j}) \in \Omega$.
 	
 	Let $(i, j) \in \Omega$ and let $T(i, j)$ be the test statistic defined in \eqref{teststatistic} and $H_0(i, j)$ be the null hypothesis defined in \eqref{nullhypothesis}.
@@ -1354,7 +1185,7 @@ The changes of the upper bound for the probability of a type I error after openi
 		&\leq \sum_{\ell \in \Phi_\varphi} \mathbb{P}_V\left( \bigcup_{k \in \Phi_\varphi} \bigcap_{\tilde{k}, \tilde{\ell} \in \Phi_\varphi} \left\{ \mathfrak{I}_\alpha(i - k + \tilde{k}, j - \ell + \tilde{\ell}) = 1 \right\} \right).
 	\end{align*}
 	
-	By dropping every term except for $\tilde{k} = k$ in the intersection inside, we obtain
+	By dropping every term except for $\tilde{k} = k$ in the inner intersection, we obtain
 	\begin{align*}
 		\mathbb{P}_V&\left( (\mathfrak{I}_\alpha \circ \Psi_\varphi)(i, j) = 1 \right) \\
 		&\leq \sum_{\ell \in \Phi_\varphi} \mathbb{P}_V\left( \bigcup_{k \in \Phi_\varphi} \bigcap_{\tilde{k} = k, \tilde{\ell} \in \Phi_\varphi} \left\{ \mathfrak{I}_\alpha(i - k + \tilde{k}, j - \ell + \tilde{\ell}) = 1 \right\} \right) \\
@@ -1378,7 +1209,7 @@ The changes of the upper bound for the probability of a type I error after openi
 		&= \sum_{\ell \in \Phi_\varphi} \mathbb{P}_V\left( \bigcap_{\tilde{\ell} \in \Phi_\varphi} \left( \left\{ \norm{\Delta^+ F(i, j - \ell + \tilde{\ell})} \geq t_\alpha \right\} \cap \left\{ \norm{\Delta^- F(i, j - \ell + \tilde{\ell})} \geq t_\alpha \right\} \right) \right).
 	\end{align*}
 	
-	In the case $V \in \mathcal{H}_0^{(1)}(i, j)$, the values of $\norm{\Delta^+ V(i, j - \ell + \tilde{\ell})}$ are unknown. Thus, we do not know the distribution of the random variables $\norm{\Delta^+ F(i, j - \ell + \tilde{\ell})}$ and we drop the events $\left\{ \norm{\Delta^+ F(i, j - \ell + \tilde{\ell})} \geq t_\alpha \right\}$ to obtain
+	In the case $V \in \mathcal{H}_0^{(1)}(i, j) \subseteq \mathcal{H}_0^-(i, j)$, the values of $\norm{\Delta^+ V(i, j - \ell + \tilde{\ell})}$ are unknown. Thus, we do not know the distribution of the random variables $\norm{\Delta^+ F(i, j - \ell + \tilde{\ell})}$ and we drop the events $\left\{ \norm{\Delta^+ F(i, j - \ell + \tilde{\ell})} \geq t_\alpha \right\}$ to obtain
 	\begin{align*}
 		\mathbb{P}_V&\left( (\mathfrak{I}_\alpha \circ \Psi_\varphi)(i, j) = 1 \right) \\
 		&\leq \sum_{\ell \in \Phi_\varphi} \mathbb{P}_V\left( \bigcap_{\tilde{\ell} \in \Phi_\varphi} \left( \left\{ \norm{\Delta^+ F(i, j - \ell + \tilde{\ell})} \geq t_\alpha \right\} \cap \left\{ \norm{\Delta^- F(i, j - \ell + \tilde{\ell})} \geq t_\alpha \right\} \right) \right) \\
@@ -1388,36 +1219,7 @@ The changes of the upper bound for the probability of a type I error after openi
 	Define a subset $\tilde{\Phi}_\varphi = \left\{ -\frac{\varphi - 1}{2}, -\frac{\varphi - 5}{2}, \dots, \frac{\varphi - 5}{2}, \frac{\varphi - 1}{2} \right\}$ of $\Phi_\varphi$. Since $\Delta^- F(i, j)$ only depends on the pixels $(i, j), (i - 1, j)$ and $(i, j - 1)$, the set $\left\{ \norm{\Delta^- F(i, j - \ell + \tilde{\ell})} \mid \tilde{\ell} \in \tilde{\Phi}_\varphi \right\}$ is a set of independent random variables for fixed $\ell \in \Phi_\varphi$, see Figure \ref{fig: independentpoints}.
 	
 	% Draw picture of independent pixels:
-	\begin{figure}[h]
-		\centering
-		\begin{tikzpicture}
-			\foreach \i in {-6, ..., 5}
-				\foreach \j in {-6, ..., 5}
-					\filldraw[gray] (\i, \j) rectangle + (1, 1);
-			\foreach \i in {-4, ..., 5}
-				\foreach \j in {-6, ..., 0}
-					{
-						\pgfmathparse{mod(\i+\j, 2) ? "black" : "white"}
-						\edef\colour{\pgfmathresult}
-						\filldraw[fill=\colour] (\i, \j) rectangle + (1, 1);
-					}
-			\foreach \x in {(-2, 1), (-3, 1), (-2, 2)}
-				\filldraw[red] \x rectangle + (1, 1);
-			\foreach \x in {(0, 1), (-1, 1), (0, 2)}
-				\filldraw[green] \x rectangle + (1, 1);
-			\foreach \x in {(2, 1), (1, 1), (2, 2)}
-				\filldraw[blue] \x rectangle + (1, 1);
-			\draw[step=1] (-6, -6) grid (6, 6);
-			\node at (0.5, 1.5) {$(i, j)$};
-			\node at (-5.5, 5.5) {$(1, 1)$};
-			\node at (-4.5, 5.5) {$(1, 2)$};
-			\node at (-3.5, 5.5) {$\dots$};
-			\node at (-5.5, 4.5) {$(2, 1)$};
-			\node at (-5.5, 3.5) {$\vdots$};
-		\end{tikzpicture}
-		\caption{The random variable $\norm{\Delta^- F(i, j)}$ only depends on the green pixels, $\norm{\Delta^- F(i, j - 2)}$ depends on the red pixels and $\norm{\Delta^- F(i, j + 2)}$ on the blue pixels. Since these are all distinct from another, the random variables are independent.}
-		\label{fig: independentpoints}
-	\end{figure}
+	\input{Figures/independentpoints}
 	
 	We drop the terms in $\Phi_\varphi \setminus \tilde{\Phi}_\varphi$ and use the independence to obtain
 	\begin{align*}
@@ -1504,9 +1306,9 @@ We will need the additional assumption, that the region of interest is sufficien
 	for some $\beta \in (0, 1)$ and all $(\tilde{i}, \tilde{j}) \in \Omega$ and $V \in \mathcal{H}_1(\tilde{i}, \tilde{j})$, cf. \eqref{setH1}.
 	
 	Let $\mathfrak{I}$ be the binary image defined by
-	\begin{equation}
+	\begin{equation*}
 		\mathfrak{I}(\tilde{i}, \tilde{j}) = \mathds{1}_{ \{ T(\tilde{i}, \tilde{j}) \geq t \} }
-	\end{equation}
+	\end{equation*}
 	for all $(\tilde{i}, \tilde{j}) \in \Omega$.
 	
 	Let $(i, j) \in \Omega$ and let $T(i, j)$ be the test statistic defined in \eqref{teststatistic} and $H_1(i, j)$ be the alternative hypothesis defined in \eqref{alternativehypothesis}.
@@ -1523,32 +1325,8 @@ We will need the additional assumption, that the region of interest is sufficien
 \begin{proof}
 	We start by proving inequality \eqref{ineq: typeIIopening}. We use a similar approach as in Theorem \ref{thm: typeIinequalities} by finding indices $(k_0, \ell_0) \in \Psi_\varphi$, such that the alternative hypotheses $H_1(i - k_0 + \tilde{k}, j - \ell_0 + \tilde{\ell})$ are true for all $\tilde{k}, \tilde{\ell} \in \Phi_\varphi$. Figure \ref{fig: setofforegroundpixels} shows, that we can find such indices even for the case of a corner pixel. A constructive proof can be found in Appendix \ref{appendix: proofs}.
 	
-	\begin{figure}[h]
-		\centering
-		\begin{tikzpicture}
-			\foreach \i in {-5, ..., 4}
-				\foreach \j in {-5, ..., 4}
-					\filldraw[white] (\i, \j) rectangle + (1, 1);
-			\foreach \i in {-3, ..., 4}
-				\foreach \j in {-5, ..., 1}
-					\filldraw[gray, opacity=0.5] (\i, \j) rectangle + (1, 1);
-			\foreach \i in {-3, ..., 1}
-				\foreach \j in {-3, ..., 1}
-					\filldraw[gray] (\i, \j) rectangle + (1, 1);
-			\draw[step=1] (-5, -5) grid (5, 5);
-			\node at (-2.5, 1.5) {$(i, j)$};
-			\node at (-1.5, 1.5) {$\dots$};
-			\node at (-2.5, 0.5) {$\vdots$};
-			\node at (-0.5, -0.5) {$(i - k_0, j - \ell_0)$};
-			\node at (-4.5, 4.5) {$(1, 1)$};
-			\node at (-3.5, 4.5) {$(1, 2)$};
-			\node at (-2.5, 4.5) {$\dots$};
-			\node at (-4.5, 3.5) {$(2, 1)$};
-			\node at (-4.5, 2.5) {$\vdots$};
-		\end{tikzpicture}
-		\caption{White pixels represent background, light gray pixels represent foreground. The indices $(k_0, \ell_0) \in \Psi_\varphi$ are chosen, such that for all $\tilde{k}, \tilde{\ell} \in \Phi_\varphi$ the pixels $(i - k_0 + \tilde{k}, j - \ell_0 + \tilde{\ell})$ belong to the foreground. These pixels are marked as dark gray.}
-		\label{fig: setofforegroundpixels}
-	\end{figure}
+	% Draw picture of foreground pixels:
+	\input{Figures/setofforegroundpixels}
 	
 	The alternative hypotheses $H_1(i - k_0 + \tilde{k}, j - \ell_0 + \tilde{\ell})$ being true for all $\tilde{k}, \tilde{\ell} \in \Phi_\varphi$ implies $V \in \bigcap_{\tilde{k}, \tilde{\ell} \in \Phi_\varphi} \mathcal{H}_1(i - k_0 + \tilde{k}, j - \ell_0 + \tilde{\ell})$.
 	
@@ -1621,7 +1399,7 @@ Note, that any improvements of the upper bound in inequality \eqref{ineq: typeII
 
 For simulation, we randomly generated 5 images with a rectangular region of interest with a checkerboard pattern for each image size $128 \times 128$, $256 \times 256$ and $512 \times 512$ pixels. For each image we randomly generated $50$ different noise terms.
 
-In Figure \ref{fig: simulationresults} we see the proportion of falsely classified pixels after binarization through the statistical test, opening and closing. After binarization, the proportion of background pixels that were falsely classified as foreground is below the chosen statistical significance $\alpha = 0.05$. It is almost constant across all values of the standard deviation $\sigma$. We performed opening and closing with a $3 \times 3$ pixel structuring element. Opening reduces the proportion of falsely classified background pixels to almost zero. Applying closing does not change that.
+In Figure \ref{fig: normal_alpha0.05_phi3} we see the proportion of falsely classified pixels after binarization through the statistical test, opening and closing. After binarization, the proportion of background pixels that were falsely classified as foreground is below the chosen statistical significance $\alpha = 0.05$. It is almost constant across all values of the standard deviation $\sigma$. We performed opening and closing with a $3 \times 3$ pixel structuring element. Opening reduces the proportion of falsely classified background pixels to almost zero. Applying closing does not change that.
 
 In contrast to that, the proportion of falsely classified foreground pixels is almost zero for low standard deviations $\sigma$ but greatly increases, as $\sigma$ increases. For high values of $\sigma$ opening greatly increases the proportion of falsely classified foreground pixels. Closing fixes this only to a certain extent. For values up to $\sigma = 65$ for $128 \times 128$ pixels, $\sigma = 67$ for $256 \times 256$ pixels and $\sigma = 68$ for $512 \times 512$ pixels it reduces the proportion of type II errors below that of binarization. For higher values of $\sigma$ this improvement can not be observed and the effect of closing becomes negligible.
 
@@ -1629,319 +1407,15 @@ Using a relaxed statistical significance $\tilde{\alpha} = \left( \frac{\alpha}{
 \begin{equation*}
 	\mathbb{P}_V\left( ((\mathfrak{I}_{\tilde{\alpha}} \circ \Psi_\varphi) \bullet \Psi_\varphi)(i, j) = 1 \right) \leq \varphi^3 \left( \left( \frac{\alpha}{\varphi^3} \right)^{\frac{2}{\varphi + 1}} \right)^{\frac{\varphi + 1}{2}} \leq \alpha
 \end{equation*}
-by inequality \eqref{ineq: typeIclosing}. This way, we can bound the probability of a type I error after opening and closing below a given statistical significance $\alpha$. The results of this approach are displayed in Figure \ref{fig: simulationresults_relaxed}. The proportion of type I errors after opening and closing is below the given statistical significance, while the number of type II errors for higher values of $\sigma$ has decreased. This allows the proportion of type II errors after opening and closing to be lower than that of binarization up to $\sigma = 74$ for $128 \times 128$ pixels, $\sigma = 77$ for $256 \times 256$ pixels and $\sigma = 79$ for $512 \times 512$ pixels.
+by inequality \eqref{ineq: typeIclosing}. This way, we can bound the probability of a type I error after opening and closing below a given statistical significance $\alpha$. The results of this approach are displayed in Figure \ref{fig: relaxed_alpha0.05_phi3}. The proportion of type I errors after opening and closing is below the given statistical significance, while the number of type II errors for higher values of $\sigma$ has decreased. This allows the proportion of type II errors after opening and closing to be lower than that of binarization up to $\sigma = 74$ for $128 \times 128$ pixels, $\sigma = 77$ for $256 \times 256$ pixels and $\sigma = 79$ for $512 \times 512$ pixels.
 
 Simulations for larger structuring elements as well as for $\alpha = 0.01$ and the code used for the simulation can be found in the appendix.
 
-\begin{figure}[H]
-	\centering
-	\begin{subfigure}[t]{0.48\linewidth}
-		\centering
-		\begin{tikzpicture}
-			\begin{axis}[
-				legend pos=north west,
-				legend style={nodes={scale=0.5, transform shape}},
-				grid=both,
-				minor grid style={gray!25},
-				major grid style={gray!25},
-				ymin=-0.05,
-				ymax=1.05,
-				width=\linewidth,
-				no marks]
-				\addplot[line width=1pt,dashed,color=blue] table[x=sigma,y=probtypeI,col sep=comma]{CSV/Dimensions/resultsErrorTestCasesTypeI_128x128.csv};
-				\addlegendentry{Binarization}
-				\addplot[line width=1pt,dashed,color=red] table[x=sigma,y=probtypeI,col sep=comma]{CSV/Dimensions/resultsErrorTestCasesTypeI_128x128_o.csv};
-				\addlegendentry{Opening}
-				\addplot[line width=1pt,dashed,color=gray] table[x=sigma,y=probtypeI,col sep=comma]{CSV/Dimensions/resultsErrorTestCasesTypeI_128x128_oc.csv};
-				\addlegendentry{Opening \& Closing}
-			\end{axis}
-		\end{tikzpicture}
-		\caption{Proportion of type I errors for images with size $128 \times 128$.}
-		\label{fig: simulationresultstypeI_128}
-	\end{subfigure}
-	\hfill
-	\begin{subfigure}[t]{0.48\linewidth}
-		\centering
-		\begin{tikzpicture}
-			\begin{axis}[
-				legend pos=north west,
-				legend style={nodes={scale=0.5, transform shape}},
-				grid=both,
-				minor grid style={gray!25},
-				major grid style={gray!25},
-				ymin=-0.05,
-				ymax=1.05,
-				width=\linewidth,
-				no marks]
-				\addplot[line width=1pt,dashed,color=blue] table[x=sigma,y=probtypeII,col sep=comma]{CSV/Dimensions/resultsErrorTestCasesTypeII_128x128.csv};
-				\addlegendentry{Binarization}
-				\addplot[line width=1pt,dashed,color=red] table[x=sigma,y=probtypeII,col sep=comma]{CSV/Dimensions/resultsErrorTestCasesTypeII_128x128_o.csv};
-				\addlegendentry{Opening}
-				\addplot[line width=1pt,dashed,color=gray] table[x=sigma,y=probtypeII,col sep=comma]{CSV/Dimensions/resultsErrorTestCasesTypeII_128x128_oc.csv};
-				\addlegendentry{Opening \& Closing}
-			\end{axis}
-		\end{tikzpicture}
-		\caption{Proportion of type II errors for images with size $128 \times 128$.}
-		\label{fig: simulationresultstypeII_128}
-	\end{subfigure}
-	\vfill
-	\begin{subfigure}[t]{0.48\linewidth}
-		\centering
-		\begin{tikzpicture}
-			\begin{axis}[
-				legend pos=north west,
-				legend style={nodes={scale=0.5, transform shape}},
-				grid=both,
-				minor grid style={gray!25},
-				major grid style={gray!25},
-				ymin=-0.05,
-				ymax=1.05,
-				width=\linewidth,
-				no marks]
-				\addplot[line width=1pt,dashed,color=blue] table[x=sigma,y=probtypeI,col sep=comma]{CSV/Dimensions/resultsErrorTestCasesTypeI_256x256.csv};
-				\addlegendentry{Binarization}
-				\addplot[line width=1pt,dashed,color=red] table[x=sigma,y=probtypeI,col sep=comma]{CSV/Dimensions/resultsErrorTestCasesTypeI_256x256_o.csv};
-				\addlegendentry{Opening}
-				\addplot[line width=1pt,dashed,color=gray] table[x=sigma,y=probtypeI,col sep=comma]{CSV/Dimensions/resultsErrorTestCasesTypeI_256x256_oc.csv};
-				\addlegendentry{Opening \& Closing}
-			\end{axis}
-		\end{tikzpicture}
-		\caption{Proportion of type I errors for images with size $256 \times 256$.}
-		\label{fig: simulationresultstypeI_256}
-	\end{subfigure}
-	\hfill
-	\begin{subfigure}[t]{0.48\linewidth}
-		\centering
-		\begin{tikzpicture}
-			\begin{axis}[
-				legend pos=north west,
-				legend style={nodes={scale=0.5, transform shape}},
-				grid=both,
-				minor grid style={gray!25},
-				major grid style={gray!25},
-				ymin=-0.05,
-				ymax=1.05,
-				width=\linewidth,
-				no marks]
-				\addplot[line width=1pt,dashed,color=blue] table[x=sigma,y=probtypeII,col sep=comma]{CSV/Dimensions/resultsErrorTestCasesTypeII_256x256.csv};
-				\addlegendentry{Binarization}
-				\addplot[line width=1pt,dashed,color=red] table[x=sigma,y=probtypeII,col sep=comma]{CSV/Dimensions/resultsErrorTestCasesTypeII_256x256_o.csv};
-				\addlegendentry{Opening}
-				\addplot[line width=1pt,dashed,color=gray] table[x=sigma,y=probtypeII,col sep=comma]{CSV/Dimensions/resultsErrorTestCasesTypeII_256x256_oc.csv};
-				\addlegendentry{Opening \& Closing}
-			\end{axis}
-		\end{tikzpicture}
-		\caption{Proportion of type II errors for images with size $256 \times 256$.}
-		\label{fig: simulationresultstypeII_256}
-	\end{subfigure}
-	\vfill
-	\begin{subfigure}[t]{0.48\linewidth}
-		\centering
-		\begin{tikzpicture}
-			\begin{axis}[
-				legend pos=north west,
-				legend style={nodes={scale=0.5, transform shape}},
-				grid=both,
-				minor grid style={gray!25},
-				major grid style={gray!25},
-				ymin=-0.05,
-				ymax=1.05,
-				width=\linewidth,
-				no marks]
-				\addplot[line width=1pt,dashed,color=blue] table[x=sigma,y=probtypeI,col sep=comma]{CSV/Dimensions/resultsErrorTestCasesTypeI_512x512.csv};
-				\addlegendentry{Binarization}
-				\addplot[line width=1pt,dashed,color=red] table[x=sigma,y=probtypeI,col sep=comma]{CSV/Dimensions/resultsErrorTestCasesTypeI_512x512_o.csv};
-				\addlegendentry{Opening}
-				\addplot[line width=1pt,dashed,color=gray] table[x=sigma,y=probtypeI,col sep=comma]{CSV/Dimensions/resultsErrorTestCasesTypeI_512x512_oc.csv};
-				\addlegendentry{Opening \& Closing}
-			\end{axis}
-		\end{tikzpicture}
-		\caption{Proportion of type I errors for images with size $512 \times 512$.}
-		\label{fig: simulationresultstypeI_512}
-	\end{subfigure}
-	\hfill
-	\begin{subfigure}[t]{0.48\linewidth}
-		\centering
-		\begin{tikzpicture}
-			\begin{axis}[
-				legend pos=north west,
-				legend style={nodes={scale=0.5, transform shape}},
-				grid=both,
-				minor grid style={gray!25},
-				major grid style={gray!25},
-				ymin=-0.05,
-				ymax=1.05,
-				width=\linewidth,
-				no marks]
-				\addplot[line width=1pt,dashed,color=blue] table[x=sigma,y=probtypeII,col sep=comma]{CSV/Dimensions/resultsErrorTestCasesTypeII_512x512.csv};
-				\addlegendentry{Binarization}
-				\addplot[line width=1pt,dashed,color=red] table[x=sigma,y=probtypeII,col sep=comma]{CSV/Dimensions/resultsErrorTestCasesTypeII_512x512_o.csv};
-				\addlegendentry{Opening}
-				\addplot[line width=1pt,dashed,color=gray] table[x=sigma,y=probtypeII,col sep=comma]{CSV/Dimensions/resultsErrorTestCasesTypeII_512x512_oc.csv};
-				\addlegendentry{Opening \& Closing}
-			\end{axis}
-		\end{tikzpicture}
-		\caption{Proportion of type II errors for images with size $512 \times 512$.}
-		\label{fig: simulationresultstypeII_512}
-	\end{subfigure}
-	\caption{Proportion of type I \& II errors after binarization, opening and closing. The $x$-axes display the standard deviation $\sigma$ and the $y$-axes the proportion of falsely classified pixels. For sizes $128 \times 128$, $256 \times 256$, $512 \times 512$ the images were randomly generated with 5 images per size. For each image 50 different noises were randomly generated. We used a $3 \times 3$ pixel structuring element and chose $\alpha = 0.05$.}
-	\label{fig: simulationresults}
-\end{figure}
-
-\begin{figure}[H]
-	\centering
-	\begin{subfigure}[t]{0.48\linewidth}
-		\centering
-		\begin{tikzpicture}
-			\begin{axis}[
-				legend pos=north west,
-				legend style={nodes={scale=0.5, transform shape}},
-				grid=both,
-				minor grid style={gray!25},
-				major grid style={gray!25},
-				ymin=-0.05,
-				ymax=1.05,
-				width=\linewidth,
-				no marks]
-				\addplot[line width=1pt,dashed,color=blue] table[x=sigma,y=probtypeI,col sep=comma]{CSV/Dimensions/resultsErrorTestCasesTypeI_128x128_relaxed.csv};
-				\addlegendentry{Binarization}
-				\addplot[line width=1pt,dashed,color=red] table[x=sigma,y=probtypeI,col sep=comma]{CSV/Dimensions/resultsErrorTestCasesTypeI_128x128_o_relaxed.csv};
-				\addlegendentry{Opening}
-				\addplot[line width=1pt,dashed,color=gray] table[x=sigma,y=probtypeI,col sep=comma]{CSV/Dimensions/resultsErrorTestCasesTypeI_128x128_oc_relaxed.csv};
-				\addlegendentry{Opening \& Closing}
-			\end{axis}
-		\end{tikzpicture}
-		\caption{Proportion of type I errors for images with size $128 \times 128$.}
-		\label{fig: simulationresultstypeI_128_relaxed}
-	\end{subfigure}
-	\hfill
-	\begin{subfigure}[t]{0.48\linewidth}
-		\centering
-		\begin{tikzpicture}
-			\begin{axis}[
-				legend pos=north west,
-				legend style={nodes={scale=0.5, transform shape}},
-				grid=both,
-				minor grid style={gray!25},
-				major grid style={gray!25},
-				ymin=-0.05,
-				ymax=1.05,
-				width=\linewidth,
-				no marks]
-				\addplot[line width=1pt,dashed,color=blue] table[x=sigma,y=probtypeII,col sep=comma]{CSV/Dimensions/resultsErrorTestCasesTypeII_128x128_relaxed.csv};
-				\addlegendentry{Binarization}
-				\addplot[line width=1pt,dashed,color=red] table[x=sigma,y=probtypeII,col sep=comma]{CSV/Dimensions/resultsErrorTestCasesTypeII_128x128_o_relaxed.csv};
-				\addlegendentry{Opening}
-				\addplot[line width=1pt,dashed,color=gray] table[x=sigma,y=probtypeII,col sep=comma]{CSV/Dimensions/resultsErrorTestCasesTypeII_128x128_oc_relaxed.csv};
-				\addlegendentry{Opening \& Closing}
-			\end{axis}
-		\end{tikzpicture}
-		\caption{Proportion of type II errors for images with size $128 \times 128$.}
-		\label{fig: simulationresultstypeII_128_relaxed}
-	\end{subfigure}
-	\vfill
-	\begin{subfigure}[t]{0.48\linewidth}
-		\centering
-		\begin{tikzpicture}
-			\begin{axis}[
-				legend pos=north west,
-				legend style={nodes={scale=0.5, transform shape}},
-				grid=both,
-				minor grid style={gray!25},
-				major grid style={gray!25},
-				ymin=-0.05,
-				ymax=1.05,
-				width=\linewidth,
-				no marks]
-				\addplot[line width=1pt,dashed,color=blue] table[x=sigma,y=probtypeI,col sep=comma]{CSV/Dimensions/resultsErrorTestCasesTypeI_256x256_relaxed.csv};
-				\addlegendentry{Binarization}
-				\addplot[line width=1pt,dashed,color=red] table[x=sigma,y=probtypeI,col sep=comma]{CSV/Dimensions/resultsErrorTestCasesTypeI_256x256_o_relaxed.csv};
-				\addlegendentry{Opening}
-				\addplot[line width=1pt,dashed,color=gray] table[x=sigma,y=probtypeI,col sep=comma]{CSV/Dimensions/resultsErrorTestCasesTypeI_256x256_oc_relaxed.csv};
-				\addlegendentry{Opening \& Closing}
-			\end{axis}
-		\end{tikzpicture}
-		\caption{Proportion of type I errors for images with size $256 \times 256$.}
-		\label{fig: simulationresultstypeI_256_relaxed}
-	\end{subfigure}
-	\hfill
-	\begin{subfigure}[t]{0.48\linewidth}
-		\centering
-		\begin{tikzpicture}
-			\begin{axis}[
-				legend pos=north west,
-				legend style={nodes={scale=0.5, transform shape}},
-				grid=both,
-				minor grid style={gray!25},
-				major grid style={gray!25},
-				ymin=-0.05,
-				ymax=1.05,
-				width=\linewidth,
-				no marks]
-				\addplot[line width=1pt,dashed,color=blue] table[x=sigma,y=probtypeII,col sep=comma]{CSV/Dimensions/resultsErrorTestCasesTypeII_256x256_relaxed.csv};
-				\addlegendentry{Binarization}
-				\addplot[line width=1pt,dashed,color=red] table[x=sigma,y=probtypeII,col sep=comma]{CSV/Dimensions/resultsErrorTestCasesTypeII_256x256_o_relaxed.csv};
-				\addlegendentry{Opening}
-				\addplot[line width=1pt,dashed,color=gray] table[x=sigma,y=probtypeII,col sep=comma]{CSV/Dimensions/resultsErrorTestCasesTypeII_256x256_oc_relaxed.csv};
-				\addlegendentry{Opening \& Closing}
-			\end{axis}
-		\end{tikzpicture}
-		\caption{Proportion of type II errors for images with size $256 \times 256$.}
-		\label{fig: simulationresultstypeII_256_relaxed}
-	\end{subfigure}
-	\vfill
-	\begin{subfigure}[t]{0.48\linewidth}
-		\centering
-		\begin{tikzpicture}
-			\begin{axis}[
-				legend pos=north west,
-				legend style={nodes={scale=0.5, transform shape}},
-				grid=both,
-				minor grid style={gray!25},
-				major grid style={gray!25},
-				ymin=-0.05,
-				ymax=1.05,
-				width=\linewidth,
-				no marks]
-				\addplot[line width=1pt,dashed,color=blue] table[x=sigma,y=probtypeI,col sep=comma]{CSV/Dimensions/resultsErrorTestCasesTypeI_512x512_relaxed.csv};
-				\addlegendentry{Binarization}
-				\addplot[line width=1pt,dashed,color=red] table[x=sigma,y=probtypeI,col sep=comma]{CSV/Dimensions/resultsErrorTestCasesTypeI_512x512_o_relaxed.csv};
-				\addlegendentry{Opening}
-				\addplot[line width=1pt,dashed,color=gray] table[x=sigma,y=probtypeI,col sep=comma]{CSV/Dimensions/resultsErrorTestCasesTypeI_512x512_oc_relaxed.csv};
-				\addlegendentry{Opening \& Closing}
-			\end{axis}
-		\end{tikzpicture}
-		\caption{Proportion of type I errors for images with size $512 \times 512$.}
-		\label{fig: simulationresultstypeI_512_relaxed}
-	\end{subfigure}
-	\hfill
-	\begin{subfigure}[t]{0.48\linewidth}
-		\centering
-		\begin{tikzpicture}
-			\begin{axis}[
-				legend pos=north west,
-				legend style={nodes={scale=0.5, transform shape}},
-				grid=both,
-				minor grid style={gray!25},
-				major grid style={gray!25},
-				ymin=-0.05,
-				ymax=1.05,
-				width=\linewidth,
-				no marks]
-				\addplot[line width=1pt,dashed,color=blue] table[x=sigma,y=probtypeII,col sep=comma]{CSV/Dimensions/resultsErrorTestCasesTypeII_512x512_relaxed.csv};
-				\addlegendentry{Binarization}
-				\addplot[line width=1pt,dashed,color=red] table[x=sigma,y=probtypeII,col sep=comma]{CSV/Dimensions/resultsErrorTestCasesTypeII_512x512_o_relaxed.csv};
-				\addlegendentry{Opening}
-				\addplot[line width=1pt,dashed,color=gray] table[x=sigma,y=probtypeII,col sep=comma]{CSV/Dimensions/resultsErrorTestCasesTypeII_512x512_oc_relaxed.csv};
-				\addlegendentry{Opening \& Closing}
-			\end{axis}
-		\end{tikzpicture}
-		\caption{Proportion of type II errors for images with size $512 \times 512$.}
-		\label{fig: simulationresultstypeII_512_relaxed}
-	\end{subfigure}
-	\caption{Proportion of type I \& II errors after binarization, opening and closing. The $x$-axes display the standard deviation $\sigma$ and the $y$-axes the proportion of falsely classified pixels. For sizes $128 \times 128$, $256 \times 256$, $512 \times 512$ the images were randomly generated with 5 images per size. For each image 50 different noises were randomly generated. We used a $3 \times 3$ pixel structuring element and chose a relaxed statistical significance $\tilde{\alpha} = \left( \frac{0.05}{3^3} \right)^{\frac{2}{3 + 1}}$.}
-	\label{fig: simulationresults_relaxed}
-\end{figure}
+\input{Figures/simulatedpixeltypes}
+%
+%\input{CSV/normal_alpha0.05_phi3}
+%
+%\input{CSV/relaxed_alpha0.05_phi3}
 
 \newpage
 
@@ -1949,17 +1423,21 @@ Simulations for larger structuring elements as well as for $\alpha = 0.01$ and t
 
 \section{Discussion}\label{section: conclusion}
 
-Theorems \ref{thm: typeIinequalities} and \ref{thm: typeIIinequalities} give us a better understanding of the effects of morphological opening and closing on the error probabilities, when testing for a region of interest. The results were obtained by exploiting the prior knowledge of some properties of the region of interest. Namely, we used the fact, that the region of interest is rectangular and has a checkerboard pattern.
+In this thesis we consider how the upper bounds for the error probabilities of a statistical test change, when morphological opening and closing are applied. To this end, we examine a simplified model and develop a thresholding method to extract the region of interest. The simplified model and thresholding method are designed, such that the probability of a type I error can be bounded by a given statistical significance. This is achieved by computing a suitable threshold based on the target statistical significance.
 
-Especially the exponent $\frac{\varphi + 1}{2}$ in inequality \eqref{ineq: typeIopening} is of high interest. It is worth noting, that we were able to get this exponent, because we chose a perfectly fitting structuring element, i.e. we used a square structuring element for a rectangular region of interest. The choice of the structuring element is substantial. A different shaped structuring element could lead to no improvements of the error probabilities, but since we have $\Theta \circ \Psi \subseteq \Theta$ for any structuring element $\Psi$, the probability of a type I error can not get worse through morphological opening.
+Theorems \ref{thm: typeIinequalities} and \ref{thm: typeIIinequalities} quantify upper bounds for the error rates after morphological opening and closing are applied to the outcome of the statistical test. The upper bounds are stated in terms of the structuring element and the upper bounds for the error probabilities before morphological operations are applied. This was done by exploiting prior knowledge of properties of the region of interest.
 
-Generalizations of the results from Sections \ref{section: statisticalmodel} and \ref{section: boundtypeIerror} to convex regions of interest with a checkerboard pattern are possible. Since these regions of interest are not necessarily rectangular, it is not possible to choose a structuring element, that is well suited for all cases. This means, that the results from Section \ref{section: mainresults} can not be easily generalized. For shapes of the region of interest, where the structuring element can be chosen to be well suited for all cases, results similar to Theorems \ref{thm: typeIinequalities} and \ref{thm: typeIIinequalities} seem possible.
+In particular, we were able to obtain the exponent $\frac{\varphi + 1}{2}$ in inequality \eqref{ineq: typeIopening} through the choice of the structuring element. For a background pixel to be falsely identified as foreground after opening, at least $\frac{\varphi + 1}{2}$ many pixels background pixels have to be falsely categorized by the binarization through the statistical test. This is the \emph{minimum number of independent points in a structuring element} that can lead to a false categorization of a background pixel.
 
-We consider the setting of Theorem \ref{thm: typeIinequalities} again, i.e. a rectangular region of interest. For a background pixel to be falsely identified as foreground after opening, at least $\frac{\varphi + 1}{2}$ many pixels background pixels have to be falsely categorized by the binarization through the statistical test. This is the \emph{minimum number of independent points in a structuring element} that can lead to a false categorization of a background pixel. With this connection in mind, the techniques to prove the main results of this thesis might present themselves useful for the aforementioned other shapes of the region of interest.
+A different shaped structuring element could lead to no improvements of the error probabilities. To see this, consider a diamond shaped structuring element. A background pixel at the edge of the region of interest, cf. Figure \ref{fig: background_edge}, that is falsely classified by the statistical test, would not be correctly identified as a background pixel, when morphological opening with a diamond shaped structuring element is applied. Thus, the upper bound of this probability in this case does not decrease through application of morphological opening. Hence, we see, that the choice of the structuring element is substantial.
 
-It is also important to note, that the main results of this thesis only considered the categorization of a single pixel. Since we perform tests for all pixels at once, the analysis of techniques from multiple testing in connection with morphological operations would be an interesting field of study to expand the results of this thesis. When researching the connection between multiple testing and morphological operations, one might consider morphological operators, that go beyond the scope of this thesis. Namely, the convex hull operator is of high interest in the extraction of the region of interest of a fingerprint.
+Since we only considered the categorization of a single pixel, a natural next step could be an expansion beyond the scope of this thesis by applying techniques from the field of multiple testing. When researching the connection between multiple testing and morphological operations, one might consider more morphological operators. Namely, the convex hull operator is of high interest in the extraction of the region of interest of a fingerprint.
+
+Generalizations of the results from Sections \ref{section: statisticalmodel} and \ref{section: boundtypeIerror} to convex regions of interest with a checkerboard pattern are possible. For the reasons described above, the choice of the structuring element for a convex region of interest is a question to ponder on. Advances could be achieved in conjunction with multiple testing techniques, since the choice of the structuring element is mainly a limiting factor for pixels close to the edge of the region of interest, which form only a subset of the total pixels in the image.
 
 \newpage
+
+
 
 % Settings for Matlab code inclusion
 \definecolor{mygreen}{rgb}{0,0.6,0}
@@ -2104,33 +1582,8 @@ It is also important to note, that the main results of this thesis only consider
 			&\leq \sum_{k, \ell \in \Phi_\varphi} \mathbb{P}_V\left( \bigcap_{r + \tilde{k}, s + \tilde{\ell} \in \{ - ( \varphi - 1 ), \varphi - 1 \}} \bigcup_{\tilde{r}, \tilde{s} \in \Phi_\varphi} \{ \mathfrak{I}(i + k - \tilde{k} - r + \tilde{r}, j + \ell - \tilde{\ell} - s + \tilde{s}) = 0 \} \right).
 		\end{align*}
 		
-		\begin{figure}[t!]
-			\centering
-			\resizebox{\textwidth}{!}{
-				\begin{tikzpicture}
-					\foreach \i in {-6, ..., 6}
-						\foreach \j in {-6, ..., 6}
-							\filldraw[black, opacity=0.7] (\i, \j) rectangle + (1, 1);
-					\foreach \i in {-4, ..., 4}
-						\foreach \j in {-4, ..., 4}
-							\filldraw[black] (\i, \j) rectangle + (1, 1);
-					\foreach \x in {(-3, -3), (-3, 1), (1, -3), (1, 1)}
-						\filldraw[blue] \x rectangle + (3, 3);
-					\foreach \x in {(-2, -2), (-2, 2), (2, -2), (2, 2)}
-						\filldraw[red] \x rectangle + (1, 1);
-					\draw[help lines, step=1] (-9, -9) grid (10, 10);
-					\filldraw[green] (0, 0) rectangle + (1, 1);
-					\node at (0.5, 0.5) {$(i, j)$};
-					\node at (-8.5, 9.5) {$(1, 1)$};
-					\node at (-7.5, 9.5) {$(1, 2)$};
-					\node at (-6.5, 9.5) {$\dots$};
-					\node at (-8.5, 8.5) {$(2, 1)$};
-					\node at (-8.5, 7.5) {$\vdots$};
-				\end{tikzpicture}
-			}
-			\caption{The black area are the pixels that contribute to $(\mathfrak{I} \circ \Psi_\varphi) \bullet \Psi_\varphi)(i, j)$. The blue squares are mutually independent. The red pixels are the pixels that we reduce the intersection in the proof to.}
-			\label{fig: powerindependentpoints}
-		\end{figure}
+		% Draw picture of independent points:
+		\input{Figures/powerindependentpoints}
 		
 		The sets $\bigcup_{\tilde{r}, \tilde{s} \in \Phi_\varphi} \{ \mathfrak{I}(i + k - \tilde{k} - r + \tilde{r}, j + \ell - \tilde{\ell} - s + \tilde{s}) = 0 \}$ are mutually independent for $r + \tilde{k}, s + \tilde{\ell} \in \{ - ( \varphi - 1 ), \varphi - 1 \}$ and fixed $k, \ell \in \Phi_\varphi$, see Figure \ref{fig: powerindependentpoints}. Thus we obtain
 		\begin{align*}
@@ -2164,7 +1617,33 @@ It is also important to note, that the main results of this thesis only consider
 	
 	\section{Simulations}\label{appendix: simulations}
 	
-	Blub
+%	\input{CSV/normal_alpha0.05_phi5}
+%	
+%	\input{CSV/relaxed_alpha0.05_phi5}
+%	
+%	\input{CSV/normal_alpha0.05_phi7}
+%	
+%	\input{CSV/relaxed_alpha0.05_phi7}
+%	
+%	\input{CSV/normal_alpha0.05_phi99}
+%	
+%	\input{CSV/relaxed_alpha0.05_phi99}
+%	
+%	\input{CSV/normal_alpha0.01_phi3}
+%	
+%	\input{CSV/relaxed_alpha0.01_phi3}
+%	
+%	\input{CSV/normal_alpha0.01_phi5}
+%	
+%	\input{CSV/relaxed_alpha0.01_phi5}
+%	
+%	\input{CSV/normal_alpha0.01_phi7}
+%	
+%	\input{CSV/relaxed_alpha0.01_phi7}
+%	
+%	\input{CSV/normal_alpha0.01_phi99}
+%	
+%	\input{CSV/relaxed_alpha0.01_phi99}
 	
 	\newpage
 	
@@ -2178,15 +1657,11 @@ It is also important to note, that the main results of this thesis only consider
 	
 	\newpage
 	
-	\lstinputlisting[caption=\emph{MATLAB} implementation of an algorithm to randomly generate images with a rectangular region of interest with a checkerboard pattern.]{ROI-Detection/ROI_Generator.m}
-	
-	\newpage
-	
 	\lstinputlisting[caption=\emph{MATLAB} implementation of the testing procedure to test for a rectangular region of interest with a checkerboard pattern.]{ROI-Detection/SIMULATION/ROI_Detection.m}
 	
 	\newpage
 	
-	\lstinputlisting[caption=\emph{MATLAB} implementation of the algorithm counting the errors for the randomly generated test images.]{ROI-Detection/SIMULATION/ErrorTestCases.m}
+	\lstinputlisting[caption=\emph{MATLAB} implementation of the algorithm determining the error rates for the different pixel positions.]{ROI-Detection/SIMULATION/ErrorSinglePixel.m}
 \end{appendix}
 
 \newpage

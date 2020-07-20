@@ -1,0 +1,23 @@
+\begin{figure}[h]
+	\centering
+	\begin{tikzpicture}
+		\foreach \i in {-6, ..., 5}
+			\foreach \j in {-6, ..., 5}
+				\filldraw[gray] (\i, \j) rectangle + (1, 1);
+		\foreach \i in {-4, ..., 1}
+			\foreach \j in {-2, ..., 2}
+			{
+				\pgfmathparse{mod(\i+\j, 2) ? "black" : "white"}
+				\edef\colour{\pgfmathresult}
+				\filldraw[fill=\colour] (\i, \j) rectangle + (1, 1);
+			}
+		\draw[step=1] (-6, -6) grid (6, 6);
+		\node at (-5.5, 5.5) {$(1, 1)$};
+		\node at (-4.5, 5.5) {$(1, 2)$};
+		\node at (-3.5, 5.5) {$\dots$};
+		\node at (-5.5, 4.5) {$(2, 1)$};
+		\node at (-5.5, 3.5) {$\vdots$};
+	\end{tikzpicture}
+	\caption{Example of a matrix, that contains a rROI with a checkerboard pattern. The top left corner of the rROI is $(4, 3)$ and the bottom right corner is $(8, 8)$. Here we have $m = n = 12$.}
+	\label{fig: rROI}
+\end{figure}

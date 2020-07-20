@@ -1,0 +1,28 @@
+\begin{figure}[h!]
+	\centering
+	\begin{tikzpicture}
+		\begin{axis}[
+			xlabel=$t$,
+			ylabel=$p_1(t)$,
+			title={Cumulative distribution function $p_1(t)$},
+			grid=both,
+			minor grid style={gray!25},
+			major grid style={gray!25},
+			width=0.75\linewidth,
+			no marks]
+			\addplot[line width=1pt,solid,color=blue] table[x=x,y=y,col sep=comma]{CSV/CDF.csv};
+			\draw (axis cs: 3.5844, 0) -- (axis cs: 3.5844, 0.95);
+			\draw (axis cs: 0, 0.95) -- (axis cs: 3.5844, 0.95);
+			\draw (axis cs: 4.6017, 0) -- (axis cs: 4.6017, 0.99);
+			\draw (axis cs: 0, 0.99) -- (axis cs: 4.6017, 0.99);
+			\filldraw (axis cs: 3.5844, 0.95) circle (2pt);
+			\filldraw (axis cs: 4.6017, 0.99) circle (2pt);
+			\node[below] at (axis cs: 3.5844, 0) {\small{$t_{0.05}$}};
+			\node[below] at (axis cs: 4.6017, 0) {\small{$t_{0.01}$}};
+			\node[left] at (axis cs: 0, 0.95) {\tiny{$0.95$}};
+			\node[left] at (axis cs: 0, 0.99) {\tiny{$0.99$}};
+		\end{axis}
+	\end{tikzpicture}
+	\caption{Plot of the cumulative distribution function $p_1(t)$. The numerically computed thresholds $t_{0.05} = 3.5844$ and $t_{0.01} = 4.6017$ are marked.}
+	\label{fig: cdf}
+\end{figure}

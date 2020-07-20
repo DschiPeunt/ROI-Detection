@@ -1,0 +1,25 @@
+\begin{figure}[h!]
+	\centering
+	\begin{tikzpicture}
+		\begin{axis}[
+			legend pos=south east,
+			xlabel=Standard deviation $\sigma$,
+			ylabel=Probability of a type II error,
+			grid=both,
+			minor grid style={gray!25},
+			major grid style={gray!25},
+			width=\linewidth,
+			no marks]
+			\addplot[line width=1pt,dashed,color=blue] table[x=sigma,y=upperBound,col sep=comma]{CSV/resultsPowerSimBounds_alpha0.01.csv};
+			\addlegendentry{Upper bound for $\alpha = 0.01$}
+			\addplot[line width=1pt,dashed,color=red] table[x=sigma,y=upperBound,col sep=comma]{CSV/resultsPowerSimBounds_alpha0.05.csv};
+			\addlegendentry{Upper bound for $\alpha = 0.05$}
+			\addplot[line width=1pt,dotted,color=blue] table[x=sigma,y=lowerBound,col sep=comma]{CSV/resultsPowerSimBounds_alpha0.01.csv};
+			\addlegendentry{Lower bound for $\alpha = 0.01$}
+			\addplot[line width=1pt,dotted,color=red] table[x=sigma,y=lowerBound,col sep=comma]{CSV/resultsPowerSimBounds_alpha0.05.csv};
+			\addlegendentry{Lower bound for $\alpha = 0.05$}
+		\end{axis}
+	\end{tikzpicture}
+	\caption{Simulated bounds for the probability of a type II error. We use the thresholds $t_{0.05} = 3.5844$ for $\alpha = 0.05$ and $t_{0.01} = 4.6017$ for $\alpha = 0.01$. (Sample size: $1.000.000$)}
+	\label{fig: simulatedboundstypeIIerror}
+\end{figure}
