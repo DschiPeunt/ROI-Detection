@@ -36,10 +36,13 @@
 
 # TeX files
 *.aux
+*.bbl
+*.bcf
+*.blg
 *.log
 *.nav
 *.out
-*.snm
+*.run.xml
 *.synctex.gz
 *.toc
 
@@ -47,4 +50,4 @@
 Code/
 Fingerprints/
 Literature/
-Wavelets/
+TODO/

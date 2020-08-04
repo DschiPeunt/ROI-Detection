@@ -2,9 +2,9 @@
 FileVersion=1
 File0\FileName=MA.tex
 File0\EditorGroup=0
-File0\Line=126
+File0\Line=152
 File0\Col=0
-File0\FirstLine=111
+File0\FirstLine=139
 File0\FoldedLines=
 MasterFile=
 CurrentFile=MA.tex
@@ -15,12 +15,6 @@ File1\Line=114
 File1\Col=38
 File1\FirstLine=0
 File1\FoldedLines=
-File2\FileName=_TODO/TODO.tex
-File2\EditorGroup=0
-File2\Line=96
-File2\Col=27
-File2\FirstLine=0
-File2\FoldedLines=
 
 [InternalPDFViewer]
 File=MA.pdf

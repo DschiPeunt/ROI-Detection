@@ -33,10 +33,10 @@
 \newcommand\authors{Dominik Blank}
 
 \fancyhf{} % sets all head and foot elements empty
-\fancyhead[L]{\shorttitle}
-\fancyhead[R]{\authors}
+%\fancyhead[L]{\shorttitle}
+%\fancyhead[R]{\authors}
 \fancyfoot[C]{\thepage}
-\pagestyle{fancy} % sets the page style to the style delivered and editable with fancyhdr
+%\pagestyle{fancy} % sets the page style to the style delivered and editable with fancyhdr
 
 % Own commands, operators, etc.
 \newcommand{\abs}[1]{\lvert#1\rvert}
@@ -153,9 +153,9 @@ Dr. Robin \textsc{Richter}
 
 Fingerprint analysis has played an important role in biometric identification for more than a century with a variety of applications ranging from border control to smartphone development \cite{Henry}. By comparing the characteristic features of two fingerprints, called minutiae, the likelihood of them originating from the same individual can be determined. Complementary to the study of matching algorithms, the usage of image preprocessing techniques to improve the performance of these matching algorithms has become a beneficial field of study. One important preprocessing step of many automated matching algorithms is the extraction of the so-called \emph{region of interest} (ROI) of the fingerprint aiming at dividing a given fingerprint image into the ROI or foreground, that contains the fingerprint and thus the minutia, and the background containing no information about the fingerprint, see \cite{handbookfipri}.
 
-Automated extraction of the ROI is often achieved by the use of thresholding methods, see \cite{FDB}, and morphological operators, see \cite{FDB, BazenGerez, adaboost}. While the thresholding methods provide a binarization of the image to categorize pixels into ROI and background, the use of morphological operators aims at minimizing errors such as falsely classifying a background pixel as ROI or vice versa. The usage of these morphological operators relies on prior information of the fingerprint image, such as convexity and oscillatory behaviour within the ROI.
+Automated extraction of the ROI is often achieved by the use of thresholding methods, see \cite{FDB}, and morphological operators, see \cite{FDB, BazenGerez, adaboost}. While the thresholding methods provide a binarization of the image to categorize pixels into ROI and background, the use of morphological operators aims at minimizing errors, such as falsely classifying a background pixel as ROI or vice versa. The usage of these morphological operators relies on prior information of the fingerprint image, such as convexity and oscillatory behaviour within the ROI.
 
-We interpret the thresholding techniques via statistical testing. When thresholding, one usually applies an operator and compares the outcome to a threshold, for an example see \cite{AbramovichBenjamini1996}. This is the same procedure as calculating a test statistic and performing a one- or two-sided hypothesis test. In this sense, falsely classifying a background pixel as a foreground pixel and vice versa can be seen as a type I and II error of a statistical test. Considering this interpretation, the application of morphological operators is an attempt to lower the error rates of the statistical test.
+We interpret the thresholding techniques via statistical testing. When thresholding, one usually applies an operator to the image and compares the outcome to a threshold, for an example see \cite{AbramovichBenjamini1996}. This is the same procedure as calculating a test statistic and performing a one- or two-sided hypothesis test. In this sense, falsely classifying a background pixel as a foreground pixel and vice versa can be seen as a type I and II error of a statistical test. Considering this interpretation, the application of morphological operators is an attempt to lower the error rates of the statistical test.
 
 The interplay of thresholding techniques with post-processing via morphological operators, incorporating prior knowledge, has, to the best of the author's knowledge, not been addressed. This thesis aims at providing a first step towards understanding this interplay by assessing the change of error rates through application of morphological operators.
 
@@ -268,7 +268,7 @@ The question of bounding the probability of a type II error after morphological 
 
 Note, that the bounds in the previous theorems are independent of the specific $(i, j)$. This means, that the bounds also hold for the worst case, i.e. pixels directly at the transition from background to foreground.
 
-We simulate six different positions of $(i, j)$ with respect to the region of interest, see Figure \ref{}. Regardless of the position of the pixel, morphological opening decreases the rate of type I errors as expected from inequality \eqref{ineq: introtypeIopening}. The increase of this rate through morphological closing, suggested by inequality \eqref{ineq: introtypeIclosing}, can not be observed. On the other hand, the rate of type II errors does not increase under morphological opening as much as inequality \eqref{ineq: introtypeIIopening} suggests. The fact, that the upper bound in inequalities \eqref{ineq: introtypeIIopening} and \eqref{ineq: introtypeIIclosing} is the same is well reflected in the simulation results.
+We simulate six different positions of $(i, j)$ with respect to the region of interest, see Figure \ref{fig: simulatedpixeltypes}. Regardless of the position of the pixel, morphological opening decreases the rate of type I errors as expected from inequality \eqref{ineq: introtypeIopening}. The increase of this rate through morphological closing, suggested by inequality \eqref{ineq: introtypeIclosing}, can not be observed. On the other hand, the rate of type II errors does not increase under morphological opening as much as inequality \eqref{ineq: introtypeIIopening} suggests. The fact, that the upper bound in inequalities \eqref{ineq: introtypeIIopening} and \eqref{ineq: introtypeIIclosing} is the same is well reflected in the simulation results.
 
 \paragraph{Outlook}
 
@@ -1289,12 +1289,16 @@ The changes of the upper bound for the probability of a type I error after openi
 \end{proof}
 
 \begin{remark}
+	The bounds in Theorem \ref{thm: typeIinequalities} hold for all background pixels. This means, they also hold for the worst case, i.e. pixels, that lie adjacent to the region of interest, see Figure \ref{fig: independentpoints}.
+\end{remark}
+
+\begin{remark}
 	We require the threshold $t_\alpha$ in Theorem \ref{thm: typeIinequalities} to satisfy stronger conditions than $\mathbb{P}_V( T(i, j) \geq t_\alpha ) \leq \alpha$ for every $V \in \mathcal{H}_0(i, j)$. Since the methods developed in Section \ref{section: boundtypeIerror} yield thresholds, that meet these stronger requirements, we use them to achieve better bounds in Theorem \ref{thm: typeIinequalities}.
 \end{remark}
 
 Let us consider the probability of a type II error in the statistical test. In Section \ref{section: analyzetypeIIerror} we numerically calculated bounds for this probability. Similar to the previous theorem, we aim at quantifying the change of the upper bound after morphological opening and closing are applied.
 
-We will need the additional assumption, that the region of interest is sufficiently large, i.e. larger than the structuring element. Otherwise, even if there are no errors in the binarization through the statistical test, morphological opening will classify all pixels as background and thus the probability of a type II error cannot be bound anymore.
+We will need the additional assumption, that the region of interest is sufficiently large, i.e. larger than the structuring element. Otherwise, even if there are no errors in the binarization through the statistical test, morphological opening will classify all pixels as background and thus the probability of a type II error cannot be bounded anymore.
 
 \begin{theorem}\label{thm: typeIIinequalities}
 	Let $m, n \in \mathbb{N}$, $c \in \mathbb{R} \setminus \{ 0 \}$ and $\Omega = \left\{ 1, \dots, m \right\} \times \left\{ 1, \dots, n \right\}$. Assume that $F$ follows the statistical model given in \eqref{statmodel2}.
@@ -1384,9 +1388,9 @@ We will need the additional assumption, that the region of interest is sufficien
 	A proof can be found in Appendix \ref{appendix: proofs}. This only improves the bound for very small values of $\beta$.
 \end{remark}
 
-We employ morphological closing to reduce the number of type II errors. This is not represented in the upper bound in inequality \eqref{ineq: typeIIclosing}. The simulation results displayed in Section \ref{section: simulationresults} and Appendix \ref{appendix: simulations} show, that the amount of type II errors after opening and after opening and closing behave similarly, when the standard deviation of the noise increases. An improvement through closing can only be observed for a certain range of standard deviations.
+We employ morphological closing to reduce the number of type II errors. This is not represented in the upper bound in inequality \eqref{ineq: typeIIclosing}. The simulation results displayed in Section \ref{section: simulationresults} and Appendix \ref{appendix: simulations} show, that the amount of type II errors after opening and after opening and closing behave similarly, when the standard deviation of the noise increases. A small improvement through closing can only be observed for a certain range of standard deviations.
 
-This behaviour is due to the pixels not being independent anymore, after morphological opening has been applied. In some cases, the amount of type II errors is greatly increased through opening and the application of closing only reverts this to a very small extent, cf. Figure \ref{}.
+This behaviour is due to the pixels not being independent anymore, after morphological opening has been applied. In some cases, the amount of type II errors is greatly increased through opening and the application of closing only reverts this to a very small extent, cf. Appendix \ref{appendix: simulations} Figure \ref{fig: normal_alpha0.01_phi99}.
 
 Based on these observations, an improvement of the upper bound in inequality \eqref{ineq: typeIIclosing} without improving the upper bound in \eqref{ineq: typeIIopening} seems unlikely.
 Note, that any improvements of the upper bound in inequality \eqref{ineq: typeIIopening} can immediately be applied to the upper bound in inequality \eqref{ineq: typeIIclosing} as well.
@@ -1397,25 +1401,25 @@ Note, that any improvements of the upper bound in inequality \eqref{ineq: typeII
 
 \section{Simulation results}\label{section: simulationresults}
 
-For simulation, we randomly generated 5 images with a rectangular region of interest with a checkerboard pattern for each image size $128 \times 128$, $256 \times 256$ and $512 \times 512$ pixels. For each image we randomly generated $50$ different noise terms.
-
-In Figure \ref{fig: normal_alpha0.05_phi3} we see the proportion of falsely classified pixels after binarization through the statistical test, opening and closing. After binarization, the proportion of background pixels that were falsely classified as foreground is below the chosen statistical significance $\alpha = 0.05$. It is almost constant across all values of the standard deviation $\sigma$. We performed opening and closing with a $3 \times 3$ pixel structuring element. Opening reduces the proportion of falsely classified background pixels to almost zero. Applying closing does not change that.
-
-In contrast to that, the proportion of falsely classified foreground pixels is almost zero for low standard deviations $\sigma$ but greatly increases, as $\sigma$ increases. For high values of $\sigma$ opening greatly increases the proportion of falsely classified foreground pixels. Closing fixes this only to a certain extent. For values up to $\sigma = 65$ for $128 \times 128$ pixels, $\sigma = 67$ for $256 \times 256$ pixels and $\sigma = 68$ for $512 \times 512$ pixels it reduces the proportion of type II errors below that of binarization. For higher values of $\sigma$ this improvement can not be observed and the effect of closing becomes negligible.
-
-Using a relaxed statistical significance $\tilde{\alpha} = \left( \frac{\alpha}{\varphi^3} \right)^{\frac{2}{\varphi + 1}}$ to calculate the thresholding parameter $t_{\tilde{\alpha}}$, yields
-\begin{equation*}
-	\mathbb{P}_V\left( ((\mathfrak{I}_{\tilde{\alpha}} \circ \Psi_\varphi) \bullet \Psi_\varphi)(i, j) = 1 \right) \leq \varphi^3 \left( \left( \frac{\alpha}{\varphi^3} \right)^{\frac{2}{\varphi + 1}} \right)^{\frac{\varphi + 1}{2}} \leq \alpha
-\end{equation*}
-by inequality \eqref{ineq: typeIclosing}. This way, we can bound the probability of a type I error after opening and closing below a given statistical significance $\alpha$. The results of this approach are displayed in Figure \ref{fig: relaxed_alpha0.05_phi3}. The proportion of type I errors after opening and closing is below the given statistical significance, while the number of type II errors for higher values of $\sigma$ has decreased. This allows the proportion of type II errors after opening and closing to be lower than that of binarization up to $\sigma = 74$ for $128 \times 128$ pixels, $\sigma = 77$ for $256 \times 256$ pixels and $\sigma = 79$ for $512 \times 512$ pixels.
-
-Simulations for larger structuring elements as well as for $\alpha = 0.01$ and the code used for the simulation can be found in the appendix.
+%For simulation, we randomly generated 5 images with a rectangular region of interest with a checkerboard pattern for each image size $128 \times 128$, $256 \times 256$ and $512 \times 512$ pixels. For each image we randomly generated $50$ different noise terms.
+%
+%In Figure \ref{fig: normal_alpha0.05_phi3} we see the proportion of falsely classified pixels after binarization through the statistical test, opening and closing. After binarization, the proportion of background pixels that were falsely classified as foreground is below the chosen statistical significance $\alpha = 0.05$. It is almost constant across all values of the standard deviation $\sigma$. We performed opening and closing with a $3 \times 3$ pixel structuring element. Opening reduces the proportion of falsely classified background pixels to almost zero. Applying closing does not change that.
+%
+%In contrast to that, the proportion of falsely classified foreground pixels is almost zero for low standard deviations $\sigma$ but greatly increases, as $\sigma$ increases. For high values of $\sigma$ opening greatly increases the proportion of falsely classified foreground pixels. Closing fixes this only to a certain extent. For values up to $\sigma = 65$ for $128 \times 128$ pixels, $\sigma = 67$ for $256 \times 256$ pixels and $\sigma = 68$ for $512 \times 512$ pixels it reduces the proportion of type II errors below that of binarization. For higher values of $\sigma$ this improvement can not be observed and the effect of closing becomes negligible.
+%
+%Using a relaxed statistical significance $\tilde{\alpha} = \left( \frac{\alpha}{\varphi^3} \right)^{\frac{2}{\varphi + 1}}$ to calculate the thresholding parameter $t_{\tilde{\alpha}}$, yields
+%\begin{equation*}
+%	\mathbb{P}_V\left( ((\mathfrak{I}_{\tilde{\alpha}} \circ \Psi_\varphi) \bullet \Psi_\varphi)(i, j) = 1 \right) \leq \varphi^3 \left( \left( \frac{\alpha}{\varphi^3} \right)^{\frac{2}{\varphi + 1}} \right)^{\frac{\varphi + 1}{2}} \leq \alpha
+%\end{equation*}
+%by inequality \eqref{ineq: typeIclosing}. This way, we can bound the probability of a type I error after opening and closing below a given statistical significance $\alpha$. The results of this approach are displayed in Figure \ref{fig: relaxed_alpha0.05_phi3}. The proportion of type I errors after opening and closing is below the given statistical significance, while the number of type II errors for higher values of $\sigma$ has decreased. This allows the proportion of type II errors after opening and closing to be lower than that of binarization up to $\sigma = 74$ for $128 \times 128$ pixels, $\sigma = 77$ for $256 \times 256$ pixels and $\sigma = 79$ for $512 \times 512$ pixels.
+%
+%Simulations for larger structuring elements as well as for $\alpha = 0.01$ and the code used for the simulation can be found in the appendix.
 
 \input{Figures/simulatedpixeltypes}
-%
-%\input{CSV/normal_alpha0.05_phi3}
-%
-%\input{CSV/relaxed_alpha0.05_phi3}
+
+\input{CSV/normal_alpha0.05_phi5}
+
+\input{CSV/relaxed_alpha0.05_phi5}
 
 \newpage
 
@@ -1423,7 +1427,7 @@ Simulations for larger structuring elements as well as for $\alpha = 0.01$ and t
 
 \section{Discussion}\label{section: conclusion}
 
-In this thesis we consider how the upper bounds for the error probabilities of a statistical test change, when morphological opening and closing are applied. To this end, we examine a simplified model and develop a thresholding method to extract the region of interest. The simplified model and thresholding method are designed, such that the probability of a type I error can be bounded by a given statistical significance. This is achieved by computing a suitable threshold based on the target statistical significance.
+In this thesis we consider how the upper bounds for the error probabilities of a statistical test change, when morphological opening and closing are applied. To this end, we examine a simplified model and develop a thresholding method to extract the region of interest. The simplified model and thresholding method are designed, such that the probability of a type I error can be bound by a given statistical significance. This is achieved by computing a suitable threshold based on the target statistical significance.
 
 Theorems \ref{thm: typeIinequalities} and \ref{thm: typeIIinequalities} quantify upper bounds for the error rates after morphological opening and closing are applied to the outcome of the statistical test. The upper bounds are stated in terms of the structuring element and the upper bounds for the error probabilities before morphological operations are applied. This was done by exploiting prior knowledge of properties of the region of interest.
 
@@ -1434,6 +1438,12 @@ A different shaped structuring element could lead to no improvements of the erro
 Since we only considered the categorization of a single pixel, a natural next step could be an expansion beyond the scope of this thesis by applying techniques from the field of multiple testing. When researching the connection between multiple testing and morphological operations, one might consider more morphological operators. Namely, the convex hull operator is of high interest in the extraction of the region of interest of a fingerprint.
 
 Generalizations of the results from Sections \ref{section: statisticalmodel} and \ref{section: boundtypeIerror} to convex regions of interest with a checkerboard pattern are possible. For the reasons described above, the choice of the structuring element for a convex region of interest is a question to ponder on. Advances could be achieved in conjunction with multiple testing techniques, since the choice of the structuring element is mainly a limiting factor for pixels close to the edge of the region of interest, which form only a subset of the total pixels in the image.
+
+\newpage
+
+
+
+\printbibliography[heading=bibintoc]
 
 \newpage
 
@@ -1617,33 +1627,33 @@ Generalizations of the results from Sections \ref{section: statisticalmodel} and
 	
 	\section{Simulations}\label{appendix: simulations}
 	
-%	\input{CSV/normal_alpha0.05_phi5}
-%	
-%	\input{CSV/relaxed_alpha0.05_phi5}
-%	
-%	\input{CSV/normal_alpha0.05_phi7}
-%	
-%	\input{CSV/relaxed_alpha0.05_phi7}
-%	
-%	\input{CSV/normal_alpha0.05_phi99}
-%	
-%	\input{CSV/relaxed_alpha0.05_phi99}
-%	
-%	\input{CSV/normal_alpha0.01_phi3}
-%	
-%	\input{CSV/relaxed_alpha0.01_phi3}
-%	
-%	\input{CSV/normal_alpha0.01_phi5}
-%	
-%	\input{CSV/relaxed_alpha0.01_phi5}
-%	
-%	\input{CSV/normal_alpha0.01_phi7}
-%	
-%	\input{CSV/relaxed_alpha0.01_phi7}
-%	
-%	\input{CSV/normal_alpha0.01_phi99}
-%	
-%	\input{CSV/relaxed_alpha0.01_phi99}
+	\input{CSV/normal_alpha0.05_phi3}
+	
+	\input{CSV/relaxed_alpha0.05_phi3}
+	
+	\input{CSV/normal_alpha0.05_phi7}
+	
+	\input{CSV/relaxed_alpha0.05_phi7}
+	
+	\input{CSV/normal_alpha0.05_phi99}
+	
+	\input{CSV/relaxed_alpha0.05_phi99}
+	
+	\input{CSV/normal_alpha0.01_phi3}
+	
+	\input{CSV/relaxed_alpha0.01_phi3}
+	
+	\input{CSV/normal_alpha0.01_phi5}
+	
+	\input{CSV/relaxed_alpha0.01_phi5}
+	
+	\input{CSV/normal_alpha0.01_phi7}
+	
+	\input{CSV/relaxed_alpha0.01_phi7}
+	
+	\input{CSV/normal_alpha0.01_phi99}
+	
+	\input{CSV/relaxed_alpha0.01_phi99}
 	
 	\newpage
 	
@@ -1664,12 +1674,7 @@ Generalizations of the results from Sections \ref{section: statisticalmodel} and
 	\lstinputlisting[caption=\emph{MATLAB} implementation of the algorithm determining the error rates for the different pixel positions.]{ROI-Detection/SIMULATION/ErrorSinglePixel.m}
 \end{appendix}
 
-\newpage
-
 % ------------------------------------------------------------------------
-
-\printbibliography[heading=bibintoc]
-
 
 %\newpage
 %
