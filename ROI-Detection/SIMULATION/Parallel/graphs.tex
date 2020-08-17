@@ -1,0 +1,83 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+\usepackage[backend=bibtex, style=alphabetic]{biblatex}
+\usepackage{color}
+\usepackage{lmodern}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{mathtools}
+\usepackage{listings}
+\usepackage[ruled, linesnumbered, longend]{algorithm2e}
+\usepackage{dsfont}
+\usepackage{nicefrac}
+\usepackage{upgreek}
+\usepackage{paralist}
+\usepackage{tabulary}
+\usepackage{stmaryrd}
+\usepackage{tikz}
+\usepackage{pgffor}
+\usepackage{pgfplots}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{setspace}
+\usepackage{fancyhdr}
+\usepackage{float}
+% \usepackage[colorlinks=true,linkcolor=blue]{hyperref}				% Blue hyperlinks look better than red boxed ones
+
+% Header
+\newcommand\shorttitle{}
+\newcommand\authors{Dominik Blank}
+
+\fancyhf{} % sets all head and foot elements empty
+%\fancyhead[L]{\shorttitle}
+%\fancyhead[R]{\authors}
+\fancyfoot[C]{\thepage}
+%\pagestyle{fancy} % sets the page style to the style delivered and editable with fancyhdr
+
+% Own commands, operators, etc.
+\newcommand{\abs}[1]{\lvert#1\rvert}
+\newcommand{\norm}[1]{\lVert#1\rVert}
+
+% Math environments
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{notation}[theorem]{Notation}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{example}[theorem]{Example}
+
+% END PREAMBLE
+
+\author{Dominik Blank}
+\title{On the influence of morphological operators on testing for a region of interest}
+
+\onehalfspacing
+\setlength{\parindent}{0pt}
+\allowdisplaybreaks
+
+\begin{document}
+
+\input{CSV/alpha0.05_phi3}
+
+\input{CSV/alpha0.05_phi5}
+
+\input{CSV/alpha0.05_phi7}
+
+\input{CSV/alpha0.05_phi99}
+
+\input{CSV/alpha0.01_phi3}
+
+\input{CSV/alpha0.01_phi5}
+
+\input{CSV/alpha0.01_phi7}
+
+\input{CSV/alpha0.01_phi99}
+
+\end{document}

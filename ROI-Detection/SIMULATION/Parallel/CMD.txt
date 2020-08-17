@@ -1,0 +1,8 @@
+scp ErrorSinglePixel.m ROI_Detection.m Threshold.m dblank@134.76.84.80:/space/fbms/dblank
+ssh -l dblank 134.76.84.80
+rxf1J3MwPi
+cd /space/fbms/dblank
+matlab -nojvm -nodisplay -nosplash -sd /space/fbms/dblank -r "disp(['Current folder: ' pwd])"
+matlab -nodisplay -nosplash -sd /space/fbms/dblank -r "disp(['Current folder: ' pwd])"
+parpool(6)
+scp -r dblank@134.76.84.80:/space/fbms/dblank C:\Users\Domin\Dropbox\Masterarbeit\ROI-Detection\SIMULATION\Parallel\results2

@@ -1,0 +1,190 @@
+\begin{figure}[H]
+	\pgfplotstableread[col sep = comma]{CSV/CSV_SinglePixel/alpha0.01/phi99/background_corner.csv}\backcorner
+	\pgfplotstableread[col sep = comma]{CSV/CSV_SinglePixel/alpha0.01/phi99/foreground_corner.csv}\forecorner
+	\pgfplotstableread[col sep = comma]{CSV/CSV_SinglePixel/alpha0.01/phi99/background_edge.csv}\backedge
+	\pgfplotstableread[col sep = comma]{CSV/CSV_SinglePixel/alpha0.01/phi99/foreground_edge.csv}\foreedge
+	\pgfplotstableread[col sep = comma]{CSV/CSV_SinglePixel/alpha0.01/phi99/background_free.csv}\backfree
+	\pgfplotstableread[col sep = comma]{CSV/CSV_SinglePixel/alpha0.01/phi99/foreground_free.csv}\forefree
+	\centering
+	\begin{subfigure}[t]{0.48\linewidth}
+		\centering
+		\begin{tikzpicture}
+			\begin{axis}[
+				legend pos=north west,
+				legend style={nodes={scale=0.5, transform shape}},
+				xlabel=Standard deviation $\sigma$,
+				ylabel=False positive rate,
+				grid=both,
+				minor grid style={gray!25},
+				major grid style={gray!25},
+				ymin=-0.05,
+				ymax=1.05,
+				width=\linewidth,
+				no marks,
+				table/x = sigma]
+				\addplot[line width=1pt,dashed,color=blue] table[y=typeI] from \backcorner;
+				\addlegendentry{Binarization}
+				\addplot[line width=1pt,dashed,color=red] table[y=typeI_o] from \backcorner;
+				\addlegendentry{Opening}
+				\addplot[line width=1pt,dashed,color=gray] table[y=typeI_c] from \backcorner;
+				\addlegendentry{Closing}
+				\addplot[line width=1pt,dashed,color=black] table[y=typeI_oc] from \backcorner;
+				\addlegendentry{Opening \& Closing}
+			\end{axis}
+		\end{tikzpicture}
+		\caption{Background pixel at the corner of the rROI.}
+		\label{fig: alpha0.01_phi99_background_corner}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[t]{0.48\linewidth}
+		\centering
+		\begin{tikzpicture}
+			\begin{axis}[
+				legend pos=north west,
+				legend style={nodes={scale=0.5, transform shape}},
+				xlabel=Standard deviation $\sigma$,
+				ylabel=False negative rate,
+				grid=both,
+				minor grid style={gray!25},
+				major grid style={gray!25},
+				ymin=-0.05,
+				ymax=1.05,
+				width=\linewidth,
+				no marks,
+				table/x = sigma]
+				\addplot[line width=1pt,dashed,color=blue] table[y=typeII] from \forecorner;
+				\addlegendentry{Binarization}
+				\addplot[line width=1pt,dashed,color=red] table[y=typeII_o] from \forecorner;
+				\addlegendentry{Opening}
+				\addplot[line width=1pt,dashed,color=gray] table[y=typeII_c] from \forecorner;
+				\addlegendentry{Closing}
+				\addplot[line width=1pt,dashed,color=black] table[y=typeII_oc] from \forecorner;
+				\addlegendentry{Opening \& Closing}
+			\end{axis}
+		\end{tikzpicture}
+		\caption{Foreground pixel at the corner of the rROI.}
+		\label{fig: alpha0.01_phi99_foreground_corner}
+	\end{subfigure}
+	\vfill
+	\begin{subfigure}[t]{0.48\linewidth}
+		\centering
+		\begin{tikzpicture}
+			\begin{axis}[
+				legend pos=north west,
+				legend style={nodes={scale=0.5, transform shape}},
+				xlabel=Standard deviation $\sigma$,
+				ylabel=False positive rate,
+				grid=both,
+				minor grid style={gray!25},
+				major grid style={gray!25},
+				ymin=-0.05,
+				ymax=1.05,
+				width=\linewidth,
+				no marks,
+				table/x = sigma]
+				\addplot[line width=1pt,dashed,color=blue] table[y=typeI] from \backedge;
+				\addlegendentry{Binarization}
+				\addplot[line width=1pt,dashed,color=red] table[y=typeI_o] from \backedge;
+				\addlegendentry{Opening}
+				\addplot[line width=1pt,dashed,color=gray] table[y=typeI_c] from \backedge;
+				\addlegendentry{Closing}
+				\addplot[line width=1pt,dashed,color=black] table[y=typeI_oc] from \backedge;
+				\addlegendentry{Opening \& Closing}
+			\end{axis}
+		\end{tikzpicture}
+		\caption{Background pixel at the edge of the rROI.}
+		\label{fig: alpha0.01_phi99_background_edge}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[t]{0.48\linewidth}
+		\centering
+		\begin{tikzpicture}
+			\begin{axis}[
+				legend pos=north west,
+				legend style={nodes={scale=0.5, transform shape}},
+				xlabel=Standard deviation $\sigma$,
+				ylabel=False negative rate,
+				grid=both,
+				minor grid style={gray!25},
+				major grid style={gray!25},
+				ymin=-0.05,
+				ymax=1.05,
+				width=\linewidth,
+				no marks,
+				table/x = sigma]
+				\addplot[line width=1pt,dashed,color=blue] table[y=typeII] from \foreedge;
+				\addlegendentry{Binarization}
+				\addplot[line width=1pt,dashed,color=red] table[y=typeII_o] from \foreedge;
+				\addlegendentry{Opening}
+				\addplot[line width=1pt,dashed,color=gray] table[y=typeII_c] from \foreedge;
+				\addlegendentry{Closing}
+				\addplot[line width=1pt,dashed,color=black] table[y=typeII_oc] from \foreedge;
+				\addlegendentry{Opening \& Closing}
+			\end{axis}
+		\end{tikzpicture}
+		\caption{Foreground pixel at the edge of the rROI.}
+		\label{fig: alpha0.01_phi99_foreground_edge}
+	\end{subfigure}
+	\vfill
+	\begin{subfigure}[t]{0.48\linewidth}
+		\centering
+		\begin{tikzpicture}
+			\begin{axis}[
+				legend pos=north west,
+				legend style={nodes={scale=0.5, transform shape}},
+				xlabel=Standard deviation $\sigma$,
+				ylabel=False positive rate,
+				grid=both,
+				minor grid style={gray!25},
+				major grid style={gray!25},
+				ymin=-0.05,
+				ymax=1.05,
+				width=\linewidth,
+				no marks,
+				table/x = sigma]
+				\addplot[line width=1pt,dashed,color=blue] table[y=typeI] from \backfree;
+				\addlegendentry{Binarization}
+				\addplot[line width=1pt,dashed,color=red] table[y=typeI_o] from \backfree;
+				\addlegendentry{Opening}
+				\addplot[line width=1pt,dashed,color=gray] table[y=typeI_c] from \backfree;
+				\addlegendentry{Closing}
+				\addplot[line width=1pt,dashed,color=black] table[y=typeI_oc] from \backfree;
+				\addlegendentry{Opening \& Closing}
+			\end{axis}
+		\end{tikzpicture}
+		\caption{Background pixel surrounded by background.}
+		\label{fig: alpha0.01_phi99_background_free}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[t]{0.48\linewidth}
+		\centering
+		\begin{tikzpicture}
+			\begin{axis}[
+				legend pos=north west,
+				legend style={nodes={scale=0.5, transform shape}},
+				xlabel=Standard deviation $\sigma$,
+				ylabel=False negative rate,
+				grid=both,
+				minor grid style={gray!25},
+				major grid style={gray!25},
+				ymin=-0.05,
+				ymax=1.05,
+				width=\linewidth,
+				no marks,
+				table/x = sigma]
+				\addplot[line width=1pt,dashed,color=blue] table[y=typeII] from \forefree;
+				\addlegendentry{Binarization}
+				\addplot[line width=1pt,dashed,color=red] table[y=typeII_o] from \forefree;
+				\addlegendentry{Opening}
+				\addplot[line width=1pt,dashed,color=gray] table[y=typeII_c] from \forefree;
+				\addlegendentry{Closing}
+				\addplot[line width=1pt,dashed,color=black] table[y=typeII_oc] from \forefree;
+				\addlegendentry{Opening \& Closing}
+			\end{axis}
+		\end{tikzpicture}
+		\caption{Foreground pixel surrounded by foreground.}
+		\label{fig: alpha0.01_phi99_foreground_free}
+	\end{subfigure}
+	\caption{Error rates after binarization, opening and closing. The $x$-axes display the standard deviation $\sigma$ and the $y$-axes the error rate. For each pixel type 1000 different noises were randomly generated $(\alpha = 0.01, \varphi = 99)$.}
+	\label{fig: alpha0.01_phi99}
+\end{figure}

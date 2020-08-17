@@ -1401,23 +1401,28 @@ Note, that any improvements of the upper bound in inequality \eqref{ineq: typeII
 
 \section{Simulation results}\label{section: simulationresults}
 
-%For simulation, we randomly generated 5 images with a rectangular region of interest with a checkerboard pattern for each image size $128 \times 128$, $256 \times 256$ and $512 \times 512$ pixels. For each image we randomly generated $50$ different noise terms.
-%
-%In Figure \ref{fig: normal_alpha0.05_phi3} we see the proportion of falsely classified pixels after binarization through the statistical test, opening and closing. After binarization, the proportion of background pixels that were falsely classified as foreground is below the chosen statistical significance $\alpha = 0.05$. It is almost constant across all values of the standard deviation $\sigma$. We performed opening and closing with a $3 \times 3$ pixel structuring element. Opening reduces the proportion of falsely classified background pixels to almost zero. Applying closing does not change that.
-%
-%In contrast to that, the proportion of falsely classified foreground pixels is almost zero for low standard deviations $\sigma$ but greatly increases, as $\sigma$ increases. For high values of $\sigma$ opening greatly increases the proportion of falsely classified foreground pixels. Closing fixes this only to a certain extent. For values up to $\sigma = 65$ for $128 \times 128$ pixels, $\sigma = 67$ for $256 \times 256$ pixels and $\sigma = 68$ for $512 \times 512$ pixels it reduces the proportion of type II errors below that of binarization. For higher values of $\sigma$ this improvement can not be observed and the effect of closing becomes negligible.
-%
-%Using a relaxed statistical significance $\tilde{\alpha} = \left( \frac{\alpha}{\varphi^3} \right)^{\frac{2}{\varphi + 1}}$ to calculate the thresholding parameter $t_{\tilde{\alpha}}$, yields
-%\begin{equation*}
-%	\mathbb{P}_V\left( ((\mathfrak{I}_{\tilde{\alpha}} \circ \Psi_\varphi) \bullet \Psi_\varphi)(i, j) = 1 \right) \leq \varphi^3 \left( \left( \frac{\alpha}{\varphi^3} \right)^{\frac{2}{\varphi + 1}} \right)^{\frac{\varphi + 1}{2}} \leq \alpha
-%\end{equation*}
-%by inequality \eqref{ineq: typeIclosing}. This way, we can bound the probability of a type I error after opening and closing below a given statistical significance $\alpha$. The results of this approach are displayed in Figure \ref{fig: relaxed_alpha0.05_phi3}. The proportion of type I errors after opening and closing is below the given statistical significance, while the number of type II errors for higher values of $\sigma$ has decreased. This allows the proportion of type II errors after opening and closing to be lower than that of binarization up to $\sigma = 74$ for $128 \times 128$ pixels, $\sigma = 77$ for $256 \times 256$ pixels and $\sigma = 79$ for $512 \times 512$ pixels.
-%
-%Simulations for larger structuring elements as well as for $\alpha = 0.01$ and the code used for the simulation can be found in the appendix.
+To simulate the error rates of the statistical test and the subsequent application of morphological opening and closing, we create six different types of images, depending on the position of the pixel $(i, j)$ with respect to the region of interest, see Figure \ref{fig: simulatedpixeltypes}.
 
 \input{Figures/simulatedpixeltypes}
 
+The six different types include the best and worst case for identification of a background and foreground pixel, respectively. For both background and foreground pixels to be identified correctly, it is ideal, if the pixel is only surrounded by other background or foreground pixels, see Figures \ref{fig: background_free} and \ref{fig: foreground_free}.
+For a background pixel to be correctly identified, the worst case is, if the pixel is located at the edge of the region of interest, see Figure \ref{fig: background_edge}. Similarly, the worst case for a foreground pixel to be correctly identified is to be located at the corner of the region of interest, see Figure \ref{fig: foreground_corner}. While other positions of the pixel $(i, j)$ with respect to the region of interest are possible, our simulations cover the extreme cases. We expect the error rates for other cases to lie between those of the extreme cases.
+
+The images are created by contructing the image and region of interest around the pixel $(i, j)$ according to the target position of the pixel. For each type of image, we randomly generate 1000 noises and add it to the image with standard deviations $\sigma$ ranging from 1 to 150. After binarization through the statistical test, morphological opening and closing, we determine the error rate by dividing the the number of times the pixel is falsely identified by the total number of noises.
+
+In Figure \ref{fig: normal_alpha0.05_phi5} the error rates for $\alpha = 0.05$ and $\varphi = 5$ are displayed. For all simulated positions of background pixels, we keep the error rate after binarization through the statistical test below the target statistical significance through the choice of the threshold. As expected, the error rate is equal to the statistical significance in the worst case for low standard deviations, see Figure \ref{fig: normal_alpha0.05_phi5_background_edge}. Through application of morphological opening and closing, the error rates drop to zero for all standard deviations and all simulated positions of background pixels. For the simulated positions of foreground pixels, the error rates after binarization are zero for small standard deviations and increase, as the standard deviation increases. The better the position of the foreground pixel, the longer the error rate stays close to zero. While the application of morphological opening barely has an impact for small standard deviations, it greatly increases the error rate for higher standard deviations. The subsequent application of morphological closing only decreases the error rate to a very small extent, if at all, making it almost negligible.
+
 \input{CSV/normal_alpha0.05_phi5}
+
+This observation can be explained as follows. As the standard deviation increases, type II errors become more numerous. Thus, there are more falsely identified pixels within the region of interest after binarization. Morphological opening connects these falsely identified pixels, also misclassifying the pixels between the initial falsely classified pixels. This can create clusters the size of the structuring element of falsely identified pixels within the region of interest. Morphological closing with the same structuring element cannot fix these errors.
+
+Theorem \ref{thm: typeIinequalities} yields another approach to the extraction of the region of interest. Using a relaxed statistical significance $\tilde{\alpha} = \left( \frac{\alpha}{\varphi^3} \right)^{\frac{2}{\varphi + 1}}$ to calculate the threshold $t_{\tilde{\alpha}}$, yields
+\begin{equation*}
+	\mathbb{P}_V\left( ((\mathfrak{I}_{\tilde{\alpha}} \circ \Psi_\varphi) \bullet \Psi_\varphi)(i, j) = 1 \right) \leq \varphi^3 \left( \left( \frac{\alpha}{\varphi^3} \right)^{\frac{2}{\varphi + 1}} \right)^{\frac{\varphi + 1}{2}} \leq \alpha
+\end{equation*}
+by inequality \eqref{ineq: typeIclosing}. This way, we can bound the probability of a type I error after opening and closing below a given statistical significance $\alpha$. The error rates for this approach with $\alpha = 0.05$ and $\varphi = 5$ are displayed in Figure \ref{fig: relaxed_alpha0.05_phi5}. The error rates for background pixels after opening and closing are below the given statistical significance $\alpha$, while the errors rates for foreground pixels are slightly lower than in Figure \ref{fig: normal_alpha0.05_phi5}.
+
+Simulations for other structuring elements as well as for $\alpha = 0.01$ can be found in Appendix \ref{appendix: simulations}. The code used for the simulation can be found in Appendix \ref{appendix: algorithms}.
 
 \input{CSV/relaxed_alpha0.05_phi5}
 
