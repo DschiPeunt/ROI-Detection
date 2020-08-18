@@ -1390,7 +1390,7 @@ We will need the additional assumption, that the region of interest is sufficien
 
 We employ morphological closing to reduce the number of type II errors. This is not represented in the upper bound in inequality \eqref{ineq: typeIIclosing}. The simulation results displayed in Section \ref{section: simulationresults} and Appendix \ref{appendix: simulations} show, that the amount of type II errors after opening and after opening and closing behave similarly, when the standard deviation of the noise increases. A small improvement through closing can only be observed for a certain range of standard deviations.
 
-This behaviour is due to the pixels not being independent anymore, after morphological opening has been applied. In some cases, the amount of type II errors is greatly increased through opening and the application of closing only reverts this to a very small extent, cf. Appendix \ref{appendix: simulations} Figure \ref{fig: normal_alpha0.01_phi99}.
+This behaviour is due to the pixels not being independent anymore, after morphological opening has been applied. In some cases, the amount of type II errors is greatly increased through opening and the application of closing only reverts this to a very small extent, cf. Appendix \ref{appendix: simulations} Figure \ref{fig: alpha0.01_phi99}.
 
 Based on these observations, an improvement of the upper bound in inequality \eqref{ineq: typeIIclosing} without improving the upper bound in \eqref{ineq: typeIIopening} seems unlikely.
 Note, that any improvements of the upper bound in inequality \eqref{ineq: typeIIopening} can immediately be applied to the upper bound in inequality \eqref{ineq: typeIIclosing} as well.
@@ -1410,9 +1410,9 @@ For a background pixel to be correctly identified, the worst case is, if the pix
 
 The images are created by contructing the image and region of interest around the pixel $(i, j)$ according to the target position of the pixel. For each type of image, we randomly generate 1000 noises and add it to the image with standard deviations $\sigma$ ranging from 1 to 150. After binarization through the statistical test, morphological opening and closing, we determine the error rate by dividing the the number of times the pixel is falsely identified by the total number of noises.
 
-In Figure \ref{fig: normal_alpha0.05_phi5} the error rates for $\alpha = 0.05$ and $\varphi = 5$ are displayed. For all simulated positions of background pixels, we keep the error rate after binarization through the statistical test below the target statistical significance through the choice of the threshold. As expected, the error rate is equal to the statistical significance in the worst case for low standard deviations, see Figure \ref{fig: normal_alpha0.05_phi5_background_edge}. Through application of morphological opening and closing, the error rates drop to zero for all standard deviations and all simulated positions of background pixels. For the simulated positions of foreground pixels, the error rates after binarization are zero for small standard deviations and increase, as the standard deviation increases. The better the position of the foreground pixel, the longer the error rate stays close to zero. While the application of morphological opening barely has an impact for small standard deviations, it greatly increases the error rate for higher standard deviations. The subsequent application of morphological closing only decreases the error rate to a very small extent, if at all, making it almost negligible.
+In Figure \ref{fig: alpha0.05_phi5} the error rates for $\alpha = 0.05$ and $\varphi = 5$ are displayed. For all simulated positions of background pixels, we keep the error rate after binarization through the statistical test below the target statistical significance through the choice of the threshold. As expected, the error rate is equal to the statistical significance in the worst case for low standard deviations, see Figure \ref{fig: alpha0.05_phi5_background_edge}. Through application of morphological opening and closing, the error rates drop to zero for all standard deviations and all simulated positions of background pixels. For the simulated positions of foreground pixels, the error rates after binarization are zero for small standard deviations and increase, as the standard deviation increases. The better the position of the foreground pixel, the longer the error rate stays close to zero. While the application of morphological opening barely has an impact for small standard deviations, it greatly increases the error rate for higher standard deviations. The subsequent application of morphological closing only decreases the error rate to a very small extent, if at all, making it almost negligible.
 
-\input{CSV/normal_alpha0.05_phi5}
+\input{CSV/alpha0.05_phi3}
 
 This observation can be explained as follows. As the standard deviation increases, type II errors become more numerous. Thus, there are more falsely identified pixels within the region of interest after binarization. Morphological opening connects these falsely identified pixels, also misclassifying the pixels between the initial falsely classified pixels. This can create clusters the size of the structuring element of falsely identified pixels within the region of interest. Morphological closing with the same structuring element cannot fix these errors.
 
@@ -1420,11 +1420,9 @@ Theorem \ref{thm: typeIinequalities} yields another approach to the extraction o
 \begin{equation*}
 	\mathbb{P}_V\left( ((\mathfrak{I}_{\tilde{\alpha}} \circ \Psi_\varphi) \bullet \Psi_\varphi)(i, j) = 1 \right) \leq \varphi^3 \left( \left( \frac{\alpha}{\varphi^3} \right)^{\frac{2}{\varphi + 1}} \right)^{\frac{\varphi + 1}{2}} \leq \alpha
 \end{equation*}
-by inequality \eqref{ineq: typeIclosing}. This way, we can bound the probability of a type I error after opening and closing below a given statistical significance $\alpha$. The error rates for this approach with $\alpha = 0.05$ and $\varphi = 5$ are displayed in Figure \ref{fig: relaxed_alpha0.05_phi5}. The error rates for background pixels after opening and closing are below the given statistical significance $\alpha$, while the errors rates for foreground pixels are slightly lower than in Figure \ref{fig: normal_alpha0.05_phi5}.
+by inequality \eqref{ineq: typeIclosing}. This way, we can bound the probability of a type I error after opening and closing below a given statistical significance $\alpha$. The error rates for this approach with $\alpha = 0.05$ and $\varphi = 5$ are displayed in Figure \ref{fig: alpha0.05_phi5}. The error rates for background pixels after opening and closing are below the given statistical significance $\alpha$, while the errors rates for foreground pixels are slightly lower than in Figure \ref{fig: alpha0.05_phi5}.
 
 Simulations for other structuring elements as well as for $\alpha = 0.01$ can be found in Appendix \ref{appendix: simulations}. The code used for the simulation can be found in Appendix \ref{appendix: algorithms}.
-
-\input{CSV/relaxed_alpha0.05_phi5}
 
 \newpage
 
@@ -1632,33 +1630,19 @@ Generalizations of the results from Sections \ref{section: statisticalmodel} and
 	
 	\section{Simulations}\label{appendix: simulations}
 	
-	\input{CSV/normal_alpha0.05_phi3}
+	\input{CSV/alpha0.05_phi5}
 	
-	\input{CSV/relaxed_alpha0.05_phi3}
+	\input{CSV/alpha0.05_phi7}
 	
-	\input{CSV/normal_alpha0.05_phi7}
+	\input{CSV/alpha0.05_phi99}
 	
-	\input{CSV/relaxed_alpha0.05_phi7}
+	\input{CSV/alpha0.01_phi3}
 	
-	\input{CSV/normal_alpha0.05_phi99}
+	\input{CSV/alpha0.01_phi5}
 	
-	\input{CSV/relaxed_alpha0.05_phi99}
+	\input{CSV/alpha0.01_phi7}
 	
-	\input{CSV/normal_alpha0.01_phi3}
-	
-	\input{CSV/relaxed_alpha0.01_phi3}
-	
-	\input{CSV/normal_alpha0.01_phi5}
-	
-	\input{CSV/relaxed_alpha0.01_phi5}
-	
-	\input{CSV/normal_alpha0.01_phi7}
-	
-	\input{CSV/relaxed_alpha0.01_phi7}
-	
-	\input{CSV/normal_alpha0.01_phi99}
-	
-	\input{CSV/relaxed_alpha0.01_phi99}
+	\input{CSV/alpha0.01_phi99}
 	
 	\newpage
 	
