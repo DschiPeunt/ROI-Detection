@@ -374,5 +374,29 @@
     \field{month}{05}
     \field{year}{2016}
   \endentry
+
+  \entry{Watson}{book}{}
+    \name{author}{1}{}{%
+      {{hash=WG}{%
+         family={Watson},
+         familyi={W\bibinitperiod},
+         given={G.N.},
+         giveni={G\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {Cambridge University Press}%
+    }
+    \strng{namehash}{WG1}
+    \strng{fullhash}{WG1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelalpha}{Wat66}
+    \field{sortinit}{W}
+    \field{sortinithash}{W}
+    \field{edition}{2nd}
+    \field{title}{A treatise on the theory of Bessel functions}
+    \field{year}{1966}
+  \endentry
 \enddatalist
 \endinput

@@ -1,0 +1,103 @@
+\begin{figure}[H]
+	\pgfplotstableread[col sep = comma]{CSV/CSV_SinglePixel/alpha0.05/phi7/foreground_corner.csv}\forecorner
+	\pgfplotstableread[col sep = comma]{CSV/CSV_SinglePixel/alpha0.05/phi7/foreground_edge.csv}\foreedge
+	\pgfplotstableread[col sep = comma]{CSV/CSV_SinglePixel/alpha0.05/phi7/foreground_free.csv}\forefree
+	\centering
+	\begin{subfigure}[t]{0.48\linewidth}
+		\centering
+		\begin{tikzpicture}
+			\begin{axis}[
+				legend pos=north west,
+				legend style={nodes={scale=0.5, transform shape}},
+				xlabel=Standard deviation $\sigma$,
+				ylabel=False negative rate,
+				grid=both,
+				minor grid style={gray!25},
+				major grid style={gray!25},
+				xmin=25,
+				xmax=70,
+				ymin=-0.05,
+				ymax=1.05,
+				width=\linewidth,
+				no marks,
+				table/x = sigma]
+				\addplot[line width=1pt,dashed,color=blue] table[y=typeII] from \forecorner;
+				\addlegendentry{Statistical test}
+				\addplot[line width=1pt,dashed,color=red] table[y=typeII_o] from \forecorner;
+				\addlegendentry{Opening}
+				\addplot[line width=1pt,dashed,color=gray] table[y=typeII_c] from \forecorner;
+				\addlegendentry{Closing}
+				\addplot[line width=1pt,dashed,color=black] table[y=typeII_oc] from \forecorner;
+				\addlegendentry{Opening \& Closing}
+			\end{axis}
+		\end{tikzpicture}
+		\caption{Foreground pixel at the corner of the ROI.}
+		\label{fig: alpha0.05_phi7_foreground_corner_zoom}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[t]{0.48\linewidth}
+		\centering
+		\begin{tikzpicture}
+			\begin{axis}[
+				legend pos=north west,
+				legend style={nodes={scale=0.5, transform shape}},
+				xlabel=Standard deviation $\sigma$,
+				ylabel=False negative rate,
+				grid=both,
+				minor grid style={gray!25},
+				major grid style={gray!25},
+				xmin=35,
+				xmax=80,
+				ymin=-0.05,
+				ymax=1.05,
+				width=\linewidth,
+				no marks,
+				table/x = sigma]
+				\addplot[line width=1pt,dashed,color=blue] table[y=typeII] from \foreedge;
+				\addlegendentry{Statistical test}
+				\addplot[line width=1pt,dashed,color=red] table[y=typeII_o] from \foreedge;
+				\addlegendentry{Opening}
+				\addplot[line width=1pt,dashed,color=gray] table[y=typeII_c] from \foreedge;
+				\addlegendentry{Closing}
+				\addplot[line width=1pt,dashed,color=black] table[y=typeII_oc] from \foreedge;
+				\addlegendentry{Opening \& Closing}
+			\end{axis}
+		\end{tikzpicture}
+		\caption{Foreground pixel at the edge of the ROI.}
+		\label{fig: alpha0.05_phi7_foreground_edge_zoom}
+	\end{subfigure}
+	\vfill
+	\begin{subfigure}[t]{0.48\linewidth}
+		\centering
+		\begin{tikzpicture}
+			\begin{axis}[
+				legend pos=north west,
+				legend style={nodes={scale=0.5, transform shape}},
+				xlabel=Standard deviation $\sigma$,
+				ylabel=False negative rate,
+				grid=both,
+				minor grid style={gray!25},
+				major grid style={gray!25},
+				xmin=45,
+				xmax=100,
+				ymin=-0.05,
+				ymax=1.05,
+				width=\linewidth,
+				no marks,
+				table/x = sigma]
+				\addplot[line width=1pt,dashed,color=blue] table[y=typeII] from \forefree;
+				\addlegendentry{Statistical test}
+				\addplot[line width=1pt,dashed,color=red] table[y=typeII_o] from \forefree;
+				\addlegendentry{Opening}
+				\addplot[line width=1pt,dashed,color=gray] table[y=typeII_c] from \forefree;
+				\addlegendentry{Closing}
+				\addplot[line width=1pt,dashed,color=black] table[y=typeII_oc] from \forefree;
+				\addlegendentry{Opening \& Closing}
+			\end{axis}
+		\end{tikzpicture}
+		\caption{Foreground pixel surrounded by foreground.}
+		\label{fig: alpha0.05_phi7_foreground_free_zoom}
+	\end{subfigure}
+	\caption{Closer look at the false negative rates in Figure \ref{fig: alpha0.05_phi7}.}
+	\label{fig: alpha0.05_phi7_zoom}
+\end{figure}

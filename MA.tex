@@ -53,6 +53,8 @@
 \newtheorem{remark}[theorem]{Remark}
 \newtheorem{example}[theorem]{Example}
 
+\numberwithin{equation}{section}
+
 % END PREAMBLE
 
 \addbibresource{References.bib}
@@ -131,7 +133,7 @@ Dr. Robin \textsc{Richter}
 	\begin{tabular}{p{3cm}p{10cm}}
 		$\mathbb{R}^{m \times n}$ & Set of real $m$-by-$n$ matrices \\
 		$\{ 0, 1 \}^{m \times n}$ & Set of binary $m$-by-$n$ matrices \\
-		$\mathcal{V}_c^{m, n}$ & Set of matrices in $\{ 0, \pm c \}^{m \times n}$, that contain a rectangular region of interest with a checkerboard pattern \\
+		$\mathcal{V}_c^{m, n}$ & Set of matrices in $\{ -c, 0, + c \}^{m \times n}$, that contain a rectangular region of interest with a chessboard pattern \\
 		$\mathcal{H}_0(i, j)$ & Set of matrices in $\mathcal{V}_c^{m, n}$, such that the null hypothesis at $(i, j)$ is true \\
 		$\mathcal{H}_1(i, j)$ & Set of matrices in $\mathcal{V}_c^{m, n}$, such that the alternative hypothesis at $(i, j)$ is true \\
 		$\Delta^+, \Delta^-$ & Forward and backward discrete derivative operator \\
@@ -139,7 +141,7 @@ Dr. Robin \textsc{Richter}
 		$\mathfrak{I}, \mathfrak{K}, \dots$ & Matrices in $\{ 0, 1 \}^{m \times n}$ \\
 		$\Omega, \varLambda, \Theta, \dots$ & Subsets of $\mathbb{Z}^2$ \\
 		$\Psi, \Phi, \dots$ & Structuring elements, subsets of $\mathbb{Z}^2$ \\
-		$\norm{.}$ & $\ell^2$-norm \\
+		$\norm{.}$ & Euclidean norm, $\ell^2$-norm \\
 		$\ominus, \oplus$ & Morphological erosion \& dilation operator \\
 		$\circ, \bullet$ & Morphological opening \& closing operator \\
 	\end{tabular}
@@ -159,14 +161,14 @@ We interpret the thresholding techniques via statistical testing. When threshold
 
 The interplay of thresholding techniques with post-processing via morphological operators, incorporating prior knowledge, has, to the best of the author's knowledge, not been addressed. This thesis aims at providing a first step towards understanding this interplay by assessing the change of error rates through application of morphological operators.
 
-In a simplified scenario, the change of upper bounds for the error rates, when morphological opening and closing are applied, is shown. The focus lies on the probabilites of misclassifying a single pixel.
+In a simplified scenario, we analyze the impact of morphological operators on the upper bounds for the error probabilities. The focus lies on the probabilites of misclassifying a single pixel. We restrict our assessment to the application of morphological opening and closing, since these operators only rely on a neighbourhood of the specific pixel we are considering, making their effect easy to understand.
 
-The model is given by an image with constanst gray background and a rectangular region of interest with a checkerboard pattern, see Figure \ref{fig: rROI}. We analyze the impact of morphological opening and closing, since these operators only rely on a neighbourhood of the specific pixel we are considering. The model still exhibits convexity of the ROI and an oscillatory pattern within the ROI, as in a fingerprint image. This admits the use of the discrete derivative operator for the statistical test.
+The model is given by an image with constanst gray background and a rectangular region of interest with a chessboard pattern, see Figure \ref{fig: ROI}. The model exhibits convexity of the ROI and an oscillatory pattern within the ROI, as in a fingerprint image, and thus can be viewed as a toy example of a fingerprint.
 
 Notably, we are interested in the change of the error probabilities for a specific pixel. Hence, we do not consider methods to test for the whole rectangle, but develop a test for each pixel to decide whether or not it is part of the rectangular region of interest. As an example, testing for the corners of the rectangle might offer better power, when trying to determine the rectangular ROI, but such an approach does not generalize to fingerprint images.
 
-% Draw example of a matrix with a rROI with a checkerboard pattern:
-\input{Figures/rROI}
+% Draw example of a matrix with a ROI with a chessboard pattern:
+\input{Figures/ROI}
 
 \paragraph{The statistical model}
 
@@ -174,109 +176,44 @@ Let $m, n \in \mathbb{N}$ and $c \in \mathbb{R} \setminus \{ 0 \}$. We assume a 
 \begin{equation}\label{statmodel}
 	F(i, j) = \underbrace{c + V(i, j)}_{\eqqcolon \tilde{V}(i, j)} + \varepsilon_{i, j}
 \end{equation}
-for all $(i, j) \in \Omega \coloneqq \left\{ 1, \dots, m \right\} \times \left\{ 1, \dots, n \right\}$. The values of $V$ alternate between $c$ and $-c$ along the rows and columns of the region of interest, and call the set of all such images $\mathcal{V}_c^{m, n}$. The noise terms $\varepsilon_{i, j} \sim \mathcal{N}(0, \sigma^2)$ are assumed to be i.i.d. normally distributed random variables for some $\sigma > 0$.
+for all $(i, j) \in \Omega \coloneqq \left\{ 1, \dots, m \right\} \times \left\{ 1, \dots, n \right\}$. The values of $V$ alternate between $c$ and $-c$ along the rows and columns of the region of interest. The noise terms $\varepsilon_{i, j} \sim \mathcal{N}(0, \sigma^2)$ are assumed to be i.i.d. normally distributed random variables for some $\sigma > 0$.
 
-For visualization we use grayscale images and set $c = 127.5$. Then the values of the image $\tilde{V}$ alternate between black and white within the region of interest. This gives the region of interest of $\tilde{V}$ a classical checkerboard pattern, see Figure \ref{fig: rROI} for an example.
+For visualization we use grayscale images and set $c = 127.5$. Then the values of the image $\tilde{V}$ alternate between $0$ (black) and $255$ (white) within the region of interest. This gives the region of interest of $\tilde{V}$ a classical chessboard pattern, see Figure \ref{fig: ROI} for an example.
 
 Notably, we make two simplifications in our statistical model. First, we assume the variance $\sigma$ of the noise terms to be known beforehand. Second, we ignore the limitations of grayscale images and let the images in our model take all values in the real numbers. When trying to restore a ROI from an actual grayscale fingerprint image, the image, and thus the observed data $F$, would only take values in $\{ 0, \dots, 255 \}$.
 
-The goal is to develop a statistical test for every pixel to determine whether or not the pixel belongs to the region of interest of $V$ and as such reconstructing the unknown $V$ from the noisy data. By choosing a checkerboard pattern, the discrete derivative operators can be employed to this end. The pixel $(i, j)$ belonging to the ROI is equivalent to $\min \{ \norm{\Delta^+ V(i, j)}, \norm{\Delta^- V(i, j)} \} \neq 0$, where $\Delta^+$ and $\Delta^-$ denote the forward and backward discrete derivative operator, respectively. Thus, we get the null and alternative hypotheses
-\begin{align*}
-	H_0(i, j)&: \min \{ \norm{\Delta^+ V(i, j)}, \norm{\Delta^- V(i, j)} \} = 0, \\
-	H_1(i, j)&: \min \{ \norm{\Delta^+ V(i, j)}, \norm{\Delta^- V(i, j)} \} \neq 0.
-\end{align*}
-We use
+The goal is to develop a statistical test for every pixel to determine whether or not the pixel belongs to the region of interest of $V$ and as such reconstructing the unknown $V$ from the noisy data. Choosing a chessboard pattern admits the use of the discrete derivative operator for the statistical test.
+
+As shown in Section \ref{section: statisticalmodel}, the pixel $(i, j)$ belonging to the ROI is equivalent to $\min \{ \norm{\Delta^+ V(i, j)}, \norm{\Delta^- V(i, j)} \} \neq 0$, where $\norm{.}$ is the Euclidean norm and $\Delta^+$ and $\Delta^-$ denote the forward and backward discrete derivative operator, respectively. Based on this observation, we use
 \begin{equation*}
 	T(i, j) \coloneqq \min \{ \norm{\Delta^+ F(i, j)}, \norm{\Delta^- F(i, j)} \}
 \end{equation*}
-as a test statistic for each pixel $(i, j) \in \Omega$. In the following, we denote by $\mathbb{P}_V( \ldots )$ the probability of an event given a \emph{fixed} image $V$.
+as a test statistic to test the null hypothesis $H_0(i, j)$, stating that $(i, j)$ does not belong to the ROI of $V$, against the alternative hypothesis $H_1(i, j)$, stating that $(i, j)$ does belong to the ROI of $V$. We reject the null hypothesis, if the test statistic is greater than or equal to a given threshold. This is done for each pixel $(i, j) \in \Omega$.
 
-If the null hypothesis $H_0(i, j)$ is true, we have $\norm{\Delta^+ V(i, j)} = 0$ or $\norm{\Delta^- V(i, j)} = 0$.
+In Section \ref{section: boundtypeIerror} we study the choice of a suitable threshold $t_\alpha$, that bounds the probability of a type I error in this testing procedure below a given statistical significance $\alpha \in (0, 1)$. We achieve this by bounding the distribution of the test statistic under the null hypothesis by the cumulative distribution function of a non-central Chi distributed random variable with normally distributed non-centrality parameter, see Lemma \ref{lem: typeIbound}. This yields a compound probability distribution, which we compute in Theorem \ref{thm: cdf}. By employing a trial and error algorithm, we find a threshold $t_\alpha$, such that the probability of falsely categorizing a background pixel as a foreground pixel is smaller than a given statistical significance $\alpha \in (0, 1)$.
 
-For $\norm{\Delta^+ V(i, j)} = 0$ we can bound the probability of a type I error by
-\begin{equation*}
-	\mathbb{P}_V( T(i, j) \geq t ) \leq \mathbb{P}_V( \norm{\Delta^+ F(i, j)} \geq t )
-\end{equation*}
-and for $\norm{\Delta^- V(i, j)} = 0$ by
-\begin{equation*}
-	\mathbb{P}_V( T(i, j) \geq t ) \leq \mathbb{P}_V( \norm{\Delta^- F(i, j)} \geq t ).
-\end{equation*}
-
-The right hand side of both inequalities is the same function, which can be computed explicitly. Using a trial and error algorithm, we can find a threshold $t_\alpha$ for a given statistical significance $\alpha \in ( 0, 1 )$, such that
-\begin{equation*}
-	\mathbb{P}_V( T(i, j) \geq t_\alpha ) \leq \alpha
-\end{equation*}
-for every $(i, j) \in \Omega$, if $H_0(i, j)$ is true. Since this is independent of the specific $V$, it holds for all images $V$ under which the null hypothesis for the pixel $(i, j)$ is true and thus we can bound the probability of falsely categorizing a background pixel as a foreground pixel by a given statistical significance $\alpha \in ( 0, 1 )$.
+Furthemore, we numerically generate bounds for the probability of a type II error in Section \ref{section: analyzetypeIIerror}.
 
 \paragraph{Main results}
 
-We aim at researching the changes of the upper bounds of the error probabilities under morphological opening and closing.
+We aim at researching the changes of the upper bounds of the error probabilities under morphological opening and closing. These morphological operations require the choice of a subset of $\mathbb{Z}^2$, called a \emph{structuring element}, see \cite{imageprocessing}. As the region of interest in our case is rectangular, we use a square structuring element.
 
-Let $\mathfrak{I} \in \{ 0, 1 \}^{m \times n}$ be a binary matrix and $\Psi \subseteq \mathbb{Z}^2$ be a \emph{structuring element}, see \cite{imageprocessing}, we denote by $\mathfrak{I} \circ \Psi$ the opening of the binary matrix $\mathfrak{I}$ by $\Psi$ and by $\mathfrak{I} \bullet \Psi$ the closing of the binary matrix $\mathfrak{I}$ by $\Psi$.
+In Theorem \ref{thm: typeIinequalities} we show, that using such a square structuring element yields an exponential improvement of the upper bound of the probability of a type I error after morphological opening compared to the upper bound before opening is applied, see inequality \eqref{ineq: typeIopening}. Applying morphological closing after opening will worsen this bound, but only polynomially, see inequality \eqref{ineq: typeIopeningclosing}. On the other hand, the upper bound, when only applying closing to the outcome of the statistical test, becomes a multiple of the upper bound before closing, see inequality \eqref{ineq: typeIclosing}.
+Overall, we obtain a better upper bound for the probability of a type I error, when applying morphological opening or opening and closing. When applying morphological closing, the upper bound worsens. These results allow us to adjust the statistical significance used for the statistical test, such that the probability of a type I error after morphological operations have been applied, is bounded below a given statistical significance $\alpha \in (0, 1)$ in any of these cases. Details on these adjustments as well as simulation results can be found in Section \ref{section: simulationresults}.
 
-As the region of interest in our case is rectangular, we use a square structuring element. We show, that using such a square structuring element yields an exponential improvement of the upper bound of the probability of a type I error after morphological opening compared to the upper bound before opening is applied. Applying morphological closing after opening will worsen this bound, but only polynomially. Overall, we obtain a better upper bound for the probability of a type I error, when applying morphological opening and closing. This allows us to lower the threshold $t_\alpha$ in the statistical test, potentially increasing the number of type I errors. Through the improvement of the upper bound, we can still bound the probability of a type I error after morphological opening and closing below a given statistical significance $\alpha$. The following theorem formalizes the change of the upper bounds.
+The question of bounding the probability of a type II error after morphological opening and closing also arises. Upper bounds are given in Theorem \ref{thm: typeIIinequalities}. It turns out, morphological opening increases the upper bound of this probability polynomially, see \eqref{ineq: typeIIopening}. The application of morphological closing, when applied after opening, does not improve the upper bound, since independence of the pixels is not guaranteed anymore, see \eqref{ineq: typeIIopeningclosing}. When only morphological closing is applied, the upper bound does not change, see \eqref{ineq: typeIIclosing}.
 
-\begin{theorem}
-	Let $\Omega = \left\{ 1, \dots, m \right\} \times \left\{ 1, \dots, m \right\}$. Assume $F$ follows the statistical model given in \eqref{statmodel}.
-	
-	For a statistical significance $\alpha \in (0, 1)$, let $t_\alpha$ be a threshold, such that $\mathbb{P}_V( \norm{\Delta^+ F(\tilde{i}, \tilde{j})} \geq t_\alpha ) \leq \alpha$, if $\norm{\Delta^+ V(\tilde{i}, \tilde{j})} = 0$, and $\mathbb{P}_V( \norm{\Delta^- F(\tilde{i}, \tilde{j})} \geq t_\alpha ) \leq \alpha$, if $\norm{\Delta^- V(\tilde{i}, \tilde{j})} = 0$, for every $\tilde{i}, \tilde{j} \in \Omega$.
-	
-	Let $\mathfrak{I}_\alpha$ be the binary image defined by
-	\begin{equation*}
-	\mathfrak{I}_\alpha(\tilde{i}, \tilde{j}) = \mathds{1}_{ \{ T(\tilde{i}, \tilde{j}) \geq t_\alpha \} }
-	\end{equation*}
-	for all $(\tilde{i}, \tilde{j}) \in \Omega$.
-	
-	Let $\varphi \in \mathbb{N}$ be odd and define the set $\Phi_\varphi = \left\{ -\frac{\varphi - 1}{2}, -\frac{\varphi - 3}{2}, \dots, \frac{\varphi - 3}{2}, \frac{\varphi - 1}{2} \right\}$ and the structuring element $\Psi_\varphi = \Phi_\varphi \times \Phi_\varphi$.
-	
-	Then for $(i, j) \in \Omega$ the following inequalities hold, if $H_0(i, j)$ is true:
-	\begin{align}
-		\mathbb{P}_V\left( (\mathfrak{I}_\alpha \circ \Psi_\varphi)(i, j) = 1 \right) &\leq \varphi \alpha^{\frac{\varphi + 1}{2}} \label{ineq: introtypeIopening} \\
-		\mathbb{P}_V\left( ((\mathfrak{I}_\alpha \circ \Psi_\varphi) \bullet \Psi_\varphi)(i, j) = 1 \right) &\leq \varphi^3 \alpha^{\frac{\varphi + 1}{2}} \label{ineq: introtypeIclosing}
-	\end{align}
-\end{theorem}
+Note, that all upper bounds in these theorems are independent of the specific $(i, j)$. This means, that the bounds also hold for the worst case, i.e. pixels directly at the transition from background to foreground.
 
-The question of bounding the probability of a type II error after morphological opening and closing also arises. It turns out, morphological opening increases the upper bound of this probability polynomially. The application of morphological closing, when applied after opening, does not improve the upper bound, since independence of the pixels is not guaranteed anymore. This is formalized in the following theorem.
-
-\begin{theorem}
-	Let $\Omega = \left\{ 1, \dots, m \right\} \times \left\{ 1, \dots, m \right\}$. Assume $F$ follows the statistical model given in \eqref{statmodel}.
-	
-	Let $t$ be a threshold, such that
-	\begin{equation*}
-		\mathbb{P}_V\left( T(\tilde{i}, \tilde{j}) \leq t \right) \leq \beta
-	\end{equation*}
-	for some $\beta \in (0, 1)$, all $(\tilde{i}, \tilde{j}) \in \Omega$ and all $V$, such that $H_1(\tilde{i}, \tilde{j})$ is true.
-	
-	Let $\mathfrak{I}$ be the binary image defined by
-	\begin{equation*}
-		\mathfrak{I}(\tilde{i}, \tilde{j}) = \mathds{1}_{ \{ T(\tilde{i}, \tilde{j}) \geq t \} }
-	\end{equation*}
-	for all $(\tilde{i}, \tilde{j}) \in \Omega$.
-	
-	Let $\varphi \in \mathbb{N}$ be odd and define the set $\Phi_\varphi = \left\{ -\frac{\varphi - 1}{2}, -\frac{\varphi - 3}{2}, \dots, \frac{\varphi - 3}{2}, \frac{\varphi - 1}{2} \right\}$ and the structuring element $\Psi_\varphi = \Phi_\varphi \times \Phi_\varphi$.
-	
-	Let $(i, j) \in \Omega$ and $V \in \mathcal{H}_1(i, j)$.
-	
-	Assume, that the rectangular region of interest contained in $V$ has side lengths larger than $\varphi$.
-	
-	Then for $(i, j) \in \Omega$ the following inequalities hold, if $H_1(i, j)$ is true:
-	\begin{align}
-		\mathbb{P}_V\left( (\mathfrak{I} \circ \Psi_\varphi)(i, j) = 0 \right) &\leq \varphi^2 \beta \label{ineq: introtypeIIopening} \\
-		\mathbb{P}_V\left( ((\mathfrak{I} \circ \Psi_\varphi) \bullet \Psi_\varphi)(i, j) = 0 \right) &\leq \varphi^2 \beta \label{ineq: introtypeIIclosing}
-	\end{align}
-\end{theorem}
-
-Note, that the bounds in the previous theorems are independent of the specific $(i, j)$. This means, that the bounds also hold for the worst case, i.e. pixels directly at the transition from background to foreground.
-
-We simulate six different positions of $(i, j)$ with respect to the region of interest, see Figure \ref{fig: simulatedpixeltypes}. Regardless of the position of the pixel, morphological opening decreases the rate of type I errors as expected from inequality \eqref{ineq: introtypeIopening}. The increase of this rate through morphological closing, suggested by inequality \eqref{ineq: introtypeIclosing}, can not be observed. On the other hand, the rate of type II errors does not increase under morphological opening as much as inequality \eqref{ineq: introtypeIIopening} suggests. The fact, that the upper bound in inequalities \eqref{ineq: introtypeIIopening} and \eqref{ineq: introtypeIIclosing} is the same is well reflected in the simulation results.
+These results are only upper bounds for the error probabilities. To examine the actual change of the probabilities, we perform a simulation to calculate empiric error rates in Section \ref{section: simulationresults}. We simulate six different positions of $(i, j)$ with respect to the region of interest, see Figure \ref{fig: simulatedpixeltypes}, and use adjusted statistical significances as described above.
 
 \paragraph{Outlook}
 
-The region of interest in this simplified model is convex and has an oscillatory pattern, similar to a fingerprint image. We used the discrete derivative operator to binarize the image and proceeded by applying morphological opening and closing.
+The region of interest in this simplified model is convex and has an oscillatory pattern, similar to a fingerprint image. We use the discrete derivative operator to binarize the image and proceed by applying morphological opening and closing.
 
 The results presented in this thesis do not simply carry over to fingerprints. How the error probabilities can be bounded as well as how a structuring element should be chosen are questions that need to be explored.
 
-Furthermore, we only considered bounds for single pixels. A next step should involve methods from the field of multiple testing to consider the simultaneous test of all pixels in the image.
+Furthermore, we only consider bounds for single pixels. A next step should involve methods from the field of multiple testing to consider the simultaneous test of all pixels in the image.
 
 \paragraph{Outline of the thesis}
 
@@ -290,10 +227,10 @@ In Section \ref{section: definitions} we introduce definitions and notation of t
 
 \subsection{Definitions}\label{section: definitions}
 
-Assume that the noise-free image $V$ in our statistical model has a rectangular region of interest with a checkerboard pattern, cf. equation \eqref{statmodel} and Figure \ref{fig: rROI}. In the following we give formal definitions of these properties.
+Assume that the noise-free image $V$ in our statistical model has a rectangular region of interest with a chessboard pattern, cf. equation \eqref{statmodel} and Figure \ref{fig: ROI}. In the following we give a formal definition of this setup.
 
-\begin{definition}\label{def: rROIcheckerboard}
-	Let $m, n \in \mathbb{N}$, $c \in \mathbb{R} \setminus \{ 0 \}$ and $V \in \{ 0, \pm c \}^{m \times n}$. We say that $V$ contains a \emph{rectangular region of interest with a checkerboard pattern}, if
+\begin{definition}\label{def: ROIchessboard}
+	Let $m, n \in \mathbb{N}$, $c \in \mathbb{R} \setminus \{ 0 \}$ and $V \in \{ -c, 0, + c \}^{m \times n}$. We say that $V$ contains a \emph{rectangular region of interest with a chessboard pattern}, if
 	\begin{equation}
 		V(i, j) =
 		\begin{cases}
@@ -302,29 +239,29 @@ Assume that the noise-free image $V$ in our statistical model has a rectangular 
 			0, \textrm{ if } (i, j) \notin \{ \kappa_1, \dots, \kappa_2 \} \times \{ \lambda_1, \dots, \lambda_2 \}
 		\end{cases}
 	\end{equation}
-	for some $(\kappa_1, \lambda_1), (\kappa_2, \lambda_2) \in \mathbb{N}^2$ with $1 \leq \kappa_1 \leq \kappa_2 \leq m$ and $1 \leq \lambda_1 \leq \lambda_2 \leq m$ and all $(i, j) \in \{ 1, \dots, m \} \times \{ 1, \dots, n \}$. The set of all such $V$ is denoted by $\mathcal{V}_c^{m, n}$.
+	for some $(\kappa_1, \lambda_1), (\kappa_2, \lambda_2) \in \mathbb{N}^2$ with $1 < \kappa_1 \leq \kappa_2 < m$ and $1 < \lambda_1 \leq \lambda_2 < n$ and all $(i, j) \in \{ 1, \dots, m \} \times \{ 1, \dots, n \}$. The set of all such $V$ is denoted by $\mathcal{V}_c^{m, n}$.
 	
-	We call $\varLambda = \{ \kappa_1, \dots, \kappa_2 \} \times \{ \lambda_1, \dots, \lambda_2 \}$ a \emph{rectangular region of interest (rROI)} and say that $V$ contains the rROI $\varLambda$.
+	We call $\varLambda = \{ \kappa_1, \dots, \kappa_2 \} \times \{ \lambda_1, \dots, \lambda_2 \}$ a \emph{rectangular region of interest (ROI)} and say that $V$ contains the ROI $\varLambda$.
 	
 	Furthermore, we call $(\kappa_1, \lambda_1)$ the \emph{top left corner} and $(\kappa_2, \lambda_2)$ the \emph{bottom right corner} of $\varLambda$.
 \end{definition}
 
-Hence, the top left corner of the region of interest of $V$ takes the value $c$ and then the values of $V$ alternate between $+c$ and $-c$ along the rows and columns of the region of interest. This is similar to the classical checkerboard pattern.
+Hence, the top left corner of the region of interest of $V$ takes the value $c$ and then the values of $V$ alternate between $+c$ and $-c$ along the rows and columns of the region of interest. This is similar to the classical chessboard pattern.
 
 \begin{remark}
-	Any matrix $V \in \mathcal{V}_c^{m, n}$ is uniquely defined by the top left and bottom right corner of $\varLambda$. Hence, a rROI $\varLambda = \{ \kappa_1, \dots, \kappa_2 \} \times \{ \lambda_1, \dots, \lambda_2 \}$ corresponds to a unique element $V \in \mathcal{V}_c^{m, n}$, that contains the rROI $\varLambda$.
+	Any matrix $V \in \mathcal{V}_c^{m, n}$ is uniquely defined by the top left and bottom right corner of $\varLambda$.
 \end{remark}
 
 \begin{remark}
-	To adjust to boundary issues, we use a periodic boundary condition, i.e. we extend $V$ to all of $\mathbb{Z}^2$ by setting $V(i, j) = V(i \mod m, j \mod n)$ for all $(i, j) \in \mathbb{Z}^2$.
+	To adjust for boundary issues, we use a periodic boundary condition, i.e. we extend $V$ to all of $\mathbb{Z}^2$ by setting $V(i, j) = V(i \mod m, j \mod n)$ for all $(i, j) \in \mathbb{Z}^2$. We also require there to be at least be one pixel distance between the ROI and the edge of the image.
 \end{remark}
 
-In Figure \ref{fig: rROI} we see an example of such a matrix. To visualize these types of matrices, we take $c = 127.5$ and plot the grayscale image $V + c$. Thus, gray pixels represent $V = 0$, white pixels represent $V = c$ and black pixels represent $V = - c$.
+In Figure \ref{fig: ROI} we see an example of such a matrix. To visualize these types of matrices, we would have $c = 127.5$ and plot the grayscale image $V + c$. Thus, gray pixels represent $V = 0$, white pixels represent $V = c$ and black pixels represent $V = - c$. We use notation from the field of image processing and start indexing at the top left corner of the image.
 
 We also need the forward and backward discrete derivative operator, whose definitions we give below, to establish our statistical test.
 
 \begin{definition}
-	Let $m, n \in \mathbb{N}$ and let $V \in \mathbb{R}^{m \times n}$. Define the set of possible indices $\Omega \coloneqq \{ 1, \dots, m \} \times \{ 1, \dots, m \}$. Let $(i, j) \in \Omega$. The \textit{forward and backward discrete derivative of $V$ evaluated at $(i, j)$} are defined as
+	Let $m, n \in \mathbb{N}$ and let $V \in \mathbb{R}^{m \times n}$. Define the set of possible indices $\Omega \coloneqq \{ 1, \dots, m \} \times \{ 1, \dots, n \}$. Let $(i, j) \in \Omega$. The \textit{forward and backward discrete derivative of $V$ evaluated at $(i, j)$} are defined as
 	\begin{equation}
 		\Delta^+ V(i, j) =
 		\begin{pmatrix}
@@ -344,21 +281,22 @@ We also need the forward and backward discrete derivative operator, whose defini
 	respectively.
 \end{definition}
 
-The following lemma shows, that the euclidean norm of these operators evaluated at a pixel $(i, j) \in \Omega$ for matrices $V \in \mathcal{V}_c^{m, n}$ can only take specific values.
+The following lemma shows, that the Euclidean norm of these operators evaluated at a pixel $(i, j) \in \Omega$ for matrices $V \in \mathcal{V}_c^{m, n}$ can only take specific values.
 
 \begin{lemma}\label{lem: setD}
 	Let $m, n \in \mathbb{N}$ and $c \in \mathbb{R} \setminus \{ 0 \}$. Let $V \in \mathcal{V}_c^{m, n}$. For any $(i, j) \in \Omega$ we have
 	\begin{equation}
-		\norm{\Delta^+ V(i, j)}, \norm{\Delta^- V(i, j)} \in \{ 0, c, \sqrt{2} c, \sqrt{5} c, \sqrt{8} c \}.
+		\norm{\Delta^+ V(i, j)}, \norm{\Delta^- V(i, j)} \in \{ 0, c, \sqrt{2} c, \sqrt{5} c, \sqrt{8} c \},
 	\end{equation}
+	where $\norm{.}$ denotes the $\ell^2$-norm.
 \end{lemma}
 \begin{proof}
-	Let $(i, j) \in \Omega$. We have assumed, that $V \in \mathcal{V}_c^{m, n}$. Thus, $V$ only takes values in $\{ 0, \pm c \}$ and we obtain $\Delta^+ V(i, j), \Delta^- V(i, j) \in \{ 0, \pm c, \pm 2 c \}^2$. Taking the euclidean norm of all possible combinations yields
+	Let $(i, j) \in \Omega$. By assumption, $V \in \mathcal{V}_c^{m, n}$. Thus, $V$ only takes values in $\{ -c, 0, + c \}$ and we obtain $\Delta^+ V(i, j), \Delta^- V(i, j) \in \{ - 2 c, - c, 0, + c, + 2 c \}^2$. Taking the Euclidean norm of all possible combinations yields
 	\begin{equation*}
 		\norm{\Delta^+ V(i, j)}, \norm{\Delta^- V(i, j)} \in \{ 0, c, 2 c, \sqrt{2} c, \sqrt{5} c, \sqrt{8} c \}.
 	\end{equation*}
 	
-	We can narrow this list down even more. By assumption, $V$ contains a rectangular region of interest $\varLambda$ with a checkerboard pattern. This only allows for the combinations of $\abs{V(i + 1, j) - V(i, j)}$ and $\abs{V(i, j + 1) - V(i, j)}$ listed in Table \ref{table: discretederivativevalues}.
+	We can narrow this list down even more. By assumption, $V$ contains a rectangular region of interest $\varLambda$ with a chessboard pattern. This only allows for the combinations of $\abs{V(i + 1, j) - V(i, j)}$ and $\abs{V(i, j + 1) - V(i, j)}$ listed in Table \ref{table: discretederivativevalues}.
 	\begin{table}[t]
 		\centering
 		\resizebox{\textwidth}{!}{
@@ -380,12 +318,15 @@ The following lemma shows, that the euclidean norm of these operators evaluated 
 				$(i, j), (i + 1, j), (i, j + 1) \in \varLambda$ & $2 c$ & $2 c$ & $\sqrt{8} c$ \\
 			\end{tabular}
 		}
-	\caption{Possible locations of the pixels $(i, j)$, $(i + 1, j)$, $(i, j + 1)$ and the corresponding values of $\abs{V(i + 1, j) - V(i, j)}$, $\abs{V(i, j + 1) - V(i, j)}$ and $\norm{\Delta^+ V(i, j)}$, respectively.}
+	\caption{Possible locations of the pixels $(i, j)$, $(i + 1, j)$, $(i, j + 1)$ and the corresponding values of $\abs{V(i + 1, j) - V(i, j)}$, $\abs{V(i, j + 1) - V(i, j)}$ and $\norm{\Delta^+ V(i, j)}$, respectively. See Figure \ref{fig: discretederivativevalues} for a visualization of these cases.}
 	\label{table: discretederivativevalues}
 	\end{table}
 	
 	Other cases are not possible and thus $\norm{\Delta^+ V(i, j)} \in \{ 0, c, \sqrt{2} c, \sqrt{5} c, \sqrt{8} c \}$. By analogous deduction, we also obtain $\norm{\Delta^- V(i, j)} \in \{ 0, c, \sqrt{2} c, \sqrt{5} c, \sqrt{8} c \}$.
 \end{proof}
+
+% Draw cases from table 1:
+\input{Figures/discretederivativevalues}
 
 
 
@@ -397,9 +338,9 @@ Let $m, n \in \mathbb{N}$, $c \in \mathbb{R} \setminus \{ 0 \}$ and $\Omega = \l
 \end{equation}
 for all $(i, j) \in \Omega$, where $V \in \mathcal{V}_c^{m, n}$ is unknown and $\varepsilon_{i, j} \sim \mathcal{N}(0, \sigma^2)$ are i.i.d. normal distributed random variables for some $\sigma > 0$.
 
-Let $\varLambda$ be the rectangular region of interest contained in $V$. In the following we specify a statistical test to determine for each individual pixel whether $(i, j) \in \varLambda$ or $(i, j) \notin \varLambda$.
+Let $\varLambda$ be the rectangular region of interest contained in the above $V$. In the following we specify a statistical test to determine for each individual pixel whether $(i, j) \in \varLambda$ or $(i, j) \notin \varLambda$.
 
-By the assumption, that $V$ contains a rROI, it follows, that $V(i, j) = 0$ if and only if $(i, j) \notin \varLambda$. Let $(\kappa_1, \lambda_1)$ and $(\kappa_2, \lambda_2)$ be the top left and bottom right corner of $\varLambda$, respectively. Now, if $(i, j) \notin \varLambda$, it follows that $i \notin \{ \kappa_1, \dots, \kappa_2 \}$ or $j \notin \{ \lambda_1, \dots, \lambda_2 \}$. We have to distinguish four cases here:
+By the assumption, that $V$ contains a rectangular ROI, it follows, that $V(i, j) = 0$ if and only if $(i, j) \notin \varLambda$. Let $(\kappa_1, \lambda_1)$ and $(\kappa_2, \lambda_2)$ be the top left and bottom right corner of $\varLambda$, respectively. Now, if $(i, j) \notin \varLambda$, it follows that $i \notin \{ \kappa_1, \dots, \kappa_2 \}$ or $j \notin \{ \lambda_1, \dots, \lambda_2 \}$. We have to distinguish four cases here, which are visualized in Figure \ref{fig: cases(I)-(IV)}:
 \begin{enumerate}[(I)]
 	\item $\begin{aligned}[t]
 		\hspace{40pt} i < \kappa_1 &\Rightarrow (i, j - 1) \notin \varLambda \textrm{ and } (i - 1, j) \notin \varLambda \\
@@ -419,20 +360,23 @@ By the assumption, that $V$ contains a rROI, it follows, that $V(i, j) = 0$ if a
 	\end{aligned}$
 \end{enumerate}
 
-We have $\norm{\Delta^- V(i, j)} = 0$ in the first two cases and $\norm{\Delta^+ V(i, j)} = 0$ in the latter two cases. Thus, $(i, j) \notin \varLambda$ implies $\min \{ \norm{\Delta^+ V(i, j)}, \norm{\Delta^- V(i, j)} \} = 0$.
+% Draw cases (I) - (IV):
+\input{Figures/cases(I)-(IV)}
 
-On the other hand, we have assumed, that $\varLambda$ has a checkerboard pattern. Thus $\norm{\Delta^- V(i, j)}, \norm{\Delta^+ V(i, j)} \neq 0$ for $(i, j) \in \varLambda$. This yields the equivalence
+From now on, $\norm{.}$ always denotes the $\ell^2$-norm. We have $\norm{\Delta^- V(i, j)} = 0$ in the first two cases and $\norm{\Delta^+ V(i, j)} = 0$ in the latter two cases. Thus, $(i, j) \notin \varLambda$ implies $\min \{ \norm{\Delta^+ V(i, j)}, \norm{\Delta^- V(i, j)} \} = 0$.
+
+On the other hand, we have assumed, that $\varLambda$ has a chessboard pattern. Thus $\norm{\Delta^- V(i, j)}, \norm{\Delta^+ V(i, j)} \neq 0$ for $(i, j) \in \varLambda$. This yields the equivalence
 \begin{equation*}
 	(i, j) \notin \varLambda \Leftrightarrow \min \{ \norm{\Delta^+ V(i, j)}, \norm{\Delta^- V(i, j)} \} = 0.
 \end{equation*}
 
 Using this equivalence, we test for each individual pixel $(i, j)$ the null hypothesis
 \begin{equation}\label{nullhypothesis}
-	H_0(i, j): \min \{ \norm{\Delta^+ V(i, j)}, \norm{\Delta^- V(i, j)} \} = 0
+	H_0(i, j): (i, j) \notin \varLambda
 \end{equation}
 against the alternative hypothesis
 \begin{equation}\label{alternativehypothesis}
-	H_1(i, j): \min \{ \norm{\Delta^+ V(i, j)}, \norm{\Delta^- V(i, j)} \} \neq 0
+	H_1(i, j): (i, j) \in \varLambda
 \end{equation}
 using the test statistic
 \begin{equation}\label{teststatistic}
@@ -440,9 +384,9 @@ using the test statistic
 \end{equation}
 which is based on the given noisy data.
 
-To extract the rROI, we classify pixels as foreground, if we reject the null hypothesis, i.e. if $T(i, j) \geq t$ for some threshold $t \in \mathbb{R}^+$. The choice of the threshold is examined in Section \ref{section: boundtypeIerror}.
+To extract the ROI, we classify pixels as foreground, if we reject the null hypothesis, i.e. if $T(i, j) \geq t$ for some threshold $t \in \mathbb{R}^+$. The choice of the threshold is examined in Section \ref{section: boundtypeIerror}.
 
-For convenience, we want to define some subsets of $\mathcal{V}_c^{m, n}$. For every $(i, j) \in \Omega$ we define the set of images, for which the null hypothesis $H_0(i, j)$ is true as
+For convenience, we want to define some subsets of $\mathcal{V}_c^{m, n}$, such that $(i, j) \notin \varLambda$. For every $(i, j) \in \Omega$ we define the set of images, for which the null hypothesis $H_0(i, j)$ is true as
 \begin{equation}
 	\mathcal{H}_0(i, j) \coloneqq \left\{ V \in \mathcal{V}_c^{m, n} \mid \min \{ \norm{\Delta^+ V(i, j)}, \norm{\Delta^- V(i, j)} \} = 0 \right\}.
 \end{equation}
@@ -453,7 +397,7 @@ Then $H_0(i, j)$ is true, if and only if $V \in \mathcal{H}_0(i, j)$. Furthermor
 	\mathcal{H}_0^-(i, j) &\coloneqq \left\{ V \in \mathcal{V}_c^{m, n} \mid \norm{\Delta^- V(i, j)} = 0 \right\} \label{setH0-}.
 \end{align}
 
-Then $\mathcal{H}_0(i, j) = \mathcal{H}_0^+(i, j) \cup \mathcal{H}_0^-(i, j)$, where the union is not necessarily disjoint.
+Then $\mathcal{H}_0(i, j) = \mathcal{H}_0^+(i, j) \cup \mathcal{H}_0^-(i, j)$, where the union is usually not disjoint, except for pixels on the boundary of the ROI.
 
 
 
@@ -461,7 +405,7 @@ Then $\mathcal{H}_0(i, j) = \mathcal{H}_0^+(i, j) \cup \mathcal{H}_0^-(i, j)$, w
 
 Having established our hypotheses and test statistic, we want to examine the choice of the threshold $t \in \mathbb{R}^+$ in the testing procedure. We reject the null hypothesis, if $T(i, j) \geq t$ for some threshold $t \in \mathbb{R}^+$. We want to choose $t$ such, that the probability of falsely classifying a background pixel as foreground is bounded from above by a given statistical significance $\alpha \in (0, 1)$. Such a threshold will be denoted as $t_\alpha$.
 
-As a reminder, we use the notation $\mathbb{P}_V( \ldots )$ for the probability of an event for some \emph{fixed} image $V$. This will allow us to analyze the probabilites of falsely categorizing a pixel. Using this notation, we want to find a threshold $t_\alpha$, such that $\mathbb{P}_V( T(i, j) \geq t_\alpha ) \leq \alpha$ for every $V \in \mathcal{H}_0(i, j)$. A first step towards finding such a threshold is the following lemma.
+We use the notation $\mathbb{P}_V( \ldots )$ for the probability of an event for some \emph{fixed} image $V$. This will allow us to analyze the probabilites of falsely categorizing a pixel. Using this notation, we want to find a threshold $t_\alpha$, such that $\mathbb{P}_V( T(i, j) \geq t_\alpha ) \leq \alpha$ for every $V \in \mathcal{H}_0(i, j)$. A first step towards finding such a threshold is the following lemma.
 
 \begin{lemma}\label{lem: typeIbound}
 	Let $(i, j) \in \Omega$ and $t \in \mathbb{R}^+$. Assume that $F$ follows the statistical model given in \eqref{statmodel2} and let $T(i, j)$ be defined as in \eqref{teststatistic}. Let $V \in \mathcal{V}_c^{m, n}$. Then
@@ -485,7 +429,14 @@ As a reminder, we use the notation $\mathbb{P}_V( \ldots )$ for the probability 
 	Combining these two inequalities yields the result and thus finishes the proof of the lemma.
 \end{proof}
 
-The second step is given in the following theorem, where we calculate the cumulative distribution functions of $\mathbb{P}_V( \norm{\Delta^+ F(i, j)} \leq t )$ for $V \in \mathcal{H}_0^+(i, j)$ and $\mathbb{P}_V( \norm{\Delta^- F(i, j)} \leq t )$ for $V \in \mathcal{H}_0^-(i, j)$, which turn out to be the same.
+The second step is given in the following theorem, where we calculate the cumulative distribution functions of $\mathbb{P}_V( \norm{\Delta^+ F(i, j)} \leq t )$ for $V \in \mathcal{H}_0^+(i, j)$ and $\mathbb{P}_V( \norm{\Delta^- F(i, j)} \leq t )$ for $V \in \mathcal{H}_0^-(i, j)$, which turn out to be the same. This cumulative distribution function involves the Marcum $Q$-function. For $M \geq 1$, it is defined as
+\begin{equation*}
+	Q_M(a, b) = \int_b^\infty x \left( \frac{x}{a} \right)^{M-1} \exp \left( -\frac{x^2 + a^2}{2} \right) I_{M-1}(a x) \mathrm{d}x.
+\end{equation*}
+
+\begin{remark}
+	The cumulative distribution function of a non-central chi distributed random variable with $k$ degrees of freedom and non-centrality parameter $\lambda$ is given by $1 - Q_\frac{k}{2}(\lambda, x)$.
+\end{remark}
 
 \begin{theorem}\label{thm: cdf}
 	Let $(i, j) \in \Omega$ and $t \in \mathbb{R}^+$. Assume that $F$ follows the statistical model given in \eqref{statmodel2}. Let $V_1 \in \mathcal{H}_0^+(i, j)$ and $V_2 \in \mathcal{H}_0^-(i, j)$. Then
@@ -500,7 +451,7 @@ The second step is given in the following theorem, where we calculate the cumula
 			&\quad + \frac{2 + \sqrt{3}}{2} Q_1 \left( \sqrt{\frac{2 + \sqrt{3}}{6}} \frac{t}{\sigma}, \sqrt{\frac{2 - \sqrt{3}}{6}} \frac{t}{\sigma} \right)
 		\end{aligned}
 	\end{equation}
-	with $I_0$ being the modified Bessel function of the first kind \cite[p.~910-911]{TISP} and $Q_M$ denoting the Marcum $Q$-function \cite{IntQFunction}.
+	with $I_0$ being the modified Bessel function of the first kind \cite[p.~910-911]{TISP} and $Q_1$ denoting the Marcum $Q_1$-function \cite{IntQFunction}.
 \end{theorem}
 \begin{proof}
 	We start by proving the first equality of equation \eqref{eq: probequality}. By assumption, $V_1 \in \mathcal{H}_0^+(i, j)$ and thus $\norm{\Delta^+ V_1(i, j)} = 0$. By definition of $\Delta^+$ we get the equivalence
@@ -508,7 +459,7 @@ The second step is given in the following theorem, where we calculate the cumula
 		\norm{\Delta^+ V_1(i, j)} = 0 \Leftrightarrow V_1(i + 1, j) - V_1(i, j) = V_1(i, j + 1) - V_1(i, j) = 0.
 	\end{equation*}
 	
-	We write out the term $\mathbb{P}_{V_1}( \norm{\Delta^+ F(i, j)} \leq t )$, which we call $q(t)$, and use the equivalence above to obtain
+	We expand the term $\mathbb{P}_{V_1}( \norm{\Delta^+ F(i, j)} \leq t )$, which we call $q(t)$, and use the equivalence above to obtain
 	\begin{align*}
 		q(t) &\coloneqq \mathbb{P}_{V_1}( \norm{\Delta^+ F(i, j)} \leq t ) \\
 		&= \mathbb{P}_{V_1}\big( (c + V_1(i + 1, j) + \varepsilon_{i + 1, j} - c - V_1(i, j) - \varepsilon_{i, j})^2 \\
@@ -547,19 +498,18 @@ The second step is given in the following theorem, where we calculate the cumula
 		\frac{\sqrt{(\varepsilon_{i + 1, j} - \varepsilon_{i, j})^2 + (\varepsilon_{i, j + 1} - \varepsilon_{i, j})^2}}{\sigma} \mid \varepsilon_{i, j} = \epsilon \sim \chi_2 \left( \frac{\sqrt{2} \abs{\epsilon}}{\sigma} \right).
 	\end{equation*}
 	
-	Up to this point, we assumed $\varepsilon_{i, j}$ to be fixed, however it is itself a normal distributed random variable with zero mean and standard deviation $\sigma$. Thus, we have a compound probability distribution and obtain
+	Up to this point, we assumed $\varepsilon_{i, j}$ to be fixed, however it is itself a normal distributed random variable with zero mean and standard deviation $\sigma$. Thus, we have a compound probability distribution. We can calculate the density of this non-central Chi-distributed random variable with normally distributed non-centrality parameter $\varepsilon_{i, j}$ by marginalizing over $\varepsilon_{i, j}$ and obtain
 	\begin{align*}
 		q(t) &= \mathbb{P}\left( \frac{\sqrt{(\varepsilon_{i + 1, j} - \varepsilon_{i, j})^2 + (\varepsilon_{i, j + 1} - \varepsilon_{i, j})^2}}{\sigma} \leq \frac{t}{\sigma} \right) \\
 		&= \int_0^\frac{t}{\sigma} \int_0^\infty \underbrace{x \exp \left( - \frac{x^2}{2} - \frac{\eta^2}{\sigma^2} \right) I_0 \left( \frac{\sqrt{2} \eta}{\sigma} x \right)}_{\textrm{pdf of} \ \chi_2 \left( \frac{\sqrt{2} \eta}{\sigma} \right) \ \textrm{for fixed} \ \eta} \underbrace{\frac{2}{\sqrt{2 \pi \sigma^2}} \exp \left( - \frac{\eta^2}{2 \sigma^2} \right)}_{\textrm{pdf of absolute value of} \ \mathcal{N}(0, \sigma^2)} \mathrm{d}\eta \mathrm{d}x \\
 		&= \frac{2}{\sqrt{2 \pi \sigma^2}} \int_0^\frac{t}{\sigma} x \exp \left( - \frac{x^2}{2} \right) \int_0^\infty \exp \left( - \frac{3}{2 \sigma^2} \eta^2 \right) I_0 \left( \frac{\sqrt{2} x}{\sigma} \eta \right) \mathrm{d}\eta \mathrm{d}x,
 	\end{align*}
 	
-	where $I_0$ is the modified Bessel function of the first kind. We can solve the inner integral first. For $\nu > -1$, $\alpha > 0$ the following equality holds.\footnote{\fullcite[p.~699]{TISP}}
-	\begin{equation}\label{eq: intbessel}
-		\int_0^\infty \exp \left( - \alpha \eta^2 \right) I_\nu ( \beta \eta ) \mathrm{d}\eta = \frac{\sqrt{\pi}}{2 \sqrt{\alpha}} \exp \left( \frac{\beta^2}{8 \alpha} \right) I_{\frac{1}{2} \nu} \left( \frac{\beta^2}{8 \alpha} \right)
-	\end{equation}
-	
-	In our case, we have $\nu = 0 > -1$, $\alpha = \frac{3}{2 \sigma^2} > 0$ and $\beta = \frac{\sqrt{2} x}{\sigma}$, which yields
+	where $I_0$ is the modified Bessel function of the first kind. We can solve the inner integral first. Equality \eqref{eq: intbessel} from Theorem \ref{thm: eqintbessel} states, that
+	\begin{equation*}
+		\int_0^\infty \exp \left( - \alpha \eta^2 \right) I_0 ( \beta \eta ) \mathrm{d}\eta = \frac{\sqrt{\pi}}{2 \sqrt{\alpha}} \exp \left( \frac{\beta^2}{8 \alpha} \right) I_0 \left( \frac{\beta^2}{8 \alpha} \right)
+	\end{equation*}
+	for $\alpha, \beta > 0$. In our case, we have $\alpha = \frac{3}{2 \sigma^2} > 0$ and $\beta = \frac{\sqrt{2} x}{\sigma} > 0$, which yields
 	\begin{align*}
 		\int_0^\infty \exp \left( - \frac{3}{2 \sigma^2} \eta^2 \right) I_0 \left( \frac{\sqrt{2} x}{\sigma} \eta \right) \mathrm{d}\eta &= \frac{\sqrt{\pi}}{2 \sqrt{\frac{3}{2 \sigma^2}}} \exp \left( \frac{\frac{2 x^2}{\sigma^2}}{8 \frac{3}{2 \sigma^2}} \right) I_0 \left( \frac{\frac{2 x^2}{\sigma^2}}{8 \frac{3}{2 \sigma^2}} \right) \\
 		&= \frac{\sqrt{\pi} \sigma}{\sqrt{6}} \exp \left( \frac{x^2}{6} \right) I_0 \left( \frac{x^2}{6} \right).
@@ -572,7 +522,7 @@ The second step is given in the following theorem, where we calculate the cumula
 		&= \frac{1}{\sqrt{3}} \int_0^\frac{t}{\sigma} x \exp \left( - \frac{x^2}{3} \right) I_0 \left( \frac{x^2}{6} \right) \mathrm{d}x.
 	\end{align*}
 	
-	To proceed, we need to integrate by parts to replace the modified Bessel function $I_0$ with order zero by a modified Bessel function $I_1$ with order one.\footnote{\fullcite[p.~251]{HMF}}
+	To proceed, we need to integrate by parts to replace the modified Bessel function $I_0$ of order zero by a modified Bessel function $I_1$ of order one \cite[p.~251]{HMF}.
 	\begin{align*}
 		q(t) &= \frac{1}{\sqrt{3}} \left[ - \frac{3}{2} \exp \left( - \frac{x^2}{3} \right) I_0 \left( \frac{x^2}{6} \right) \right]_0^\frac{t}{\sigma} + \frac{1}{2 \sqrt{3}} \int_0^\frac{t}{\sigma} \exp \left( - \frac{x^2}{3} \right) x I_1 \left( \frac{x^2}{6} \right) \mathrm{d}x \\
 		&= \frac{1}{\sqrt{3}} \left( \frac{3}{2} - \frac{3}{2} \exp \left( - \frac{t^2}{3 \sigma^2} \right) I_0 \left( \frac{t^2}{6 \sigma^2} \right) \right) + \frac{1}{2 \sqrt{3}} \int_0^\frac{t}{\sigma} \exp \left( - \frac{x^2}{3} \right) x I_1 \left( \frac{x^2}{6} \right) \mathrm{d}x
@@ -583,7 +533,7 @@ The second step is given in the following theorem, where we calculate the cumula
 		q(t) = \frac{1}{\sqrt{3}} \left( \frac{3}{2} - \frac{3}{2} \exp \left( - \frac{t^2}{3 \sigma^2} \right) I_0 \left( \frac{t^2}{6 \sigma^2} \right) \right) + \frac{1}{4 \sqrt{3}} \int_0^\frac{t^2}{\sigma^2} \exp \left( - \frac{y}{3} \right) I_1 \left( \frac{y}{6} \right) \mathrm{d}y.
 	\end{equation*}
 	
-	We want to solve the remaining integral. Let $p \neq b$ and $s = \sqrt{p^2 - b^2}$, $u = \sqrt{a (p - s)}$ and $v = \sqrt{a (p + s)}$. Then\footnote{\fullcite{IntQFunction}}
+	We want to solve the remaining integral. Let $p \neq b$ and $s = \sqrt{p^2 - b^2}$, $u = \sqrt{a (p - s)}$ and $v = \sqrt{a (p + s)}$. Then \cite{IntQFunction}
 	\begin{equation}\label{eq: intmarcum}
 		\int_0^a \exp(-p x) I_M ( b x ) \mathrm{d}x = \frac{1}{s b^M} \left( (p - s)^M ( 1 - Q_M(u, v) ) - (p + s)^M ( 1 - Q_M(v, u) ) \right),
 	\end{equation}
@@ -608,27 +558,18 @@ The second step is given in the following theorem, where we calculate the cumula
 	This finishes the proof of the first equality of equation \eqref{eq: cdf}. Analogously, we can proof $\mathbb{P}_{V_2}( \norm{\Delta^- F(i, j)} \leq t ) = p_\sigma(t)$, finishing the proof of Theorem~\ref{thm: cdf}.
 \end{proof}
 
-\begin{remark}
-	The Marcum Q-function is defined as
-	\begin{equation*}
-		Q_M(a, b) = \int_b^\infty x \left( \frac{x}{a} \right)^{M-1} \exp \left( -\frac{x^2 + a^2}{2} \right) I_{M-1}(a x) \mathrm{d}x.
-	\end{equation*}
-	
-	The cumulative distribution function of a non-central chi distributed random variable with $k$ degrees of freedom and non-centrality parameter $\lambda$ given by $1 - Q_\frac{k}{2}(\lambda, x)$.
-\end{remark}
-
 \begin{corollary}\label{cor: typeIbound}
 	Let $(i, j) \in \Omega$ and $t \in \mathbb{R}^+$. Assume that $F$ follows the statistical model given in \eqref{statmodel2} and let $T(i, j)$ be defined as in \eqref{teststatistic}. Then
-	\begin{equation}
-		\mathbb{P}_V( T(i, j) \geq t ) \leq 1 - p_\sigma(t)
+	\begin{equation}\label{ineq: typeIbound}
+		\mathbb{P}_V\left( T(i, j) \geq t \right) \leq 1 - p_\sigma(t)
 	\end{equation}
 	for every $V \in \mathcal{H}_0(i, j)$.
 \end{corollary}
 \begin{proof}
 	Since $V \in \mathcal{H}_0(i, j)$, we have $V \in \mathcal{H}_0^+(i, j)$ or $V \in \mathcal{H}_0^-(i, j)$. In the first case, by Lemma \ref{lem: typeIbound} and Theorem \ref{thm: cdf} we have
 	\begin{align*}
-		\mathbb{P}_V( T(i, j) \geq t ) &\leq \min \left\{ \mathbb{P}_V( \norm{\Delta^+ F(i, j)} \geq t ), \mathbb{P}_V( \norm{\Delta^- F(i, j)} \geq t ) \right\} \\
-		&\leq \mathbb{P}_V( \norm{\Delta^+ F(i, j)} \geq t ) \\
+		\mathbb{P}_V\left( T(i, j) \geq t \right) &\leq \min \left\{ \mathbb{P}_V\left( \norm{\Delta^+ F(i, j)} \geq t \right), \mathbb{P}_V\left( \norm{\Delta^- F(i, j)} \geq t \right) \right\} \\
+		&\leq \mathbb{P}_V\left( \norm{\Delta^+ F(i, j)} \geq t \right) \\
 		&= 1 - p_\sigma(t).
 	\end{align*}
 	
@@ -639,7 +580,9 @@ Let $\alpha \in (0, 1)$ be given. According to Corollary \ref{cor: typeIbound} a
 
 Note, that finding inverse functions of the modified Bessel function of the first kind $I_\nu$ and of the Marcum $Q$-function $Q_M$ is not feasible and consequently there is no way to compute an inverse function of $p_\sigma(t)$. Thus, we cannot provide a closed form to calculate the threshold, but we can compute a threshold $t_\alpha$ numerically with a trial and error algorithm, see Algorithm \ref{alg: threshold}.
 
-To this end, we note, that $p_\sigma(t_\alpha \cdot \sigma) = p_1(t_\alpha)$. Hence, it is sufficient to calculate a threshold $t_\alpha$ for $\sigma = 1$. A \emph{MATLAB} implementation of this algorithm can be found in Appendix \ref{appendix: algorithms}. In Figure \ref{fig: cdf} the cumulative distribution function $p_1(t)$ is plotted. For $\alpha = 0.05$ and $\alpha = 0.01$ the thresholds have been numerically computed.\\
+To this end, we note, that $p_\sigma(t_\alpha \cdot \sigma) = p_1(t_\alpha)$. Hence, it is sufficient to calculate a threshold $t_\alpha$ for $\sigma = 1$. The function $p_1(t)$ is strictly monotone, as it is the cumulative distribution function of a continuous random variable. The used algorithm steadily increases a guess for a suitable threshold, until one is found. The monotonicity of $p_1(t)$ assures, that the computed threshold suffices the inequality $\mathbb{P}_V\left( T(i, j) \geq t_\alpha \right) \leq \alpha$. Other algorithms, e.g. quasi-Newton methods, likely use less computation time, but a threshold calculated with these methods will not necessarily suffice this inequality. As we only need to compute a threshold for $\sigma = 1$, we ignore the additional computation time of our algorithm in favor of adhering to the inequality.
+
+A \emph{MATLAB} implementation of this algorithm can be found in Appendix \ref{appendix: algorithms}. In Figure \ref{fig: cdf} the cumulative distribution function $p_1(t)$ is plotted. For $\alpha = 0.05$ and $\alpha = 0.01$ the thresholds have been numerically computed.\\
 
 \begin{algorithm}[H]
 	\KwIn{$\alpha \in (0, 1)$}
@@ -671,15 +614,15 @@ To this end, we define a subset of $\mathcal{V}_c^{m, n}$ for every pixel. Let $
 
 A first step towards bounds for the probability of a type II error is achieved in the following lemma.
 
-\begin{theorem}\label{thm: typeIIboundssimulation}
+\begin{lemma}\label{lem: typeIIboundssimulation}
 	Let $(i, j) \in \Omega$ and $t \in \mathbb{R}^+$. Assume that $F$ follows the statistical model given \eqref{statmodel2} and let $T(i, j)$ and $H_1(i, j)$ be defined as in \eqref{teststatistic} and \eqref{alternativehypothesis}. Let $V, V_1, V_2 \in \mathcal{H}_1(i, j)$. Assume $V_1$ is such, that $\norm{\Delta^+ V_1(i, j)} = \sqrt{2} c$ and $V_2$ such, that $\norm{\Delta^+ V_2(i, j)} = \sqrt{8} c$. Then the following inequalities hold:
 	\begin{align}
 		\mathbb{P}_V\left( T(i, j) \leq t \right) &\leq 2 \cdot \mathbb{P}_{V_1}\left( \norm{\Delta^+ F(i, j)} \leq t \right) \label{eq: typeIIupperboundsimulation} \\
 		\mathbb{P}_V\left( T(i, j) \leq t \right) &\geq \mathbb{P}_{V_2}\left( \norm{\Delta^+ F(i, j)} \leq t \right) \label{eq: typeIIlowerboundsimulation}
 	\end{align}
-\end{theorem}
+\end{lemma}
 \begin{proof}
-	By assumption $V \in \mathcal{H}_1(i, j) \subseteq \mathcal{V}_c^{m, n}$. By design of our statistical test, if $H_1(i, j)$ is true, then $(i, j) \in \varLambda$, where $\varLambda$ denotes the rROI contained in $V$. As can be seen from Table \ref{table: discretederivativevalues} in the proof of Lemma \ref{lem: setD}, $(i, j) \in \varLambda$ implies
+	By assumption $V \in \mathcal{H}_1(i, j) \subseteq \mathcal{V}_c^{m, n}$. By design of our statistical test, if $H_1(i, j)$ is true, then $(i, j) \in \varLambda$, where $\varLambda$ denotes the ROI contained in $V$. As can be seen from Table \ref{table: discretederivativevalues} in the proof of Lemma \ref{lem: setD}, $(i, j) \in \varLambda$ implies
 	\begin{equation*}
 		\norm{\Delta^+ V(i, j)}, \norm{\Delta^- V(i, j)} \in \left\{ \sqrt{2} c, \sqrt{5} c, \sqrt{8} c \right\}.
 	\end{equation*}
@@ -689,9 +632,14 @@ A first step towards bounds for the probability of a type II error is achieved i
 		\mathcal{H}_1(i, j) = \left\{ V \in \mathcal{V}_c^{m, n} \mid \norm{\Delta^+ V(i, j)}, \norm{\Delta^- V(i, j)} \in \{ \sqrt{2} c, \sqrt{5} c, \sqrt{8} c \} \right\}.
 	\end{equation*}
 	
-	Using this knowledge, we can start bounding the probability of a type II error in our testing procedure, which we call $\beta$, from above by
+	Furthermore, we note, that for any $\bar{V}, \tilde{V} \in \mathcal{V}_c^{m, n}$ with $\Delta^+ \bar{V}(i, j) \geq \Delta^+ \tilde{V}(i, j)$, we have
+	\begin{equation*}
+		\mathbb{P}_{\bar{V}}\left( \norm{\Delta^+ F(i, j)} \leq t \right) \leq \mathbb{P}_{\tilde{V}}\left( \norm{\Delta^+ F(i, j)} \leq t \right).
+	\end{equation*}
+	
+	Using this knowledge, we can start bounding the probability of a type II error in our testing procedure, which we call $\beta_V$, from above by
 	\begin{align*}
-		\beta(t) &\coloneqq \mathbb{P}_V\left( T(i, j) \leq t \right) \\
+		\beta_V(t) &\coloneqq \mathbb{P}_V\left( T(i, j) \leq t \right) \\
 		&= \mathbb{P}_V\left( \min \left\{ \norm{\Delta^+ F(i, j)}, \norm{\Delta^- F(i, j)} \right\} \leq t \right) \\
 		&= \mathbb{P}_V\left( \left\{ \norm{\Delta^+ F(i, j)} \leq t \right\} \cup \left\{ \norm{\Delta^- F(i, j)} \leq t \right\} \right) \\
 		&\leq \mathbb{P}_V\left( \norm{\Delta^+ F(i, j)} \leq t \right) + \mathbb{P}_V\left( \norm{\Delta^- F(i, j)} \leq t \right).
@@ -699,7 +647,7 @@ A first step towards bounds for the probability of a type II error is achieved i
 	
 	This upper bound depends on the actual value of $\norm{\Delta^+ V(i, j)}$, which is unknown. In both terms we take a $V^* \in \mathcal{H}_1(i, j)$ that maximizes the probability and obtain
 	\begin{align*}
-		\beta(t) &\leq \max_{V^* \in \mathcal{H}_1(i, j)} \mathbb{P}_{V^*}\left( \norm{\Delta^+ F(i, j)} \leq t \right) + \max_{V^* \in \mathcal{H}_1(i, j)} \mathbb{P}_{V^*}\left( \norm{\Delta^- F(i, j)} \leq t \right) \\
+		\beta_V(t) &\leq \max_{V^* \in \mathcal{H}_1(i, j)} \mathbb{P}_{V^*}\left( \norm{\Delta^+ F(i, j)} \leq t \right) + \max_{V^* \in \mathcal{H}_1(i, j)} \mathbb{P}_{V^*}\left( \norm{\Delta^- F(i, j)} \leq t \right) \\
 		&= 2 \cdot \max_{V^* \in \mathcal{H}_1(i, j)} \mathbb{P}_{V^*}\left( \norm{\Delta^+ F(i, j)} \leq t \right)
 	\end{align*}
 	where we used the equality
@@ -707,29 +655,29 @@ A first step towards bounds for the probability of a type II error is achieved i
 		\max_{V^* \in \mathcal{H}_1(i, j)} \mathbb{P}_{V^*}\left( \norm{\Delta^+ F(i, j)} \leq t \right) = \max_{V^* \in \mathcal{H}_1(i, j)} \mathbb{P}_{V^*}\left( \norm{\Delta^- F(i, j)} \leq t \right).
 	\end{equation*}
 	
-	The maximum is attained for any $V^* \in \mathcal{H}_1(i, j)$ with $\norm{\Delta^+ V^*(i, j)} = \sqrt{2} c$. Thus we get by $\norm{\Delta^+ V_1(i, j)} = \sqrt{2} c$, that
+	Using the above observation, we see, that the maximum is attained, if $\norm{\Delta^+ V^*(i, j)}$ is minimal. Thus, exploiting $\norm{\Delta^+ V_1(i, j)} = \sqrt{2} c$, we obtain
 	\begin{align*}
-		\beta(t) &\leq 2 \cdot \max_{V^* \in \mathcal{H}_1(i, j)} \mathbb{P}_{V^*}\left( \norm{\Delta^+ F(i, j)} \leq t \right) \\
+		\beta_V(t) &\leq 2 \cdot \max_{V^* \in \mathcal{H}_1(i, j)} \mathbb{P}_{V^*}\left( \norm{\Delta^+ F(i, j)} \leq t \right) \\
 		&= 2 \cdot \mathbb{P}_{V_1}\left( \norm{\Delta^+ F(i, j)} \leq t \right),
 	\end{align*}
 	which proves inequality \eqref{eq: typeIIupperboundsimulation}.
 	
 	For the lower bound consider
 	\begin{align*}
-		\beta(t) &= \mathbb{P}_V\left( T(i, j) \leq t \right) \\
+		\beta_V(t) &= \mathbb{P}_V\left( T(i, j) \leq t \right) \\
 		&= \mathbb{P}_V\left( \min \{ \norm{\Delta^+ F(i, j)}, \norm{\Delta^- F(i, j)} \} \leq t \right) \\
 		&\geq \mathbb{P}_V\left( \norm{\Delta^+ F(i, j)} \leq t \right).
 	\end{align*}
 	
 	Again, this lower bound depends on the value of $\norm{\Delta^+ V(i, j)}$, which is unknown, and we bound this further by
 	\begin{align*}
-		\beta(t) &\geq \mathbb{P}_V\left( \norm{\Delta^+ F(i, j)} \leq t \right) \\
+		\beta_V(t) &\geq \mathbb{P}_V\left( \norm{\Delta^+ F(i, j)} \leq t \right) \\
 		&\geq \min_{V^* \in \mathcal{H}_1(i, j)} \mathbb{P}_{V^*}\left( \norm{\Delta^+ F(i, j)} \leq t \right).
 	\end{align*}
 	
-	The minimum is attained for any $V^* \in \mathcal{H}_1(i, j)$ with $\norm{\Delta^+ V^*(i, j)} = \sqrt{8} c$. Hence,
+	Similar to the proof of the first inequality, the minimum is attained, if $\norm{\Delta^+ V^*(i, j)}$ is maximal. Hence, by $\norm{\Delta^+ V^*(i, j)} = \sqrt{8} c$, we obtain
 	\begin{align*}
-		\beta(t) &\geq \min_{V^* \in \mathcal{H}_1(i, j)} \mathbb{P}_{V^*}\left( \norm{\Delta^+ F(i, j)} \leq t \right) \\
+		\beta_V(t) &\geq \min_{V^* \in \mathcal{H}_1(i, j)} \mathbb{P}_{V^*}\left( \norm{\Delta^+ F(i, j)} \leq t \right) \\
 		&= \mathbb{P}_{V_2}\left( \norm{\Delta^+ F_2(i, j)} \leq t \right)
 	\end{align*}
 	which proves inequality \eqref{eq: typeIIlowerboundsimulation} and finishes the proof.
@@ -737,7 +685,7 @@ A first step towards bounds for the probability of a type II error is achieved i
 
 The previous theorem is the equivalent to Lemma \ref{lem: typeIbound} for the probability of a type II error. We would like to write these bounds in terms of well-known functions like we did in Theorem \ref{thm: cdf}. This would require more generalized versions of equalities \eqref{eq: intbessel} and \eqref{eq: intmarcum}, which, to the best of the author's knowledge, are not known.
 
-We can write down the compound probability distribution of the upper and lower bound from Theorem \ref{thm: typeIIboundssimulation}. The results are given in the following theorem.
+We can write down the compound probability distribution of the upper and lower bound from Lemma \ref{lem: typeIIboundssimulation}. The results are given in the following theorem.
 
 \begin{theorem}\label{thm: typeIIboundsintegration}
 	Let $(i, j) \in \Omega$ and $t \in \mathbb{R}^+$. Assume that $F$ follows the statistical model given \eqref{statmodel2} and let $T(i, j)$ and $H_1(i, j)$ be defined as in \eqref{teststatistic} and \eqref{alternativehypothesis}. Let $V_1, V_2 \in \mathcal{H}_1(i, j)$. Assume $V_1$ is such, that $\norm{\Delta^+ V_1(i, j)} = \sqrt{2} c$ and $V_2$ such, that $\norm{\Delta^+ V_2(i, j)} = \sqrt{8} c$. Then the following equalities hold:
@@ -812,16 +760,16 @@ We can write down the compound probability distribution of the upper and lower b
 	where we used the symmetry of $I_0$. The second equality can be proven analogously.
 \end{proof}
 
-These results are not as strong as the results from Theorem \ref{thm: cdf}, as we do not have a closed form for the bounds for the probability of a type II error.
+These results are not as strong as the results from Theorem \ref{thm: cdf}, as we do not state the right hand sides of equations \eqref{eq: typeIIupperboundintegration} and \eqref{eq: typeIIlowerboundintegration} in terms of well-known functions, but only as integrals. Since the Marcum $Q$-function is defined as an integral, the function $p_\sigma(t)$ in Theorem \ref{thm: cdf} also involves integrals, making these results only slightly better.
 
-We can simulate random variables $V_1$ and $V_2$ as defined in Theorem \ref{thm: typeIIboundssimulation} and in this way obtain empirical estimates of upper and lower bounds for the probability of a type II error depending on the standard deviation $\sigma$ of the noise term in the statistical model \eqref{statmodel2}.
+We can simulate random variables $V_1$ and $V_2$ as defined in Lemma \ref{lem: typeIIboundssimulation} and in this way obtain empirical estimates of upper and lower bounds for the probability of a type II error depending on the standard deviation $\sigma$ of the noise term in the statistical model \eqref{statmodel2}.
 
 Figure \ref{fig: simulatedboundstypeIIerror} shows the result of this simulation for the thresholds $t_{0.05} = 3.5844$ and $t_{0.01} = 4.6017$, that were computed in Section \ref{section: boundtypeIerror}. A \emph{MATLAB} implementation of the simulation can be found in Appendix \ref{appendix: algorithms}.
 
 % Plot simulated bounds for the probability of a type II error:
 \input{Figures/simulatedboundstypeIIerror}
 
-Theorem \ref{thm: typeIIboundsintegration} also yields a second way to numerically obtain upper and lower bounds for the probability of a type II error by numerically integrating the right hand side of equations \eqref{eq: typeIIupperboundintegration} and \eqref{eq: typeIIlowerboundintegration}.
+Theorem \ref{thm: typeIIboundsintegration} also yields a second way to numerically obtain upper and lower bounds for the probability of a type II error by numerically integrating the right hand sides of equations \eqref{eq: typeIIupperboundintegration} and \eqref{eq: typeIIlowerboundintegration}.
 
 \newpage
 
@@ -829,9 +777,9 @@ Theorem \ref{thm: typeIIboundsintegration} also yields a second way to numerical
 
 \section{Binary morphological operations}\label{section: morphologicaloperations}
 
-We now introduce morphological operations. Since the output of the testing procedure is binary, it is sufficient to only consider \emph{binary} morphological operations. In particular, we will only study the impact of \emph{binary opening} and \emph{binary closing}. These operataions are frequently used in the preprocessing of fingerprint images and, as we discuss in Section \ref{section: morphologyexamples}, exhibit properties, that make them a good tool for the reduction of falsely classified pixels.
+We now introduce morphological operations. Since the output of the testing procedure is binary, it is sufficient to only consider \emph{binary} morphological operations. In particular, we will only study the impact of \emph{binary opening} and \emph{binary closing}. These operations are frequently used in the preprocessing of fingerprint images \cite{BazenGerez, adaboost} and, as we discuss in Section \ref{section: morphologyexamples}, exhibit properties, that make them a versatile tool for the reduction of falsely classified pixels.
 
-Morphological opening and closing only depend on a limited and fixed number of pixels. In contrast to that, the \emph{convex hull} is a morphological operation, also commonly used in fingerprint analysis, depending on all pixels of an image, making it harder to study on a pixel-by-pixel basis.
+Morphological opening and closing are local operations, since they only depend on a limited and fixed number of pixels. In contrast to that, the \emph{convex hull} is a global operation, also commonly used in fingerprint analysis \cite{FDB}, depending on all pixels of an image, making it harder to study on a pixel-by-pixel basis.
 
 
 
@@ -854,14 +802,14 @@ Morphological binary opening and closing are closely related operations. They ar
 	The set $\Psi$ is called a \emph{structuring element}.
 \end{definition}
 
-Working with images we translate the definition of binary opening and closing from being operations on subsets of $\mathbb{Z}^2$ to being operations on matrices $\mathfrak{I} \in \{ 0, 1 \}^{m \times n}$.
+Working with images, we extend the definition of binary opening and closing from being operations on subsets of $\mathbb{Z}^2$ to being operations on matrices $\mathfrak{I} \in \{ 0, 1 \}^{m \times n}$, using, for convenience, the same symbols.
 
 \begin{definition}
-	Let $m, n \in \mathbb{N}$, $\mathfrak{I} \in \{ 0, 1 \}^{m \times n}$, $\Omega = \{ 1, \dots, m \} \times \{ 1, \dots, n \}$ and $\Psi \subseteq \mathbb{Z}^2$ be a structuring element. We call
+	Let $m, n \in \mathbb{N}$, $\mathfrak{I} \in \{ 0, 1 \}^{m \times n}$, $\Omega = \{ 1, \dots, m \} \times \{ 1, \dots, n \}$ and $\Psi \subseteq \mathbb{Z}^2$, which is called a structuring element. We call
 	\begin{equation*}
 		\Theta_\mathfrak{I} \coloneqq \{ (i, j) \in \Omega \mid \mathfrak{I}(i, j) = 1 \} \subseteq \mathbb{Z}^2
 	\end{equation*}
-	the \emph{index set of the binary matrix $\mathfrak{I}$}.
+	the \emph{set of non-zero entries} of the binary matrix $\mathfrak{I}$.
 	\begin{enumerate}
 		\item The \emph{erosion of the binary matrix $\mathfrak{I}$ by the structuring element $\Psi$} is defined by
 		\begin{equation}
@@ -886,10 +834,10 @@ Working with images we translate the definition of binary opening and closing fr
 
 By definition, erosion and dilation of a binary matrix are binary matrices as well, i.e. $\mathfrak{I} \ominus \Psi, \mathfrak{I} \oplus \Psi \in \{ 0, 1 \}^{m \times n}$.
 
-We want to express $\mathfrak{I} \ominus \Psi$ and $\mathfrak{I} \oplus \Psi$ in terms of $\mathfrak{I}$. This is done in the following lemma.
+We want to express $\mathfrak{I} \ominus \Psi$ and $\mathfrak{I} \oplus \Psi$ in terms of $\mathfrak{I}$. In \cite[p.~65-67]{imageprocessing} this connection is described with an informal notation. To the best of the author's knowledge, this connection has, surprisingly, not been formalized. This is done in the following lemma.
 
 \begin{lemma}\label{lem: erodil}
-	Let $m, n \in \mathbb{N}$, $\mathfrak{I} \in \{ 0, 1 \}^{m \times n}$ and $\Psi \subseteq \mathbb{Z}^2$ be a structuring element. Let $(i, j) \in \Omega$. Then the following equalities hold:
+	Let $m, n \in \mathbb{N}$, $\mathfrak{I} \in \{ 0, 1 \}^{m \times n}$ and $\Psi \subseteq \mathbb{Z}^2$. Let $(i, j) \in \Omega$. Then the following equalities hold:
 	\begin{align}
 		(\mathfrak{I} \ominus \Psi)(i, j) &= \prod_{(k, \ell) \in \Psi} \mathfrak{I}(i + k, j + \ell) \label{eq: erosion} \\
 		(\mathfrak{I} \oplus \Psi)(i, j) &= 1 - \prod_{(k, \ell) \in \Psi} ( 1 - \mathfrak{I}(i - k, j - \ell) ) \label{eq: dilation}
@@ -897,7 +845,7 @@ We want to express $\mathfrak{I} \ominus \Psi$ and $\mathfrak{I} \oplus \Psi$ in
 	where we extend the matrix $\mathfrak{I}$ to all of $\mathbb{Z}^2$ by setting $\mathfrak{I}(k, \ell) = 0$ for $(k, \ell) \notin \Omega$.
 \end{lemma}
 \begin{proof}
-	Let $\Theta_\mathfrak{I}$ be the index set of the binary matrix $\mathfrak{I}$. By definition of binary erosion and using basic properties of set theory, we obtain
+	Let $\Theta_\mathfrak{I}$ be the set of non-zero entries of the binary matrix $\mathfrak{I}$. By definition of binary erosion and using basic properties of set theory, we obtain
 	\begin{align*}
 		(\mathfrak{I} \ominus \Psi)(i, j) = 1 &\Leftrightarrow (i, j) \in \Theta_\mathfrak{I} \ominus \Psi \\
 		&\Leftrightarrow \forall \, (k, \ell) \in \Psi: (i, j) + (k, \ell) \in \Theta_\mathfrak{I} \\
@@ -949,7 +897,7 @@ We want to express $\mathfrak{I} \ominus \Psi$ and $\mathfrak{I} \oplus \Psi$ in
 \end{proof}
 
 \begin{remark}
-	The extension of $\mathfrak{I}$ to all of $\mathbb{Z}^2$ is necessary, because in the products on the right hand sides of equations \eqref{eq: erosion} and \eqref{eq: dilation}, we might reach indices outside of $\Omega$.
+	The extension of $\mathfrak{I}$ to all of $\mathbb{Z}^2$ is necessary, because in the products on the right hand sides of equations \eqref{eq: erosion} and \eqref{eq: dilation}, we might reach indices outside of $\Omega$, if $(i, j)$ is close to the boundary of the image.
 \end{remark}
 
 After having defined binary erosion and dilation, we now can define binary opening and closing. Again, we start by defining it for subsets of $\mathbb{Z}^2$ and then proceed to define it for binary matrices $\mathfrak{I} \in \{ 0, 1 \}^{m \times n}$.
@@ -970,7 +918,7 @@ After having defined binary erosion and dilation, we now can define binary openi
 The definitions for matrices are done the same way, as they were done for erosion and dilation of binary matrices.
 
 \begin{definition}
-	Let $m, n \in \mathbb{N}$, $\mathfrak{I} \in \{ 0, 1 \}^{m \times n}$, $\Psi \subseteq \mathbb{Z}^2$ be a structuring element and $\Theta_\mathfrak{I}$ be the index set of $\mathfrak{I}$.
+	Let $m, n \in \mathbb{N}$, $\mathfrak{I} \in \{ 0, 1 \}^{m \times n}$, $\Psi \subseteq \mathbb{Z}^2$, which is called a structuring element, and $\Theta_\mathfrak{I}$ be the set of non-zero entries of $\mathfrak{I}$.
 	\begin{enumerate}
 		\item The \emph{opening of the binary matrix $\mathfrak{I}$ by the structuring element $\Psi$} is defined by
 		\begin{equation}
@@ -996,14 +944,14 @@ The definitions for matrices are done the same way, as they were done for erosio
 We need to show, that opening and closing of a binary matrix are also concatenations of erosion and dilation of binary matrices.
 
 \begin{lemma}
-	Let $m, n \in \mathbb{N}$, $\mathfrak{I} \in \{ 0, 1 \}^{m \times n}$ and $\Psi \subseteq \mathbb{Z}^2$ be a structuring element. We have the following connections between opening and closing and erosion and dilation of binary matrices:
+	Let $m, n \in \mathbb{N}$, $\mathfrak{I} \in \{ 0, 1 \}^{m \times n}$ and $\Psi \subseteq \mathbb{Z}^2$. We have the following connections between opening and closing and erosion and dilation of binary matrices:
 	\begin{align}
 		(\mathfrak{I} \circ \Psi) = (\mathfrak{I} \ominus \Psi) \oplus \Psi \\
 		(\mathfrak{I} \bullet \Psi) = (\mathfrak{I} \oplus \Psi) \ominus \Psi
 	\end{align}
 \end{lemma}
 \begin{proof}
-	To prove these relations, we first show, that $\Theta_{\mathfrak{I} \ominus \Psi} = \Theta_\mathfrak{I} \ominus \Psi$ and $\Theta_{\mathfrak{I} \oplus \Psi} = \Theta_\mathfrak{I} \oplus \Psi$. By defintion of the index set of a binary matrix, we have
+	To prove these relations, we first show, that $\Theta_{\mathfrak{I} \ominus \Psi} = \Theta_\mathfrak{I} \ominus \Psi$ and $\Theta_{\mathfrak{I} \oplus \Psi} = \Theta_\mathfrak{I} \oplus \Psi$. By definition of the set of non-zero entries of a binary matrix, we have
 	\begin{align*}
 		\Theta_{\mathfrak{I} \ominus \Psi} &= \{ (i, j) \in \Omega \mid (\mathfrak{I} \ominus \Psi)(i, j) = 1 \} \\
 		&= \{ (i, j) \in \Omega \mid (i, j) \in \Theta_\mathfrak{I} \ominus \Psi \} \\
@@ -1024,7 +972,7 @@ We need to show, that opening and closing of a binary matrix are also concatenat
 After we established this connection, we can use the equalites deduced in Lemma \ref{lem: erodil} for erosion and dilation to derive similar equalities for opening and closing of a binary matrix.
 
 \begin{lemma}
-	Let $m, n \in \mathbb{N}$, $\mathfrak{I} \in \{ 0, 1 \}^{m \times n}$ and $\Psi \subseteq \mathbb{Z}^2$ be a structuring element. Let $(i, j) \in \Omega$. Then the following equalities hold:
+	Let $m, n \in \mathbb{N}$, $\mathfrak{I} \in \{ 0, 1 \}^{m \times n}$ and $\Psi \subseteq \mathbb{Z}^2$. Let $(i, j) \in \Omega$. Then the following equalities hold:
 	\begin{align}
 		(\mathfrak{I} \circ \Psi)(i, j) &= 1 - \prod_{(k, \ell) \in \Psi} \left( 1 - \left( \prod_{(\tilde{k}, \tilde{\ell}) \in \Psi} \mathfrak{I}(i - k + \tilde{k}, j - \ell + \tilde{\ell}) \right) \right) \label{eq: opening} \\
 		(\mathfrak{I} \bullet \Psi)(i, j) &= \prod_{(k, \ell) \in \Psi} \left( 1 - \prod_{(\tilde{k}, \tilde{\ell}) \in \Psi} ( 1 - \mathfrak{I}(i + k - \tilde{k}, j + \ell - \tilde{\ell}) ) \right) \label{eq: closing}
@@ -1052,7 +1000,7 @@ After we established this connection, we can use the equalites deduced in Lemma 
 Using the previous lemma, we can deduce the following equalities of sets of matrices $\mathfrak{I} \in \{ 0, 1 \}^{m \times n}$.
 
 \begin{lemma}
-	Let $m, n \in \mathbb{N}$ and $\Psi \subseteq \mathbb{Z}^2$ be a structuring element. Let $(i, j) \in \Omega$. Then the following equalities hold:
+	Let $m, n \in \mathbb{N}$ and $\Psi \subseteq \mathbb{Z}^2$. Let $(i, j) \in \Omega$. Then the following equalities hold:
 	\begin{equation}
 		\begin{aligned}
 			\big\{ \mathfrak{I} \in \{ 0, 1 \}^{m \times n} &\mid (\mathfrak{I} \circ \Psi)(i, j) = 1 \big\} \\
@@ -1096,23 +1044,19 @@ Using the previous lemma, we can deduce the following equalities of sets of matr
 
 \subsection{Examples}\label{section: morphologyexamples}
 
-In the following Figures, we display examples of binary opening and closing to depict the effects these operators have on a binary image. Note, that pixels with value one are black and pixels with value zero are white. Meanwhile, pixels that were changed by the morphological operators from one to zero will be displayed as light gray and pixels that were changed from zero to one will be displayed as dark gray.
+In the following Figures, we display examples of binary opening and closing to depict the effects these operators have on a binary image. Note, that pixels with value one are black and pixels with value zero are white. For convenience, we display the original image as light gray.
 
-In Figure \ref{fig: exampleopening} we see an example of binary morphological opening, whose effect we want to examine. We use a $3 \times 3$ pixel structuring element.
+In Figure \ref{fig: exampleopening} we see an example of binary morphological opening, whose effect we want to examine. We use a $3 \times 3$ pixel structuring element. Edges of the larger connected region are smoothed, making morphological opening a versatile tool for simplifying edges and outlier elimination, see \cite[p.~69]{imageprocessing}.\\
 
 % Draw example of morphological opening:
 \input{Figures/exampleopening}
 
-Edges of the larger connected region have been smoothed, making morphological opening a great tool for the smoothing of edges and outlier elimination \cite[p.~69]{imageprocessing}.\\
-
-Figure \ref{fig: exampleclosing} shows an example of binary morphological closing with a $3 \times 3$ pixel structuring element.
+Figure \ref{fig: exampleclosing} shows an example of binary morphological closing with a $3 \times 3$ pixel structuring element. The gapes between the pixels are filled. Hence, morphological closing is frequently used as a tool to fill gaps in binary images, see \cite[p.~69]{imageprocessing}.
 
 % Draw example of morphological closing:
 \input{Figures/exampleclosing}
 
-Morphological closing is frequently used as a tool to fill gaps in binary images, see Fig. \ref{fig: exampleclosing} and \cite[p.~69]{imageprocessing}.
-
-Altogether, both morphological opening and closing are effective tools to smooth edges. Morphological opening achieves this by eliminating outliers, while morphological closing fills gaps.
+Altogether, both morphological opening and closing are effective tools to smooth edges. Morphological opening removes outliers and simplifies edges. Closing fills gaps. The operators are dual in the sense, that the complement of the complement's closing is opening of the original set with the same structuring element and vice versa.
 
 \newpage
 
@@ -1129,13 +1073,13 @@ The changes of the upper bound for the probability of a type I error after openi
 \begin{theorem}\label{thm: typeIinequalities}
 	Let $m, n \in \mathbb{N}$, $c \in \mathbb{R} \setminus \{ 0 \}$ and $\Omega = \left\{ 1, \dots, m \right\} \times \left\{ 1, \dots, n \right\}$. Assume that $F$ follows the statistical model given in \eqref{statmodel2}.
 	
-	For a statistical significance $\alpha \in (0, 1)$, let $t_\alpha$ be a threshold, such that $\mathbb{P}_V( \norm{\Delta^+ F(\tilde{i}, \tilde{j})} \geq t_\alpha ) \leq \alpha$ for every $(\tilde{i}, \tilde{j}) \in \Omega$ and $V \in \mathcal{H}_0^+(\tilde{i}, \tilde{j})$ and $\mathbb{P}_V( \norm{\Delta^- F(\tilde{i}, \tilde{j})} \geq t_\alpha ) \leq \alpha$ for every $(\tilde{i}, \tilde{j}) \in \Omega$ and $V \in \mathcal{H}_0^-(\tilde{i}, \tilde{j})$, cf. \eqref{setH0+} and \eqref{setH0-}.
+	For a statistical significance $\alpha \in (0, 1)$, let $t_\alpha$ be a threshold, such that $\mathbb{P}_V( \norm{\Delta^+ F(i, j)} \geq t_\alpha ) \leq \alpha$ for every $(i, j) \in \Omega$ and $V \in \mathcal{H}_0^+(i, j)$ and $\mathbb{P}_V( \norm{\Delta^- F(i, j)} \geq t_\alpha ) \leq \alpha$ for every $(i, j) \in \Omega$ and $V \in \mathcal{H}_0^-(i, j)$, cf. \eqref{setH0+} and \eqref{setH0-}.
 	
-	Let $\mathfrak{I}_\alpha$ be the binary image defined by
+	Let $\mathfrak{I}_\alpha$ be the random binary image defined by
 	\begin{equation*}
-		\mathfrak{I}_\alpha(\tilde{i}, \tilde{j}) = \mathds{1}_{ \{ T(\tilde{i}, \tilde{j}) \geq t_\alpha \} }
+		\mathfrak{I}_\alpha(i, j) = \mathds{1}_{ \{ T(i, j) \geq t_\alpha \} }
 	\end{equation*}
-	for all $(\tilde{i}, \tilde{j}) \in \Omega$.
+	for all $(i, j) \in \Omega$.
 	
 	Let $(i, j) \in \Omega$ and let $T(i, j)$ be the test statistic defined in \eqref{teststatistic} and $H_0(i, j)$ be the null hypothesis defined in \eqref{nullhypothesis}.
 	
@@ -1143,7 +1087,8 @@ The changes of the upper bound for the probability of a type I error after openi
 	Then for $V \in \mathcal{H}_0(i, j)$ the following inequalities hold:
 	\begin{align}
 		\mathbb{P}_V\left( (\mathfrak{I}_\alpha \circ \Psi_\varphi)(i, j) = 1 \right) &\leq \varphi \alpha^{\frac{\varphi + 1}{2}} \label{ineq: typeIopening} \\
-		\mathbb{P}_V\left( ((\mathfrak{I}_\alpha \circ \Psi_\varphi) \bullet \Psi_\varphi)(i, j) = 1 \right) &\leq \varphi^3 \alpha^{\frac{\varphi + 1}{2}} \label{ineq: typeIclosing}
+		\mathbb{P}_V\left( (\mathfrak{I}_\alpha \bullet \Psi_\varphi)(i, j) = 1 \right) &\leq \varphi^2 \alpha \label{ineq: typeIclosing} \\
+		\mathbb{P}_V\left( ((\mathfrak{I}_\alpha \circ \Psi_\varphi) \bullet \Psi_\varphi)(i, j) = 1 \right) &\leq \varphi^3 \alpha^{\frac{\varphi + 1}{2}} \label{ineq: typeIopeningclosing}
 	\end{align}
 \end{theorem}
 \begin{proof}
@@ -1153,20 +1098,20 @@ The changes of the upper bound for the probability of a type I error after openi
 	\end{equation*}
 	for $V \in \mathcal{H}_0(i, j)$.
 	
-	As discussed in Section \ref{section: definitions}, any matrix $V \in \mathcal{V}_c^{m, n}$ is uniquely defined by the top left corner $(\kappa_1, \lambda_1)$ and bottom right corner $(\kappa_2, \lambda_2)$ of the rROI $\varLambda = \{ \kappa_1, \dots, \kappa_2 \} \times \{ \lambda_1, \dots, \lambda_2 \}$ contained in $V$, where $\varLambda$ is defined as in Definition \ref{def: rROIcheckerboard}.
+	As discussed in Section \ref{section: definitions}, any matrix $V \in \mathcal{V}_c^{m, n}$ is uniquely defined by the top left corner $(\kappa_1, \lambda_1)$ and bottom right corner $(\kappa_2, \lambda_2)$ of the ROI $\varLambda = \{ \kappa_1, \dots, \kappa_2 \} \times \{ \lambda_1, \dots, \lambda_2 \}$ contained in $V$, where $\varLambda$ is defined as in Definition \ref{def: ROIchessboard}.
 	
-	Since $V \in \mathcal{H}_0(i, j)$ we have $(i, j) \notin \varLambda$ implying, that $i < \kappa_1$ or $j < \lambda_1$ or $i > \kappa_2$ or $j > \lambda_2$. These four cases are not mutually exclusive. As deducted in Section \ref{section: statisticalmodel}, the first two cases imply $\norm{\Delta^- V(i, j)} = 0$ and the latter two imply $\norm{\Delta^+ V(i, j)} = 0$.
+	Since $V \in \mathcal{H}_0(i, j)$ we have $(i, j) \notin \varLambda$, implying, that $i < \kappa_1$ or $j < \lambda_1$ or $i > \kappa_2$ or $j > \lambda_2$, see Figure \ref{fig: cases(I)-(IV)}. These four cases are not mutually exclusive. As deducted in Section \ref{section: statisticalmodel}, the first two cases imply $\norm{\Delta^- V(i, j)} = 0$ and the latter two imply $\norm{\Delta^+ V(i, j)} = 0$.
 	
 	Based on this knowledge, we can split up the sets $\mathcal{H}_0^+(i, j)$ and $\mathcal{H}_0^-(i, j)$ as defined in \eqref{setH0+} and \eqref{setH0-} by defining the sets
 	\begin{align*}
-		\mathcal{H}_0^{(1)}(i, j) &\coloneqq \left\{ V \in \mathcal{V}_c^{m, n} \mid V(\tilde{i}, \tilde{j}) = 0 \textrm{ for all } (\tilde{i}, \tilde{j}) \in \{ 1, \dots, i \} \times \{ 1, \dots, n \} \right\}, \\
-		\mathcal{H}_0^{(2)}(i, j) &\coloneqq \left\{ V \in \mathcal{V}_c^{m, n} \mid V(\tilde{i}, \tilde{j}) = 0 \textrm{ for all } (\tilde{i}, \tilde{j}) \in \{ 1, \dots, m \} \times \{ 1, \dots, j \} \right\}, \\
-		\mathcal{H}_0^{(3)}(i, j) &\coloneqq \left\{ V \in \mathcal{V}_c^{m, n} \mid V(\tilde{i}, \tilde{j}) = 0 \textrm{ for all } (\tilde{i}, \tilde{j}) \in \{ i, \dots, m \} \times \{ 1, \dots, n \} \right\}, \\
-		\mathcal{H}_0^{(4)}(i, j) &\coloneqq \left\{ V \in \mathcal{V}_c^{m, n} \mid V(\tilde{i}, \tilde{j}) = 0 \textrm{ for all } (\tilde{i}, \tilde{j}) \in \{ 1, \dots, m \} \times \{ j, \dots, n \} \right\}.
+		\mathcal{H}_0^{(I)}(i, j) &\coloneqq \left\{ V \in \mathcal{V}_c^{m, n} \mid V(\tilde{i}, \tilde{j}) = 0 \textrm{ for all } (\tilde{i}, \tilde{j}) \in \{ 1, \dots, i \} \times \{ 1, \dots, n \} \right\}, \\
+		\mathcal{H}_0^{(II)}(i, j) &\coloneqq \left\{ V \in \mathcal{V}_c^{m, n} \mid V(\tilde{i}, \tilde{j}) = 0 \textrm{ for all } (\tilde{i}, \tilde{j}) \in \{ 1, \dots, m \} \times \{ 1, \dots, j \} \right\}, \\
+		\mathcal{H}_0^{(III)}(i, j) &\coloneqq \left\{ V \in \mathcal{V}_c^{m, n} \mid V(\tilde{i}, \tilde{j}) = 0 \textrm{ for all } (\tilde{i}, \tilde{j}) \in \{ i, \dots, m \} \times \{ 1, \dots, n \} \right\}, \\
+		\mathcal{H}_0^{(IV)}(i, j) &\coloneqq \left\{ V \in \mathcal{V}_c^{m, n} \mid V(\tilde{i}, \tilde{j}) = 0 \textrm{ for all } (\tilde{i}, \tilde{j}) \in \{ 1, \dots, m \} \times \{ j, \dots, n \} \right\}.
 	\end{align*}
-	Note, that $\mathcal{H}_0^-(i, j) = \mathcal{H}_0^{(1)}(i, j) \cup \mathcal{H}_0^{(2)}(i, j)$ and $\mathcal{H}_0^+(i, j) = \mathcal{H}_0^{(3)}(i, j) \cup \mathcal{H}_0^{(4)}(i, j)$. Furthermore, this implies $\mathcal{H}_0(i, j) = \bigcup_{u = 1}^4 \mathcal{H}_0^{(u)}(i, j)$.
+	These sets correspond to the regions displayed in Figure \ref{fig: cases(I)-(IV)}. Note, that $\mathcal{H}_0^-(i, j) = \mathcal{H}_0^{(I)}(i, j) \cup \mathcal{H}_0^{(II)}(i, j)$ and $\mathcal{H}_0^+(i, j) = \mathcal{H}_0^{(III)}(i, j) \cup \mathcal{H}_0^{(IV)}(i, j)$. Furthermore, this implies $\mathcal{H}_0(i, j) = \mathcal{H}_0^{(I)}(i, j) \cup \mathcal{H}_0^{(II)}(i, j) \cup \mathcal{H}_0^{(III)}(i, j) \cup \mathcal{H}_0^{(IV)}(i, j)$.
 	
-	Assume the first case, i.e. $V \in \mathcal{H}_0^{(1)}(i, j)$. It follows, that
+	W.l.o.g. due to symmetry, we assume the first case, i.e. $V \in \mathcal{H}_0^{(I)}(i, j)$. It follows, that
 	\begin{equation*}
 		\norm{\Delta^- V(i, 1)} = \ldots = \norm{\Delta^- V(i, n)} = 0.
 	\end{equation*}
@@ -1179,7 +1124,7 @@ The changes of the upper bound for the probability of a type I error after openi
 		&= \mathbb{P}_V\left( \bigcup_{k, \ell \in \Phi_\varphi} \bigcap_{\tilde{k}, \tilde{\ell} \in \Phi_\varphi} \left\{ \mathfrak{I}_\alpha(i - k + \tilde{k}, j - \ell + \tilde{\ell}) = 1 \right\} \right).
 	\end{align*}
 	
-	Using sub-additivity we can bound this from above by writing it as a sum over $\ell \in \Phi_\varphi$ to get
+	Using sub-additivity we can bound this from above by writing it as a sum over $\ell \in \Phi_\varphi$ to obtain
 	\begin{align*}
 		\mathbb{P}_V&\left( (\mathfrak{I}_\alpha \circ \Psi_\varphi)(i, j) = 1 \right) \\
 		&\leq \sum_{\ell \in \Phi_\varphi} \mathbb{P}_V\left( \bigcup_{k \in \Phi_\varphi} \bigcap_{\tilde{k}, \tilde{\ell} \in \Phi_\varphi} \left\{ \mathfrak{I}_\alpha(i - k + \tilde{k}, j - \ell + \tilde{\ell}) = 1 \right\} \right).
@@ -1202,14 +1147,14 @@ The changes of the upper bound for the probability of a type I error after openi
 		\mathbb{P}_V\left( (\mathfrak{I}_\alpha \circ \Psi_\varphi)(i, j) = 1 \right) \leq \sum_{\ell \in \Phi_\varphi} \mathbb{P}_V\left( \bigcap_{\tilde{\ell} \in \Phi_\varphi} \left\{ \mathfrak{I}_\alpha(i, j - \ell + \tilde{\ell}) = 1 \right\} \right).
 	\end{equation*}
 	
-	We have defined the binary $\mathfrak{I}_\alpha$ by setting $\mathfrak{I}_\alpha(\tilde{i}, \tilde{j}) = \mathds{1}_{ \{ T(\tilde{i}, \tilde{j}) \geq t_\alpha \} }$. Using this definition and the definition of $T(i, j)$ we can rewrite the upper bound as
+	We have defined the binary $\mathfrak{I}_\alpha$ by setting $\mathfrak{I}_\alpha(i, j) = \mathds{1}_{ \{ T(i, j) \geq t_\alpha \} }$. Using this definition and the definition of $T(i, j)$ we can rewrite the upper bound in the above inequality as
 	\begin{align*}
 		&\sum_{\ell \in \Phi_\varphi} \mathbb{P}_V\left( \bigcap_{\tilde{\ell} \in \Phi_\varphi} \left\{ \mathfrak{I}_\alpha(i, j - \ell + \tilde{\ell}) = 1 \right\} \right) \\
 		&= \sum_{\ell \in \Phi_\varphi} \mathbb{P}_V\left( \bigcap_{\tilde{\ell} \in \Phi_\varphi} \left\{ T(i, j - \ell + \tilde{\ell}) \geq t_\alpha \right\} \right) \\
 		&= \sum_{\ell \in \Phi_\varphi} \mathbb{P}_V\left( \bigcap_{\tilde{\ell} \in \Phi_\varphi} \left( \left\{ \norm{\Delta^+ F(i, j - \ell + \tilde{\ell})} \geq t_\alpha \right\} \cap \left\{ \norm{\Delta^- F(i, j - \ell + \tilde{\ell})} \geq t_\alpha \right\} \right) \right).
 	\end{align*}
 	
-	In the case $V \in \mathcal{H}_0^{(1)}(i, j) \subseteq \mathcal{H}_0^-(i, j)$, the values of $\norm{\Delta^+ V(i, j - \ell + \tilde{\ell})}$ are unknown. Thus, we do not know the distribution of the random variables $\norm{\Delta^+ F(i, j - \ell + \tilde{\ell})}$ and we drop the events $\left\{ \norm{\Delta^+ F(i, j - \ell + \tilde{\ell})} \geq t_\alpha \right\}$ to obtain
+	In the case $V \in \mathcal{H}_0^{(I)}(i, j) \subseteq \mathcal{H}_0^-(i, j)$, the values of $\norm{\Delta^+ V(i, j - \ell + \tilde{\ell})}$ are unknown. Thus, we do not know the distribution of the random variables $\norm{\Delta^+ F(i, j - \ell + \tilde{\ell})}$ and we drop the events $\left\{ \norm{\Delta^+ F(i, j - \ell + \tilde{\ell})} \geq t_\alpha \right\}$ to obtain
 	\begin{align*}
 		\mathbb{P}_V&\left( (\mathfrak{I}_\alpha \circ \Psi_\varphi)(i, j) = 1 \right) \\
 		&\leq \sum_{\ell \in \Phi_\varphi} \mathbb{P}_V\left( \bigcap_{\tilde{\ell} \in \Phi_\varphi} \left( \left\{ \norm{\Delta^+ F(i, j - \ell + \tilde{\ell})} \geq t_\alpha \right\} \cap \left\{ \norm{\Delta^- F(i, j - \ell + \tilde{\ell})} \geq t_\alpha \right\} \right) \right) \\
@@ -1228,7 +1173,7 @@ The changes of the upper bound for the probability of a type I error after openi
 		&= \sum_{\ell \in \Phi_\varphi} \prod_{\tilde{\ell} \in \tilde{\Phi}_\varphi} \mathbb{P}_V\left( \norm{\Delta^- F(i, j - \ell + \tilde{\ell})} \geq t_\alpha \right).
 	\end{align*}
 	
-	Since $V \in \mathcal{H}_0^{(1)}(i, j)$, we have
+	Since $V \in \mathcal{H}_0^{(I)}(i, j)$, we have
 	\begin{equation*}
 		V \in \bigcap_{\tilde{j} = 1}^n \mathcal{H}_0^-(i, \tilde{j}) \subseteq \bigcap_{\ell \in \Phi_\varphi, \tilde{\ell} \in \tilde{\Phi}_\varphi} \mathcal{H}_0^-(i, j - \ell + \tilde{\ell}).
 	\end{equation*}
@@ -1241,12 +1186,12 @@ The changes of the upper bound for the probability of a type I error after openi
 		&= \varphi \alpha^{\frac{\varphi + 1}{2}}.
 	\end{align*}
 	
-	This proves the first inequality for $V \in \mathcal{H}_0^{(1)}(i, j)$. The other three cases can be proven analogously by swapping the roles of $k$ or $\tilde{k}$ with $\ell$ or $\tilde{\ell}$, respectively and/or by replacing $\Delta^-$ by $\Delta^+$. This finishes the proof of the first inequality.\\
+	This proves the first inequality for $V \in \mathcal{H}_0^{(I)}(i, j)$. The other three cases can be proven analogously by swapping the roles of $k$ or $\tilde{k}$ with $\ell$ or $\tilde{\ell}$, respectively and/or by replacing $\Delta^-$ by $\Delta^+$. This finishes the proof of the first inequality.\\
 	
 	
-	For the proof of the second inequality, we exploit our prior knowledge on $V$ again. As already stated in the proof of the first inequality, we have, that $H_0(i, j)$ is equivalent to $(i, j) \notin \varLambda$, which is equivalent to at least one of the cases $V \in \mathcal{H}_0^{(u)}(i, j)$ for $u \in \{ 1, 2, 3, 4 \}$.
+	For the proof of the second and third inequality, we exploit our prior knowledge on $V$ again. As already stated in the proof of the first inequality, we have, that $H_0(i, j)$ is equivalent to $(i, j) \notin \varLambda$, which is equivalent to at least one of the cases $V \in \mathcal{H}_0^{(I)}(i, j), V \in \mathcal{H}_0^{(II)}(i, j), V \in \mathcal{H}_0^{(III)}(i, j)$ or $V \in \mathcal{H}_0^{(IV)}(i, j)$.
 	
-	Again, we assume the first case, i.e. $V \in \mathcal{H}_0^{(1)}(i, j)$. This implies, that the null hypotheses $H_0(\tilde{i}, 1), \ldots, H_0(\tilde{i}, n)$ are true for all $\tilde{i} \in \{ 1, \dots, i \}$. It also implies
+	Again, we assume the first case, i.e. $V \in \mathcal{H}_0^{(I)}(i, j)$. This implies, that the null hypotheses $H_0(\tilde{i}, 1), \ldots, H_0(\tilde{i}, n)$ are true for all $\tilde{i} \in \{ 1, \dots, i \}$. It also implies
 	\begin{equation*}
 		\norm{\Delta^- V(\tilde{i}, 1)} = \ldots = \norm{\Delta^- V(\tilde{i}, n)} = 0
 	\end{equation*}
@@ -1254,7 +1199,7 @@ The changes of the upper bound for the probability of a type I error after openi
 	
 	Set $k_0 = -\frac{\varphi - 1}{2}$ and $\ell_0 = 0$. Then $(k_0, \ell_0) \in \Psi_\varphi$ and we get that the null hypotheses $H_0(i + k_0 - \tilde{k}, j + \ell_0 - \tilde{\ell})$ are true for all $\tilde{k}, \tilde{\ell} \in \Phi_\varphi$. Hence, we have $V \in \bigcap_{\tilde{k}, \tilde{\ell} \in \Phi_\varphi} \mathcal{H}_0(i + k_0 - \tilde{k}, j - \tilde{\ell})$ as well as $\norm{\Delta^- V(i + k_0 - \tilde{k}, j + \ell_0 - \tilde{\ell})} = 0$ for all $\tilde{k}, \tilde{\ell} \in \Phi_\varphi$.
 	
-	Define $\mathfrak{K}_\alpha = \mathfrak{I}_\alpha \circ \Psi_\varphi$. We use equation \eqref{eq: closingset} and $\Psi_\varphi = \Phi_\varphi \times \Phi_\varphi$ to write the left hand side of inequality \eqref{ineq: typeIclosing} as
+	Let $\mathfrak{K}_\alpha \in \{ \mathfrak{I}_\alpha, \mathfrak{I}_\alpha \circ \Psi_\varphi \}$. We use equation \eqref{eq: closingset} and $\Psi_\varphi = \Phi_\varphi \times \Phi_\varphi$ to expand $\mathbb{P}_V\left( (\mathfrak{K}_\alpha \bullet \Psi_\varphi)(i, j) = 1 \right)$ as
 	\begin{align*}
 		\mathbb{P}_V&\left( (\mathfrak{K}_\alpha \bullet \Psi_\varphi)(i, j) = 1 \right) \\
 		&= \mathbb{P}_V\left( \bigcap_{(k, \ell) \in \Psi_\varphi} \bigcup_{(\tilde{k}, \tilde{\ell}) \in \Psi_\varphi} \left\{ \mathfrak{K}_\alpha(i + k - \tilde{k}, j + \ell - \tilde{\ell}) = 1 \right\} \right) \\
@@ -1273,19 +1218,22 @@ The changes of the upper bound for the probability of a type I error after openi
 		\mathbb{P}_V\left( (\mathfrak{K}_\alpha \bullet \Psi_\varphi)(i, j) = 1 \right) \leq \sum_{\tilde{k}, \tilde{\ell} \in \Phi_\varphi} \mathbb{P}_V\left( \mathfrak{K}_\alpha(i + k_0 - \tilde{k}, j - \tilde{\ell}) = 1 \right).
 	\end{equation*}
 	
-	Plugging in the definition of $\mathfrak{K}_\alpha$ we obtain
-	\begin{equation*}
-		\mathbb{P}_V\left( (\mathfrak{K}_\alpha \bullet \Psi_\varphi)(i, j) = 1 \right) \leq \sum_{\tilde{k}, \tilde{\ell} \in \Phi_\varphi} \mathbb{P}_V\left( (\mathfrak{I}_\alpha \circ \Psi_\varphi)(i + k_0 - \tilde{k}, j - \tilde{\ell}) = 1 \right).
-	\end{equation*}
+	As discussed, we have $V \in \bigcap_{\tilde{k}, \tilde{\ell} \in \Phi_\varphi} \mathcal{H}_0(i + k_0 - \tilde{k}, j - \tilde{\ell})$. In the case $\mathfrak{K}_\alpha = \mathfrak{I}_\alpha$, we get the upper bound
+	\begin{align*}
+		\mathbb{P}_V\left( (\mathfrak{K}_\alpha \bullet \Psi_\varphi)(i, j) = 1 \right) &\leq \sum_{\tilde{k}, \tilde{\ell} \in \Phi_\varphi} \mathbb{P}_V\left( \mathfrak{I}_\alpha(i + k_0 - \tilde{k}, j - \tilde{\ell}) = 1 \right) \\
+		&\leq \sum_{\tilde{k}, \tilde{\ell} \in \Phi_\varphi} \alpha \\
+		&= \varphi^2 \alpha,
+	\end{align*}
+	which proves the second inequality.
 	
-	As discussed, we have $V \in \bigcap_{\tilde{k}, \tilde{\ell} \in \Phi_\varphi} \mathcal{H}_0(i + k_0 - \tilde{k}, j - \tilde{\ell})$. Thus, we can use inequality \eqref{ineq: typeIopening} to get the upper bound
+	In the case $\mathfrak{K}_\alpha = \mathfrak{I}_\alpha \circ \Psi_\varphi$, we can use inequality \eqref{ineq: typeIopening} to get the upper bound
 	\begin{align*}
 		\mathbb{P}_V\left( (\mathfrak{K}_\alpha \bullet \Psi_\varphi)(i, j) = 1 \right) &\leq \sum_{\tilde{k}, \tilde{\ell} \in \Phi_\varphi} \mathbb{P}_V\left( (\mathfrak{I}_\alpha \circ \Psi_\varphi)(i + k_0 - \tilde{k}, j - \tilde{\ell}) = 1 \right) \\
 		&\leq \sum_{\tilde{k}, \tilde{\ell} \in \Phi_\varphi} \varphi \alpha^{\frac{\varphi + 1}{2}} \\
 		&= \varphi^3 \alpha^{\frac{\varphi + 1}{2}}.
 	\end{align*}
 	
-	This proves the inequality for $V \in \mathcal{H}_0^{(1)}(i, j)$. The other cases are proven analogously by taking $k_0 = 0, \ell_0 = -\frac{\varphi - 1}{2}$ in the second case, $k_0 = \frac{\varphi - 1}{2}, \ell_0 = 0$ in the third case and $k_0 = 0, \ell_0 = \frac{\varphi - 1}{2}$ in the fourth case. In the second and fourth case, the roles of $\Delta^+$ and $\Delta^-$ are swapped. This finishes the proof of the second inequality and thus the proof of the theorem.
+	This proves the second and third inequality for $V \in \mathcal{H}_0^{(I)}(i, j)$. The other cases are proven analogously by taking $k_0 = 0, \ell_0 = -\frac{\varphi - 1}{2}$ in the second case, $k_0 = \frac{\varphi - 1}{2}, \ell_0 = 0$ in the third case and $k_0 = 0, \ell_0 = \frac{\varphi - 1}{2}$ in the fourth case. In the second and fourth case, the roles of $\Delta^+$ and $\Delta^-$ are swapped. This finishes the proof of the second and third inequality and thus the proof of the theorem.
 \end{proof}
 
 \begin{remark}
@@ -1294,6 +1242,8 @@ The changes of the upper bound for the probability of a type I error after openi
 
 \begin{remark}
 	We require the threshold $t_\alpha$ in Theorem \ref{thm: typeIinequalities} to satisfy stronger conditions than $\mathbb{P}_V( T(i, j) \geq t_\alpha ) \leq \alpha$ for every $V \in \mathcal{H}_0(i, j)$. Since the methods developed in Section \ref{section: boundtypeIerror} yield thresholds, that meet these stronger requirements, we use them to achieve better bounds in Theorem \ref{thm: typeIinequalities}.
+	
+	Inequality \ref{ineq: typeIclosing} also holds for less assumptions than stated in Theorem \ref{thm: typeIinequalities}, but this generalization is not needed in our case.
 \end{remark}
 
 Let us consider the probability of a type II error in the statistical test. In Section \ref{section: analyzetypeIIerror} we numerically calculated bounds for this probability. Similar to the previous theorem, we aim at quantifying the change of the upper bound after morphological opening and closing are applied.
@@ -1305,25 +1255,26 @@ We will need the additional assumption, that the region of interest is sufficien
 	
 	Let $t$ be a threshold, such that
 	\begin{equation*}
-		\mathbb{P}_V\left( T(\tilde{i}, \tilde{j}) \leq t \right) \leq \beta
+		\mathbb{P}_V\left( T(i, j) \leq t \right) \leq \beta
 	\end{equation*}
-	for some $\beta \in (0, 1)$ and all $(\tilde{i}, \tilde{j}) \in \Omega$ and $V \in \mathcal{H}_1(\tilde{i}, \tilde{j})$, cf. \eqref{setH1}.
+	for some $\beta \in (0, 1)$ and all $(i, j) \in \Omega$ and $V \in \mathcal{H}_1(i, j)$, cf. \eqref{setH1}.
 	
-	Let $\mathfrak{I}$ be the binary image defined by
+	Let $\mathfrak{I}$ be the random binary image defined by
 	\begin{equation*}
-		\mathfrak{I}(\tilde{i}, \tilde{j}) = \mathds{1}_{ \{ T(\tilde{i}, \tilde{j}) \geq t \} }
+		\mathfrak{I}(i, j) = \mathds{1}_{ \{ T(i, j) \geq t \} }
 	\end{equation*}
-	for all $(\tilde{i}, \tilde{j}) \in \Omega$.
+	for all $(i, j) \in \Omega$.
 	
 	Let $(i, j) \in \Omega$ and let $T(i, j)$ be the test statistic defined in \eqref{teststatistic} and $H_1(i, j)$ be the alternative hypothesis defined in \eqref{alternativehypothesis}.
 	
 	Let $\varphi \in \mathbb{N}$ be odd and define the set $\Phi_\varphi = \left\{ -\frac{\varphi - 1}{2}, -\frac{\varphi - 3}{2}, \dots, \frac{\varphi - 3}{2}, \frac{\varphi - 1}{2} \right\}$ and the structuring element $\Psi_\varphi = \Phi_\varphi \times \Phi_\varphi$.
 	
-	Denote by $\varLambda = \{ \kappa_1, \dots, \kappa_2 \} \times \{ \lambda_1, \dots, \lambda_2 \}$ the rROI contained in $V$. Let $\min \{ \kappa_2 - \kappa_1 + 1, \lambda_2 - \lambda_1 + 1 \} \geq \varphi$.
+	Denote by $\varLambda = \{ \kappa_1, \dots, \kappa_2 \} \times \{ \lambda_1, \dots, \lambda_2 \}$ the ROI contained in $V$. Let $\min \{ \kappa_2 - \kappa_1 + 1, \lambda_2 - \lambda_1 + 1 \} \geq \varphi$.
 	Then for $V \in \mathcal{H}_1(i, j)$ the following inequalities hold:
 	\begin{align}
 		\mathbb{P}_V\left( (\mathfrak{I} \circ \Psi_\varphi)(i, j) = 0 \right) &\leq \varphi^2 \beta \label{ineq: typeIIopening} \\
-		\mathbb{P}_V\left( ((\mathfrak{I} \circ \Psi_\varphi) \bullet \Psi_\varphi)(i, j) = 0 \right) &\leq \varphi^2 \beta \label{ineq: typeIIclosing}
+		\mathbb{P}_V\left( (\mathfrak{I} \bullet \Psi_\varphi)(i, j) = 0 \right) &\leq \beta \label{ineq: typeIIclosing} \\
+		\mathbb{P}_V\left( ((\mathfrak{I} \circ \Psi_\varphi) \bullet \Psi_\varphi)(i, j) = 0 \right) &\leq \varphi^2 \beta \label{ineq: typeIIopeningclosing}
 	\end{align}
 \end{theorem}
 \begin{proof}
@@ -1363,18 +1314,23 @@ We will need the additional assumption, that the region of interest is sufficien
 	This finishes the proof of the first inequality.\\
 	
 	
-	For the proof of the second inequality, define $\mathfrak{K} = \mathfrak{I} \circ \Psi_\varphi$. By the properties of morphological closing we have $(\mathfrak{K} \bullet \Psi_\varphi)(i, j) \geq \mathfrak{K}(i, j)$ yielding
+	For the proof of the second and third inequality, let $\mathfrak{K} \in \{ \mathfrak{I}, \mathfrak{I} \circ \Psi_\varphi \}$. By the properties of morphological closing we have $(\mathfrak{K} \bullet \Psi_\varphi)(i, j) \geq \mathfrak{K}(i, j)$, yielding
 	\begin{equation*}
-		\mathbb{P}_V\left( (\mathfrak{K} \bullet \Psi_\varphi)(i, j) = 0 \right) \leq \mathbb{P}_V\left( \mathfrak{K}(i, j) = 0 \right) = \mathbb{P}_V\left( (\mathfrak{I} \circ \Psi_\varphi)(i, j) = 0 \right).
+		\mathbb{P}_V\left( (\mathfrak{K} \bullet \Psi_\varphi)(i, j) = 0 \right) \leq \mathbb{P}_V\left( \mathfrak{K}(i, j) = 0 \right).
 	\end{equation*}
 	
-	Since $V \in \mathcal{H}_1(i, j)$, we can apply inequality \eqref{ineq: typeIIopening} and obtain the upper bound
+	In the case $\mathfrak{K} = \mathfrak{I}$, we obtain
+	\begin{equation*}
+		\mathbb{P}_V\left( (\mathfrak{K} \bullet \Psi_\varphi)(i, j) = 0 \right) \leq \mathbb{P}_V\left( \mathfrak{I}(i, j) = 0 \right) = \mathbb{P}_V\left( T(i, j) \leq t \right) \leq \beta.
+	\end{equation*}
+	
+	In the case $\mathfrak{K} = \mathfrak{I} \circ \Psi_\varphi$, we can apply inequality \eqref{ineq: typeIIopening}, since $V \in \mathcal{H}_1(i, j)$, and obtain the upper bound
 	\begin{align*}
 		\mathbb{P}_V\left( (\mathfrak{K} \bullet \Psi_\varphi)(i, j) = 0 \right) &\leq \mathbb{P}_V\left( (\mathfrak{I} \circ \Psi_\varphi)(i, j) = 0 \right) \\
 		&\leq \varphi^2 \beta.
 	\end{align*}
 	
-	This proves the second inequality and thus finishes the proof.
+	This proves the second and third inequality and thus finishes the proof.
 \end{proof}
 
 \begin{remark}
@@ -1388,13 +1344,6 @@ We will need the additional assumption, that the region of interest is sufficien
 	A proof can be found in Appendix \ref{appendix: proofs}. This only improves the bound for very small values of $\beta$.
 \end{remark}
 
-We employ morphological closing to reduce the number of type II errors. This is not represented in the upper bound in inequality \eqref{ineq: typeIIclosing}. The simulation results displayed in Section \ref{section: simulationresults} and Appendix \ref{appendix: simulations} show, that the amount of type II errors after opening and after opening and closing behave similarly, when the standard deviation of the noise increases. A small improvement through closing can only be observed for a certain range of standard deviations.
-
-This behaviour is due to the pixels not being independent anymore, after morphological opening has been applied. In some cases, the amount of type II errors is greatly increased through opening and the application of closing only reverts this to a very small extent, cf. Appendix \ref{appendix: simulations} Figure \ref{fig: alpha0.01_phi99}.
-
-Based on these observations, an improvement of the upper bound in inequality \eqref{ineq: typeIIclosing} without improving the upper bound in \eqref{ineq: typeIIopening} seems unlikely.
-Note, that any improvements of the upper bound in inequality \eqref{ineq: typeIIopening} can immediately be applied to the upper bound in inequality \eqref{ineq: typeIIclosing} as well.
-
 \newpage
 
 
@@ -1405,30 +1354,83 @@ To simulate the error rates of the statistical test and the subsequent applicati
 
 \input{Figures/simulatedpixeltypes}
 
-The six different types include the best and worst case for identification of a background and foreground pixel, respectively. For both background and foreground pixels to be identified correctly, it is ideal, if the pixel is only surrounded by other background or foreground pixels, see Figures \ref{fig: background_free} and \ref{fig: foreground_free}.
-For a background pixel to be correctly identified, the worst case is, if the pixel is located at the edge of the region of interest, see Figure \ref{fig: background_edge}. Similarly, the worst case for a foreground pixel to be correctly identified is to be located at the corner of the region of interest, see Figure \ref{fig: foreground_corner}. While other positions of the pixel $(i, j)$ with respect to the region of interest are possible, our simulations cover the extreme cases. We expect the error rates for other cases to lie between those of the extreme cases.
+The six different simulated types include the best and worst case for identification of a background and foreground pixel, respectively. For both background and foreground pixels to be identified correctly, it is ideal, if the pixel is only surrounded by other background or foreground pixels, see Figures \ref{fig: background_free} and \ref{fig: foreground_free}.
+For a background pixel to be correctly identified, the worst case is, if the pixel is located at the edge of the region of interest, see Figure \ref{fig: background_edge}. Similarly, the worst case for a foreground pixel to be correctly identified is to be located at the corner of the region of interest, see Figure \ref{fig: foreground_corner}.
 
-The images are created by contructing the image and region of interest around the pixel $(i, j)$ according to the target position of the pixel. For each type of image, we randomly generate 1000 noises and add it to the image with standard deviations $\sigma$ ranging from 1 to 150. After binarization through the statistical test, morphological opening and closing, we determine the error rate by dividing the the number of times the pixel is falsely identified by the total number of noises.
+While other positions of the pixel $(i, j)$ with respect to the region of interest are possible, our simulations cover the best and worst cases. The error rates for other cases lie between those of the extreme cases.
 
-In Figure \ref{fig: alpha0.05_phi5} the error rates for $\alpha = 0.05$ and $\varphi = 5$ are displayed. For all simulated positions of background pixels, we keep the error rate after binarization through the statistical test below the target statistical significance through the choice of the threshold. As expected, the error rate is equal to the statistical significance in the worst case for low standard deviations, see Figure \ref{fig: alpha0.05_phi5_background_edge}. Through application of morphological opening and closing, the error rates drop to zero for all standard deviations and all simulated positions of background pixels. For the simulated positions of foreground pixels, the error rates after binarization are zero for small standard deviations and increase, as the standard deviation increases. The better the position of the foreground pixel, the longer the error rate stays close to zero. While the application of morphological opening barely has an impact for small standard deviations, it greatly increases the error rate for higher standard deviations. The subsequent application of morphological closing only decreases the error rate to a very small extent, if at all, making it almost negligible.
+The images are constructed around the pixel according to the target position of the pixel. This is achieved by creating the image $V$ as an image with side length $2 \varphi + 3$ and setting the values of $V$, such that the pixel $(\varphi + 2, \varphi + 2)$ has the desired position with respect to the region of interest, where $\varphi$ is the side length of the used structuring element.
 
-\input{CSV/alpha0.05_phi3}
+For our simulations we cover four different approaches to extracting the ROI. In the first one, we only perform the statistical test developed in Section \ref{section: statisticalmodel}. For the second and third approach, we apply morphological opening or closing subsequently to the statistical test, respectively. The last approach covers the application of opening to the outcome of the statistical test and subsequent closing.
 
-This observation can be explained as follows. As the standard deviation increases, type II errors become more numerous. Thus, there are more falsely identified pixels within the region of interest after binarization. Morphological opening connects these falsely identified pixels, also misclassifying the pixels between the initial falsely classified pixels. This can create clusters the size of the structuring element of falsely identified pixels within the region of interest. Morphological closing with the same structuring element cannot fix these errors.
+We want to bound the probability of a type I error below the statistical significance $\alpha$ for all of these four methods. To this end, we use an adjusted statistical significance $\tilde{\alpha}$ to calculate the threshold $t_{\tilde{\alpha}}$ for the statistical test depending on the morphological operations we perform subsequently to the statistical test, see Table \ref{table: adjustedstatisticalsignificances}.
 
-Theorem \ref{thm: typeIinequalities} yields another approach to the extraction of the region of interest. Using a relaxed statistical significance $\tilde{\alpha} = \left( \frac{\alpha}{\varphi^3} \right)^{\frac{2}{\varphi + 1}}$ to calculate the threshold $t_{\tilde{\alpha}}$, yields
-\begin{equation*}
-	\mathbb{P}_V\left( ((\mathfrak{I}_{\tilde{\alpha}} \circ \Psi_\varphi) \bullet \Psi_\varphi)(i, j) = 1 \right) \leq \varphi^3 \left( \left( \frac{\alpha}{\varphi^3} \right)^{\frac{2}{\varphi + 1}} \right)^{\frac{\varphi + 1}{2}} \leq \alpha
-\end{equation*}
-by inequality \eqref{ineq: typeIclosing}. This way, we can bound the probability of a type I error after opening and closing below a given statistical significance $\alpha$. The error rates for this approach with $\alpha = 0.05$ and $\varphi = 5$ are displayed in Figure \ref{fig: alpha0.05_phi5}. The error rates for background pixels after opening and closing are below the given statistical significance $\alpha$, while the errors rates for foreground pixels are slightly lower than in Figure \ref{fig: alpha0.05_phi5}.
+\begin{table}[h]
+	\centering
+	\resizebox{\textwidth}{!}{
+		\begin{tabular}{c|c}
+			\textbf{Morphological operations} & \textbf{Adjusted statistical significance $\tilde{\alpha}$} \\
+			\hline
+			- & $\tilde{\alpha} = \alpha$ \\
+			\hline
+			Opening & $\tilde{\alpha} = \left( \frac{\alpha}{\varphi} \right)^{\frac{2}{\varphi + 1}}$ \\
+			\hline
+			Closing & $\tilde{\alpha} = \frac{\alpha}{\varphi^2}$ \\
+			\hline
+			Opening, closing & $\tilde{\alpha} = \left( \frac{\alpha}{\varphi^3} \right)^{\frac{2}{\varphi + 1}}$ \\
+		\end{tabular}
+	}
+	\caption{Adjusted statistical significance for the statistical test depending on the morphological operations performed subsequently to the statistical test.}
+	\label{table: adjustedstatisticalsignificances}
+\end{table}
 
-Simulations for other structuring elements as well as for $\alpha = 0.01$ can be found in Appendix \ref{appendix: simulations}. The code used for the simulation can be found in Appendix \ref{appendix: algorithms}.
+Then, by inequalities \eqref{ineq: typeIopening}, \eqref{ineq: typeIclosing} and \eqref{ineq: typeIopeningclosing}, the probability of a type I error is bounded by $\alpha$ for all approaches.
+
+For each type of image and each of the four methods, we randomly generate 1000 noise terms and add it to the image with standard deviations $\sigma$ ranging from 1 to 150. For each of the four approaches, we determine the error rate by dividing the the number of times the pixel is falsely identified by the number of generated noise terms.
+
+In Figure \ref{fig: alpha0.05_phi7} the error rates for $\alpha = 0.05$ and $\varphi = 7$ are displayed.
+
+We see, that for a background pixel the false positive rate is below the target statistical significance of $0.05$ for all approaches and all simulated positions. Only in Figure \ref{fig: alpha0.05_phi7_background_edge} the false positive rate is close to $\alpha$ for small values of $\sigma$, but drops, as $\sigma$ increases. We also note, that for all simulated positions of a background pixel, the binarization through the statistical test has by far the highest error rate, although we chose adjusted statistical significances to bound the false positive rate below $0.05$ for all used methods. This is explained by the fact, that inequalities \eqref{ineq: typeIbound}, \eqref{ineq: typeIopening}, \eqref{ineq: typeIclosing} and \eqref{ineq: typeIopeningclosing} are only upper bounds. These simulation results indicate, that they are not sharp and an improvement is possible.
+
+For the simulated positions of foreground pixels, the error rates are zero for small standard deviations for all methods. In the worst case, the false negative rate is zero only up to around $\sigma = 25$, see Figure \ref{fig: alpha0.05_phi7_foreground_corner}. In the best case, the false negative rate stays close to zero up to around $\sigma = 50$, see Figure \ref{fig: alpha0.05_phi7_foreground_free}. For all simulated positions, the false negative rate increases, as the standard deviation increases. Eventually, the approach without application of morphological operations has the lowest false negative rate. Improvements of the aforementioned inequalities could change this, as a more accurately chosen adjusted statistical significance $\tilde{\alpha}$ would lower the false negative rate.
+
+\input{CSV/alpha0.05_phi7}
+
+Figure \ref{fig: alpha0.05_phi7_zoom} provides a closer look at the false negative rates in Figure \ref{fig: alpha0.05_phi7}. We zoom in on the range of standard deviations, where the error rates change the most.
+
+\input{CSV/alpha0.05_phi7_zoom}
+
+In the case of a foreground pixel at the corner of the ROI, we see, that only applying morphological opening after the statistical test provides the lowest false negative rate for $\sigma \leq 56$, see Figure \ref{fig: alpha0.05_phi7_foreground_corner_zoom}. On the other hand, applying morphological closing has the highest false negative rate. This is counterintuitive at first, as we use closing to decrease the false negative rate and opening can only worsen the false negative rate. But, as the pixel is located at the corner of the ROI, morphological opening and closing rarely change the outcome of the statistical test. Thus, the observed false negative rates are due to the threshold in the statistical test being the lowest for $\tilde{\alpha} = \left( \frac{\alpha}{\varphi} \right)^{\frac{2}{\varphi + 1}}$ and the highest for $\tilde{\alpha} = \frac{\alpha}{\varphi^2}$. For $\sigma > 56$ morphological opening changes the outcome of the statistical test more frequently, as type II errors in the statistical test become more numerous. Thus, the false negative rate, when applying opening after the statistical test, becomes higher than the false negative rate, when only the statistical test is performed.
+
+For a foreground pixel at the edge of the ROI, the statistical test alone has the lowest false negative rate for $\sigma > 57$ for the same reason as above. When comparing the four approaches, the positive effect of closing on the false negative rate becomes visible in this case, see Figure \ref{fig: alpha0.05_phi7_foreground_edge_zoom}. For $\sigma > 46$ the application of closing offers a lower false negative rate than that of opening \& closing. For $\sigma > 67$ the false negative rate of closing falls below that of opening. At these points, the positive effect of closing on the number of type II errors surpasses the effect that the lower threshold based on the adjusted statistical significance has.
+
+When considering a foreground pixel, that is only surrounded by other foreground pixels, closing comes into full effect, see Figure \ref{fig: alpha0.05_phi7_foreground_free_zoom}. For $\sigma \leq 96$, closing offers the best false negative rate. Only performing the statistical test has a lower false negative rate for higher standard deviations, which is due to more numerous type II errors, that are not fixed by closing anymore. Here, again, the higher threshold for closing, based on the adjusted statistical significance, leads to a worse false negative rate.
+
+In all three cases, the false negative rates behave similarly, when comparing the statistical test, opening and opening \& closing. Opening always performs better than opening \& closing. Both perform better than the statistical test alone up to a certain $\sigma$. This behaviour is due to the different thresholds based on the adjusted statistical significances and the increase in type II errors, as the standard deviation of the noise terms increases. The performance of closing highly depends on the position of the pixel within the ROI. It can lead to the worst false negative rate for a corner pixel and the best false negative rate for a pixel only surrounded by other foreground pixels.
+
+\input{CSV/alpha0.05_phi7_test}
+
+As we have found evidence, that improvements in the upper bounds \eqref{ineq: typeIopening}, \eqref{ineq: typeIclosing} and \eqref{ineq: typeIopeningclosing} could be possible, we are interested, how significant these improvements can be. To this end, we use the adjusted statistical significances for opening $\tilde{\alpha} = \left( \frac{\alpha}{\varphi} \right)^{\frac{2}{\varphi + 1}}$ and for opening \& closing $\tilde{\alpha} = \left( \frac{\alpha}{\varphi^3} \right)^{\frac{2}{\varphi + 1}}$ and use them for the statistical test, but perform opening and subsequent closing in both cases. The results of this experimental approach are displayed in Figure \ref{fig: alpha0.05_phi7_test}. For the simulated background pixels, only the error rate only changes in the worst case. It is slightly higher for the experimental approach, but does not get close to the intended upper bound of $0.05$. We notice, that for the simulated foreground pixels, the error rates are significantly lower in the experimental approach. The difference between the two adjusted statistical significances is the factor $\varphi^2$. Since dropping this factor barely has an effect on the false positive rates, we expect that in inequalities \eqref{ineq: typeIopening} and \eqref{ineq: typeIopeningclosing} higher exponents are possible.
+
+Simulations for other values of $\varphi$ as well as for $\alpha = 0.01$ can be found in Appendix \ref{appendix: simulations}. The code used for the simulation can be found in Appendix \ref{appendix: algorithms}.
 
 \newpage
 
 
 
 \section{Discussion}\label{section: conclusion}
+
+We employ morphological closing to reduce the number of type II errors. This is not represented in the upper bound in inequality \eqref{ineq: typeIIclosing}. The simulation results displayed in Section \ref{section: simulationresults} and Appendix \ref{appendix: simulations} show, that the amount of type II errors after opening and after opening and closing behave similarly, when the standard deviation of the noise terms increases. A small improvement through closing can only be observed for a certain range of standard deviations.
+
+This behaviour is due to the pixels not being independent anymore, after morphological opening has been applied. In some cases, the amount of type II errors is greatly increased through opening and the application of closing only reverts this to a very small extent, cf. Appendix \ref{appendix: simulations} Figure \ref{fig: alpha0.01_phi99}.
+
+Based on these observations, an improvement of the upper bound in inequality \eqref{ineq: typeIIopeningclosing} without improving the upper bound in \eqref{ineq: typeIIopening} seems unlikely.
+Note, that any improvements of the upper bound in inequality \eqref{ineq: typeIIopening} can immediately be applied to the upper bound in inequality \eqref{ineq: typeIIopeningclosing} as well.
+
+
+
+
+
 
 In this thesis we consider how the upper bounds for the error probabilities of a statistical test change, when morphological opening and closing are applied. To this end, we examine a simplified model and develop a thresholding method to extract the region of interest. The simplified model and thresholding method are designed, such that the probability of a type I error can be bound by a given statistical significance. This is achieved by computing a suitable threshold based on the target statistical significance.
 
@@ -1440,7 +1442,7 @@ A different shaped structuring element could lead to no improvements of the erro
 
 Since we only considered the categorization of a single pixel, a natural next step could be an expansion beyond the scope of this thesis by applying techniques from the field of multiple testing. When researching the connection between multiple testing and morphological operations, one might consider more morphological operators. Namely, the convex hull operator is of high interest in the extraction of the region of interest of a fingerprint.
 
-Generalizations of the results from Sections \ref{section: statisticalmodel} and \ref{section: boundtypeIerror} to convex regions of interest with a checkerboard pattern are possible. For the reasons described above, the choice of the structuring element for a convex region of interest is a question to ponder on. Advances could be achieved in conjunction with multiple testing techniques, since the choice of the structuring element is mainly a limiting factor for pixels close to the edge of the region of interest, which form only a subset of the total pixels in the image.
+Generalizations of the results from Sections \ref{section: statisticalmodel} and \ref{section: boundtypeIerror} to convex regions of interest with a chessboard pattern are possible. For the reasons described above, the choice of the structuring element for a convex region of interest is a question to ponder on. Advances could be achieved in conjunction with multiple testing techniques, since the choice of the structuring element is mainly a limiting factor for pixels close to the edge of the region of interest, which form only a subset of the total pixels in the image.
 
 \newpage
 
@@ -1486,6 +1488,66 @@ Generalizations of the results from Sections \ref{section: statisticalmodel} and
 
 \begin{appendix}
 	\section{Additional proofs}\label{appendix: proofs}
+	
+	\begin{theorem}\label{thm: eqintbessel}
+		Let $\alpha, \beta > 0$. Denote by $I_0$ the modified Bessel function of the first kind \cite[p.~910-911]{TISP}. Then
+		\begin{equation}\label{eq: intbessel}
+			\int_0^\infty \exp \left( - \alpha \eta^2 \right) I_0 ( \beta \eta ) \mathrm{d}\eta = \frac{\sqrt{\pi}}{2 \sqrt{\alpha}} \exp \left( \frac{\beta^2}{8 \alpha} \right) I_0 \left( \frac{\beta^2}{8 \alpha} \right).
+		\end{equation}
+	\end{theorem}
+	\begin{proof}
+		We note, that by substituting $\phi = \pi - \theta$ and $\zeta = - \eta$ we obtain the equality
+		\begin{align*}
+			&\int_0^\pi \int_0^\infty \exp \left( - \alpha \eta^2 \right) \exp \left( \beta \eta \cos \theta \right) \mathrm{d}\eta \mathrm{d}\theta \\
+			=& \int_0^\pi \int_{-\infty}^0 \exp \left( - \alpha \zeta^2 \right) \exp \left( - \beta \zeta \cos \left( \pi - \phi \right) \right) \mathrm{d}\zeta \mathrm{d}\phi \\
+			=& \int_0^\pi \int_{-\infty}^0 \exp \left( - \alpha \zeta^2 \right) \exp \left( \beta \zeta \cos \phi \right) \mathrm{d}\zeta \mathrm{d}\phi.
+		\end{align*}
+		
+		We start the proof by using the integral representation of the modified Bessel function of the first kind \cite[p.~181]{Watson}, which yields
+		\begin{align*}
+			\int_0^\infty \exp \left( - \alpha \eta^2 \right) I_0 ( \beta \eta ) \mathrm{d}\eta &= \int_0^\infty \exp \left( - \alpha \eta^2 \right) \int_0^\pi \exp \left( \beta \eta \cos \theta \right) \mathrm{d}\theta \mathrm{d}\eta \\
+			&= \int_0^\pi \int_0^\infty \exp \left( - \alpha \eta^2 \right) \exp \left( \beta \eta \cos \theta \right) \mathrm{d}\eta \mathrm{d}\theta.
+		\end{align*}
+		
+		Using the equality from above, we obtain
+		\begin{align*}
+			\int_0^\infty \exp \left( - \alpha \eta^2 \right) I_0 ( \beta \eta ) \mathrm{d}\eta &= \frac{1}{2} \int_0^\pi \int_{-\infty}^\infty \exp \left( - \alpha \eta^2 \right) \exp \left( \beta \eta \cos \theta \right) \mathrm{d}\eta \mathrm{d}\theta.
+		\end{align*}
+		
+		Completing the square inside the exponential function then yields
+		\begin{align*}
+			&\int_0^\infty \exp \left( - \alpha \eta^2 \right) I_0 ( \beta \eta ) \mathrm{d}\eta \\
+			=& \frac{1}{2} \int_0^\pi \int_{-\infty}^\infty \exp \left( - \alpha \left( \eta^2 - \frac{\beta \eta}{\alpha} \cos \theta \right) \right) \mathrm{d}\eta \mathrm{d}\theta \\
+			=& \frac{1}{2} \int_0^\pi \exp \left( \frac{\beta^2}{4 \alpha} \cos^2 \theta \right) \int_{-\infty}^\infty \exp \left( - \alpha \left( \eta - \frac{\beta}{2 \alpha} \cos \theta \right)^2 \right) \mathrm{d}\eta \mathrm{d}\theta.
+		\end{align*}
+		
+		The inner integral is a Gaussian integral and evauluates to $\sqrt{\frac{\pi}{\alpha}}$. Thus, we obtain
+		\begin{equation*}
+			\int_0^\infty \exp \left( - \alpha \eta^2 \right) I_0 ( \beta \eta ) \mathrm{d}\eta = \frac{\sqrt{\pi}}{2 \sqrt{\alpha}} \int_0^\pi \exp \left( \frac{\beta^2}{4 \alpha} \cos^2 \theta \right) \mathrm{d}\theta.
+		\end{equation*}
+		
+		Using the relation $\cos^2 \theta = \frac{1}{2} \left( 1 + \cos 2 \theta \right)$ and subsequently substituting $\phi = 2 \theta$ yields
+		\begin{align*}
+			\int_0^\infty \exp \left( - \alpha \eta^2 \right) I_0 ( \beta \eta ) \mathrm{d}\eta &= \frac{\sqrt{\pi}}{2 \sqrt{\alpha}} \exp \left( \frac{\beta^2}{8 \alpha} \right) \int_0^\pi \exp \left( \frac{\beta^2}{8 \alpha} \cos 2 \theta \right) \mathrm{d}\theta \\
+			&= \frac{\sqrt{\pi}}{2 \sqrt{\alpha}} \exp \left( \frac{\beta^2}{8 \alpha} \right) \frac{1}{2} \int_0^{2 \pi} \exp \left( \frac{\beta^2}{8 \alpha} \cos \phi \right) \mathrm{d}\phi.
+		\end{align*}
+		
+		To proceed, we substitute $\vartheta = 2 \pi - \phi$ to obtain the equality
+		\begin{align*}
+			\int_\pi^{2 \pi} \exp \left( \frac{\beta^2}{8 \alpha} \cos \phi \right) \mathrm{d}\phi &= \int_0^\pi \exp \left( \frac{\beta^2}{8 \alpha} \cos \left( 2 \pi - \vartheta \right) \right) \mathrm{d}\vartheta \\
+			&= \int_0^\pi \exp \left( \frac{\beta^2}{8 \alpha} \cos \vartheta \right) \mathrm{d}\vartheta.
+		\end{align*}
+		
+		Using this equality, we obtain
+		\begin{align*}
+			\int_0^\infty \exp \left( - \alpha \eta^2 \right) I_0 ( \beta \eta ) \mathrm{d}\eta &= \frac{\sqrt{\pi}}{2 \sqrt{\alpha}} \exp \left( \frac{\beta^2}{8 \alpha} \right) \int_0^\pi \exp \left( \frac{\beta^2}{8 \alpha} \cos \phi \right) \mathrm{d}\phi \\
+			&= \frac{\sqrt{\pi}}{2 \sqrt{\alpha}} \exp \left( \frac{\beta^2}{8 \alpha} \right) I_0 \left( \frac{\beta^2}{8 \alpha} \right)
+		\end{align*}
+		
+		This finishes the proof.
+	\end{proof}
+	
+	\newpage
 	
 %	Define
 %	\begin{align*}
@@ -1550,7 +1612,7 @@ Generalizations of the results from Sections \ref{section: statisticalmodel} and
 		
 		Let $\varphi \in \mathbb{N}$ be odd. Let $\Phi_\varphi = \{ -\frac{\varphi - 1}{2}, -\frac{\varphi - 3}{2}, \dots, \frac{\varphi - 3}{2}, \frac{\varphi - 1}{2} \}$ and $\Psi_\varphi = \Phi_\varphi \times \Phi_\varphi$ be a structuring element.
 		
-		Denote by $\varLambda = \{ \kappa_1, \dots, \kappa_2 \} \times \{ \lambda_1, \dots, \lambda_2 \}$ the rROI contained in $V$. Let $\min \{ \kappa_2 - \kappa_1 + 1, \lambda_2 - \lambda_1 + 1 \} \geq \varphi$. Let $V \in \mathcal{H}_1(i, j)$ and $(i, j) \in \Omega$ be such, that
+		Denote by $\varLambda = \{ \kappa_1, \dots, \kappa_2 \} \times \{ \lambda_1, \dots, \lambda_2 \}$ the ROI contained in $V$. Let $\min \{ \kappa_2 - \kappa_1 + 1, \lambda_2 - \lambda_1 + 1 \} \geq \varphi$. Let $V \in \mathcal{H}_1(i, j)$ and $(i, j) \in \Omega$ be such, that
 		\begin{equation}
 			\begin{aligned}
 				i - 2 \varphi + 2 &\geq \kappa_1, \\
@@ -1630,19 +1692,19 @@ Generalizations of the results from Sections \ref{section: statisticalmodel} and
 	
 	\section{Simulations}\label{appendix: simulations}
 	
-	\input{CSV/alpha0.05_phi5}
-	
-	\input{CSV/alpha0.05_phi7}
-	
-	\input{CSV/alpha0.05_phi99}
-	
-	\input{CSV/alpha0.01_phi3}
-	
-	\input{CSV/alpha0.01_phi5}
-	
-	\input{CSV/alpha0.01_phi7}
-	
-	\input{CSV/alpha0.01_phi99}
+%	\input{CSV/alpha0.05_phi3}
+%	
+%	\input{CSV/alpha0.05_phi5}
+%	
+%	\input{CSV/alpha0.05_phi99}
+%	
+%	\input{CSV/alpha0.01_phi3}
+%	
+%	\input{CSV/alpha0.01_phi5}
+%	
+%	\input{CSV/alpha0.01_phi7}
+%	
+%	\input{CSV/alpha0.01_phi99}
 	
 	\newpage
 	
@@ -1656,7 +1718,7 @@ Generalizations of the results from Sections \ref{section: statisticalmodel} and
 	
 	\newpage
 	
-	\lstinputlisting[caption=\emph{MATLAB} implementation of the testing procedure to test for a rectangular region of interest with a checkerboard pattern.]{ROI-Detection/SIMULATION/ROI_Detection.m}
+	\lstinputlisting[caption=\emph{MATLAB} implementation of the testing procedure to test for a rectangular region of interest with a chessboard pattern.]{ROI-Detection/SIMULATION/ROI_Detection.m}
 	
 	\newpage
 	

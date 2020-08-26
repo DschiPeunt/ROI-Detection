@@ -20,7 +20,7 @@
 			\foreach \x in {(-1, 0)}
 				\filldraw[black] \x rectangle + (1, 1);
 		\end{tikzpicture}
-		\caption{Result of binary erosion of the image with a $3 \times 3$ pixel structuring element. The light gray pixels are now set to zero.}
+		\caption{Result of binary erosion of \ref{fig: openingbefore} with a $3 \times 3$ pixel structuring element. The light gray pixels are set to zero.}
 		\label{fig: openingerosion}
 	\end{subfigure}
 	\vfill
@@ -31,11 +31,9 @@
 			\foreach \x in {(-3, -1), (-1, -2), (-1, 2), (0, -2), (2, -3), (2, -2), (3, -3), (3, -2)}
 				\filldraw[gray, opacity=0.5] \x rectangle + (1, 1);
 			\foreach \x in {(-2, -1), (-2, 0), (-2, 1), (-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 0), (0, 1)}
-				\filldraw[gray] \x rectangle + (1, 1);
-			\foreach \x in {(-1, 0)}
 				\filldraw[black] \x rectangle + (1, 1);
 		\end{tikzpicture}
-		\caption{Image after binary opening, i.e. erosion and dilation. The dark gray pixels were set to one again.}
+		\caption{Binary dilation of the black pixel in \ref{fig: openingerosion} with a $3 \times 3$ pixel structuring element. The original image is displayed as light gray.}
 		\label{fig: openingdilation}
 	\end{subfigure}
 	\hfill
@@ -46,9 +44,9 @@
 			\foreach \x in {(-2, -1), (-2, 0), (-2, 1), (-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 0), (0, 1)}
 				\filldraw[black] \x rectangle + (1, 1);
 		\end{tikzpicture}
-		\caption{Result of opening. Outliers have been eliminated and edges have been smoothed.}
+		\caption{Result of opening of \ref{fig: openingbefore} with a $3 \times 3$ pixel structuring element. Outliers have been eliminated and edges have been smoothed.}
 		\label{fig: openingafter}
 	\end{subfigure}
-	\caption{Example of binary morphological opening.}
+	\caption{Example of binary morphological opening using a $3 \times 3$ pixel structuring element.}
 	\label{fig: exampleopening}
 \end{figure}

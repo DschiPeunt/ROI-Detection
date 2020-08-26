@@ -17,13 +17,18 @@
 				grid=both,
 				minor grid style={gray!25},
 				major grid style={gray!25},
-				ymin=-0.05,
-				ymax=1.05,
+				ymin=-0.01,
+				ymax=0.1,
 				width=\linewidth,
 				no marks,
-				table/x = sigma]
+				table/x = sigma,
+				y tick label style={
+					/pgf/number format/.cd,
+					fixed,
+					/tikz/.cd
+    			}]
 				\addplot[line width=1pt,dashed,color=blue] table[y=typeI] from \backcorner;
-				\addlegendentry{Binarization}
+				\addlegendentry{Statistical test}
 				\addplot[line width=1pt,dashed,color=red] table[y=typeI_o] from \backcorner;
 				\addlegendentry{Opening}
 				\addplot[line width=1pt,dashed,color=gray] table[y=typeI_c] from \backcorner;
@@ -32,7 +37,7 @@
 				\addlegendentry{Opening \& Closing}
 			\end{axis}
 		\end{tikzpicture}
-		\caption{Background pixel at the corner of the rROI.}
+		\caption{Background pixel at the corner of the ROI.}
 		\label{fig: alpha0.05_phi99_background_corner}
 	\end{subfigure}
 	\hfill
@@ -53,7 +58,7 @@
 				no marks,
 				table/x = sigma]
 				\addplot[line width=1pt,dashed,color=blue] table[y=typeII] from \forecorner;
-				\addlegendentry{Binarization}
+				\addlegendentry{Statistical test}
 				\addplot[line width=1pt,dashed,color=red] table[y=typeII_o] from \forecorner;
 				\addlegendentry{Opening}
 				\addplot[line width=1pt,dashed,color=gray] table[y=typeII_c] from \forecorner;
@@ -62,7 +67,7 @@
 				\addlegendentry{Opening \& Closing}
 			\end{axis}
 		\end{tikzpicture}
-		\caption{Foreground pixel at the corner of the rROI.}
+		\caption{Foreground pixel at the corner of the ROI.}
 		\label{fig: alpha0.05_phi99_foreground_corner}
 	\end{subfigure}
 	\vfill
@@ -77,13 +82,18 @@
 				grid=both,
 				minor grid style={gray!25},
 				major grid style={gray!25},
-				ymin=-0.05,
-				ymax=1.05,
+				ymin=-0.01,
+				ymax=0.1,
 				width=\linewidth,
 				no marks,
-				table/x = sigma]
+				table/x = sigma,
+				y tick label style={
+					/pgf/number format/.cd,
+					fixed,
+					/tikz/.cd
+    			}]
 				\addplot[line width=1pt,dashed,color=blue] table[y=typeI] from \backedge;
-				\addlegendentry{Binarization}
+				\addlegendentry{Statistical test}
 				\addplot[line width=1pt,dashed,color=red] table[y=typeI_o] from \backedge;
 				\addlegendentry{Opening}
 				\addplot[line width=1pt,dashed,color=gray] table[y=typeI_c] from \backedge;
@@ -92,7 +102,7 @@
 				\addlegendentry{Opening \& Closing}
 			\end{axis}
 		\end{tikzpicture}
-		\caption{Background pixel at the edge of the rROI.}
+		\caption{Background pixel at the edge of the ROI.}
 		\label{fig: alpha0.05_phi99_background_edge}
 	\end{subfigure}
 	\hfill
@@ -113,7 +123,7 @@
 				no marks,
 				table/x = sigma]
 				\addplot[line width=1pt,dashed,color=blue] table[y=typeII] from \foreedge;
-				\addlegendentry{Binarization}
+				\addlegendentry{Statistical test}
 				\addplot[line width=1pt,dashed,color=red] table[y=typeII_o] from \foreedge;
 				\addlegendentry{Opening}
 				\addplot[line width=1pt,dashed,color=gray] table[y=typeII_c] from \foreedge;
@@ -122,7 +132,7 @@
 				\addlegendentry{Opening \& Closing}
 			\end{axis}
 		\end{tikzpicture}
-		\caption{Foreground pixel at the edge of the rROI.}
+		\caption{Foreground pixel at the edge of the ROI.}
 		\label{fig: alpha0.05_phi99_foreground_edge}
 	\end{subfigure}
 	\vfill
@@ -137,13 +147,18 @@
 				grid=both,
 				minor grid style={gray!25},
 				major grid style={gray!25},
-				ymin=-0.05,
-				ymax=1.05,
+				ymin=-0.01,
+				ymax=0.1,
 				width=\linewidth,
 				no marks,
-				table/x = sigma]
+				table/x = sigma,
+				y tick label style={
+					/pgf/number format/.cd,
+					fixed,
+					/tikz/.cd
+    			}]
 				\addplot[line width=1pt,dashed,color=blue] table[y=typeI] from \backfree;
-				\addlegendentry{Binarization}
+				\addlegendentry{Statistical test}
 				\addplot[line width=1pt,dashed,color=red] table[y=typeI_o] from \backfree;
 				\addlegendentry{Opening}
 				\addplot[line width=1pt,dashed,color=gray] table[y=typeI_c] from \backfree;
@@ -173,7 +188,7 @@
 				no marks,
 				table/x = sigma]
 				\addplot[line width=1pt,dashed,color=blue] table[y=typeII] from \forefree;
-				\addlegendentry{Binarization}
+				\addlegendentry{Statistical test}
 				\addplot[line width=1pt,dashed,color=red] table[y=typeII_o] from \forefree;
 				\addlegendentry{Opening}
 				\addplot[line width=1pt,dashed,color=gray] table[y=typeII_c] from \forefree;
@@ -185,6 +200,6 @@
 		\caption{Foreground pixel surrounded by foreground.}
 		\label{fig: alpha0.05_phi99_foreground_free}
 	\end{subfigure}
-	\caption{Error rates after binarization, opening and closing. The $x$-axes display the standard deviation $\sigma$ and the $y$-axes the error rate. For each pixel type 1000 different noises were randomly generated $(\alpha = 0.05, \varphi = 99)$.}
+	\caption{Error rates for all four ROI extraction approaches. The $x$-axes display the standard deviation $\sigma$ and the $y$-axes the error rate $(\alpha = 0.05, \varphi = 99)$.}
 	\label{fig: alpha0.05_phi99}
 \end{figure}
