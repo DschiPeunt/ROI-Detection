@@ -1420,31 +1420,35 @@ Simulations for other values of $\varphi$ as well as for $\alpha = 0.01$ can be 
 
 \section{Discussion}\label{section: conclusion}
 
-We employ morphological closing to reduce the number of type II errors. This is not represented in the upper bound in inequality \eqref{ineq: typeIIclosing}. The simulation results displayed in Section \ref{section: simulationresults} and Appendix \ref{appendix: simulations} show, that the amount of type II errors after opening and after opening and closing behave similarly, when the standard deviation of the noise terms increases. A small improvement through closing can only be observed for a certain range of standard deviations.
+In this thesis we consider how the upper bounds for the error probabilities of a statistical test change, when morphological opening and closing are applied. To this end, we examine a simplified model and develop a thresholding method to extract the region of interest. The simplified model and thresholding method are designed, such that the probability of a type I error can be bounded by a given statistical significance. This is achieved by computing a suitable threshold based on the target statistical significance.
 
-This behaviour is due to the pixels not being independent anymore, after morphological opening has been applied. In some cases, the amount of type II errors is greatly increased through opening and the application of closing only reverts this to a very small extent, cf. Appendix \ref{appendix: simulations} Figure \ref{fig: alpha0.01_phi99}.
-
-Based on these observations, an improvement of the upper bound in inequality \eqref{ineq: typeIIopeningclosing} without improving the upper bound in \eqref{ineq: typeIIopening} seems unlikely.
-Note, that any improvements of the upper bound in inequality \eqref{ineq: typeIIopening} can immediately be applied to the upper bound in inequality \eqref{ineq: typeIIopeningclosing} as well.
-
-
-
-
-
-
-In this thesis we consider how the upper bounds for the error probabilities of a statistical test change, when morphological opening and closing are applied. To this end, we examine a simplified model and develop a thresholding method to extract the region of interest. The simplified model and thresholding method are designed, such that the probability of a type I error can be bound by a given statistical significance. This is achieved by computing a suitable threshold based on the target statistical significance.
-
-Theorems \ref{thm: typeIinequalities} and \ref{thm: typeIIinequalities} quantify upper bounds for the error rates after morphological opening and closing are applied to the outcome of the statistical test. The upper bounds are stated in terms of the structuring element and the upper bounds for the error probabilities before morphological operations are applied. This was done by exploiting prior knowledge of properties of the region of interest.
+Theorems \ref{thm: typeIinequalities} and \ref{thm: typeIIinequalities} quantify upper bounds for the error probabilities after morphological opening and closing are applied to the outcome of the statistical test. The upper bounds are stated in terms of the structuring element and the upper bounds for the error probabilities before morphological operations are applied. This was done by exploiting the prior knowledge, that the region of interest is rectangular and has a chessboard pattern.
 
 In particular, we were able to obtain the exponent $\frac{\varphi + 1}{2}$ in inequality \eqref{ineq: typeIopening} through the choice of the structuring element. For a background pixel to be falsely identified as foreground after opening, at least $\frac{\varphi + 1}{2}$ many pixels background pixels have to be falsely categorized by the binarization through the statistical test. This is the \emph{minimum number of independent points in a structuring element} that can lead to a false categorization of a background pixel.
 
 A different shaped structuring element could lead to no improvements of the error probabilities. To see this, consider a diamond shaped structuring element. A background pixel at the edge of the region of interest, cf. Figure \ref{fig: background_edge}, that is falsely classified by the statistical test, would not be correctly identified as a background pixel, when morphological opening with a diamond shaped structuring element is applied. Thus, the upper bound of this probability in this case does not decrease through application of morphological opening. Hence, we see, that the choice of the structuring element is substantial.
 
-Since we only considered the categorization of a single pixel, a natural next step could be an expansion beyond the scope of this thesis by applying techniques from the field of multiple testing. When researching the connection between multiple testing and morphological operations, one might consider more morphological operators. Namely, the convex hull operator is of high interest in the extraction of the region of interest of a fingerprint.
+Since we only considered the categorization of a single pixel, a natural next step would be an expansion beyond the scope of this thesis by applying techniques from the field of multiple testing. When researching the connection between multiple testing and morphological operations, one might consider more morphological operators. Namely, the convex hull operator is of high interest in the extraction of the region of interest of a fingerprint.
 
 Generalizations of the results from Sections \ref{section: statisticalmodel} and \ref{section: boundtypeIerror} to convex regions of interest with a chessboard pattern are possible. For the reasons described above, the choice of the structuring element for a convex region of interest is a question to ponder on. Advances could be achieved in conjunction with multiple testing techniques, since the choice of the structuring element is mainly a limiting factor for pixels close to the edge of the region of interest, which form only a subset of the total pixels in the image.
 
-\newpage
+%\newpage
+%
+%
+%
+%
+%
+%
+%
+%
+%We employ morphological closing to reduce the number of type II errors. This is not represented in the upper bound in inequality \eqref{ineq: typeIIclosing}. The simulation results displayed in Section \ref{section: simulationresults} and Appendix \ref{appendix: simulations} show, that the amount of type II errors after opening and after opening and closing behave similarly, when the standard deviation of the noise terms increases. A small improvement through closing can only be observed for a certain range of standard deviations.
+%
+%This behaviour is due to the pixels not being independent anymore, after morphological opening has been applied. In some cases, the amount of type II errors is greatly increased through opening and the application of closing only reverts this to a very small extent, cf. Appendix \ref{appendix: simulations} Figure \ref{fig: alpha0.01_phi99}.
+%
+%Based on these observations, an improvement of the upper bound in inequality \eqref{ineq: typeIIopeningclosing} without improving the upper bound in \eqref{ineq: typeIIopening} seems unlikely.
+%Note, that any improvements of the upper bound in inequality \eqref{ineq: typeIIopening} can immediately be applied to the upper bound in inequality \eqref{ineq: typeIIopeningclosing} as well.
+
+
 
 
 
