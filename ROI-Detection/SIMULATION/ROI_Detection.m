@@ -6,8 +6,8 @@ function I = ROI_Detection(F, t_alpha, sigma)
 % Determine height and width of the input picture:
 [m, n] = size(F);
 
-% Calculate the euclidean norm of the vertical and horizontal discrete
-% derivatives:
+% Calculate the euclidean norm of the vertical and horizontal
+% discrete derivatives:
 D_plus = discreteDerivative(F, m, n, 'plus');
 D_minus = discreteDerivative(F, m, n, 'minus');
 

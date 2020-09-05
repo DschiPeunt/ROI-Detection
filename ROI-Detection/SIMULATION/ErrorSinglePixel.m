@@ -4,8 +4,6 @@ folder = '/space/fbms/dblank';
 % Reset RNG seed:
 rng('default')
 
-% ------------------------------------------------------------------------
-
 % Set number of noises to generate:
 nr_noise = 1000;
 
@@ -24,13 +22,9 @@ c_bg = 127.5;
 % Set increment size for threshold algorithm:
 increment = 0.0001;
 
-% ------------------------------------------------------------------------
-
 % Define array to loop over different positions of the pixels:
 pixelPositions = {'background_corner', 'background_edge', 'background_free', 'foreground_corner', 'foreground_edge', 'foreground_free'};
 correctVals = [0 0 0 1 1 1];
-
-% ------------------------------------------------------------------------
 
 % Determine range of standard deviations:
 sigma_range = 1 : max_sigma;
@@ -54,7 +48,8 @@ parfor p = 1 : size(pixelPositions, 2)
         V = ones(2 * phi + 3, 2 * phi + 3) * c_bg;
         
         % Set top left corner of the ROI based position of the
-        % pixel to simulate (Simulated pixel is [phi + 2 phi + 2]):
+        % pixel to simulate (Simulated pixel is
+        % [phi + 2 phi + 2]):
         switch pixelPos
             case 'background_corner'
                 tlc = [phi + 3 phi + 3];
@@ -107,7 +102,8 @@ parfor p = 1 : size(pixelPositions, 2)
             err = zeros(max_sigma, 4);
             err_test = zeros(max_sigma, 1);
             
-            % Repeat for multiple different randomly generated noises:
+            % Repeat for multiple different randomly generated
+            % noises:
             for k = 1 : nr_noise
                 
                 % Create standard normally distributed noise:
@@ -147,8 +143,6 @@ parfor p = 1 : size(pixelPositions, 2)
                     
                 end
             end
-            
-            % ------------------------------------------------------------------------
             
             % Write to .csv file:
             csvwrite(strcat(folder, '/alpha', num2str(alpha), '/phi', num2str(phi), '/', pixelPos, '.csv'), [sigma_range' (err(:, 1) / nr_noise) (err(:, 2) / nr_noise) (err(:, 3) / nr_noise) (err(:, 4) / nr_noise)])

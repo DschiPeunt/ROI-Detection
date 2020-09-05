@@ -3,7 +3,7 @@
 	\pgfplotstableread[col sep = comma]{CSV/CSV_SinglePixel/alpha0.05/phi7/foreground_edge.csv}\foreedge
 	\pgfplotstableread[col sep = comma]{CSV/CSV_SinglePixel/alpha0.05/phi7/foreground_free.csv}\forefree
 	\centering
-	\begin{subfigure}[t]{0.48\linewidth}
+	\begin{subfigure}[t]{0.45\linewidth}
 		\centering
 		\begin{tikzpicture}
 			\begin{axis}[
@@ -22,20 +22,20 @@
 				no marks,
 				table/x = sigma]
 				\addplot[line width=1pt,dashed,color=blue] table[y=typeII] from \forecorner;
-				\addlegendentry{Statistical test}
+				\addlegendentry{Thresholding (T)}
 				\addplot[line width=1pt,dashed,color=red] table[y=typeII_o] from \forecorner;
-				\addlegendentry{Opening}
+				\addlegendentry{T + Opening (O)}
 				\addplot[line width=1pt,dashed,color=gray] table[y=typeII_c] from \forecorner;
-				\addlegendentry{Closing}
+				\addlegendentry{T + Closing (C)}
 				\addplot[line width=1pt,dashed,color=black] table[y=typeII_oc] from \forecorner;
-				\addlegendentry{Opening \& Closing}
+				\addlegendentry{T + O + C}
 			\end{axis}
 		\end{tikzpicture}
 		\caption{Foreground pixel at the corner of the ROI.}
 		\label{fig: alpha0.05_phi7_foreground_corner_zoom}
 	\end{subfigure}
 	\hfill
-	\begin{subfigure}[t]{0.48\linewidth}
+	\begin{subfigure}[t]{0.45\linewidth}
 		\centering
 		\begin{tikzpicture}
 			\begin{axis}[
@@ -54,20 +54,20 @@
 				no marks,
 				table/x = sigma]
 				\addplot[line width=1pt,dashed,color=blue] table[y=typeII] from \foreedge;
-				\addlegendentry{Statistical test}
+				\addlegendentry{Thresholding (T)}
 				\addplot[line width=1pt,dashed,color=red] table[y=typeII_o] from \foreedge;
-				\addlegendentry{Opening}
+				\addlegendentry{T + Opening (O)}
 				\addplot[line width=1pt,dashed,color=gray] table[y=typeII_c] from \foreedge;
-				\addlegendentry{Closing}
+				\addlegendentry{T + Closing (C)}
 				\addplot[line width=1pt,dashed,color=black] table[y=typeII_oc] from \foreedge;
-				\addlegendentry{Opening \& Closing}
+				\addlegendentry{T + O + C}
 			\end{axis}
 		\end{tikzpicture}
 		\caption{Foreground pixel at the edge of the ROI.}
 		\label{fig: alpha0.05_phi7_foreground_edge_zoom}
 	\end{subfigure}
 	\vfill
-	\begin{subfigure}[t]{0.48\linewidth}
+	\begin{subfigure}[t]{0.45\linewidth}
 		\centering
 		\begin{tikzpicture}
 			\begin{axis}[
@@ -86,13 +86,13 @@
 				no marks,
 				table/x = sigma]
 				\addplot[line width=1pt,dashed,color=blue] table[y=typeII] from \forefree;
-				\addlegendentry{Statistical test}
+				\addlegendentry{Thresholding (T)}
 				\addplot[line width=1pt,dashed,color=red] table[y=typeII_o] from \forefree;
-				\addlegendentry{Opening}
+				\addlegendentry{T + Opening (O)}
 				\addplot[line width=1pt,dashed,color=gray] table[y=typeII_c] from \forefree;
-				\addlegendentry{Closing}
+				\addlegendentry{T + Closing (C)}
 				\addplot[line width=1pt,dashed,color=black] table[y=typeII_oc] from \forefree;
-				\addlegendentry{Opening \& Closing}
+				\addlegendentry{T + O + C}
 			\end{axis}
 		\end{tikzpicture}
 		\caption{Foreground pixel surrounded by foreground.}

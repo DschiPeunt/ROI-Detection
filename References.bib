@@ -7,45 +7,47 @@
 }
 
 @BOOK{HMF,
+	title = {NIST Handbook of Mathematical Functions},
 	author = {Olver, Frank and Lozier, Daniel and Boisvert, Ronald and Clark, Charles},
+	publisher = {Cambridge University Press},
 	year = {2010},
-	month = {01},
-	pages = {},
-	title = {NIST Handbook of Mathematical Functions}
+	month = {01}
 }
 
 @BOOK{handbookfipri,
-	title={Handbook of fingerprint recognition},
-	author={Maltoni, Davide and Maio, Dario and Jain, Anil K and Prabhakar, Salil},
-	year={2009},
-	publisher={Springer Science \& Business Media}
+	title = {Handbook of fingerprint recognition},
+	author = {Maltoni, Davide and Maio, Dario and Jain, Anil K and Prabhakar, Salil},
+	year = {2009},
+	publisher={Springer Science \& Business Media},
+	edition = {2nd}
 }
 
 @BOOK{imageprocessing,
 	title={Image processing and pattern recognition: fundamentals and techniques},
 	author={Shih, Frank Y},
-	year={2010},
-	publisher={John Wiley \& Sons}
+	publisher={John Wiley \& Sons},
+	year={2010}
 }
 
 @BOOK{Watson,
-	author = {G.N. Watson},
-	year = {1966},
 	title = {A treatise on the theory of Bessel functions},
+	author = {G.N. Watson},
 	publisher = {Cambridge University Press},
+	year = {1966},
 	edition = {2nd}
 }
 
-@ARTICLE{Henry,
+@BOOK{Henry,
 	title = {Classification and uses of finger prints},
 	author = {E. R. Henry},
-	year = {1900}
+	year = {1900},
+	publisher = {George Routledge \& Sons}
 }
 
-@ARTICLE{IntQFunction,
-	title = {Some integrals involving the {$Q_M$}-function},
-	author = {Albert H. Nuttall},
-	year = {1974}
+@MISC{IntQFunction,
+  title = {Some Integrals Involving the (Q sub M)-Function},
+  author = {Albert H. Nuttall},
+  year = {1974}
 }
 
 @ARTICLE{SNoQE,
@@ -66,20 +68,18 @@
 	year = {2016},
 	month = {05},
 	volume = {11},
-	url = {https://doi.org/10.1371/journal.pone.0154160},
 	pages = {1-31},
-	abstract = {Fingerprint recognition plays an important role in many commercial applications and is used by millions of people every day, e.g. for unlocking mobile phones. Fingerprint image segmentation is typically the first processing step of most fingerprint algorithms and it divides an image into foreground, the region of interest, and background. Two types of error can occur during this step which both have a negative impact on the recognition performance: ‘true’ foreground can be labeled as background and features like minutiae can be lost, or conversely ‘true’ background can be misclassified as foreground and spurious features can be introduced. The contribution of this paper is threefold: firstly, we propose a novel factorized directional bandpass (FDB) segmentation method for texture extraction based on the directional Hilbert transform of a Butterworth bandpass (DHBB) filter interwoven with soft-thresholding. Secondly, we provide a manually marked ground truth segmentation for 10560 images as an evaluation benchmark. Thirdly, we conduct a systematic performance comparison between the FDB method and four of the most often cited fingerprint segmentation algorithms showing that the FDB segmentation method clearly outperforms these four widely used methods. The benchmark and the implementation of the FDB method are made publicly available.},
-	number = {5},
-	doi = {10.1371/journal.pone.0154160}
+	number = {5}
 }
 
 @ARTICLE{BazenGerez,
 	author = {Bazen, Asker and Gerez, Sabih},
+	title = {Segmentation of Fingerprint Images},
+	journal = {ProRISC 2001 Workshop on Circuits, Systems and Signal Processing},
 	year = {2001},
 	month = {12},
-	pages = {},
-	title = {Segmentation of Fingerprint Images},
-	volume = {12}
+	volume = {12},
+	pages = {276 - 280}
 }
 
 @ARTICLE{adaboost,
@@ -89,29 +89,23 @@
 	pages = {148-157},
 	title = {Fingerprint segmentation based on an AdaBoost classifier},
 	volume = {5},
-	journal = {Frontiers of Computer Science in China},
-	doi = {10.1007/s11704-011-9134-x}
+	journal = {Frontiers of Computer Science in China}
 }
 
-@ARTICLE{Kittler,
-	title = {"Minimum error thresholding"},
-	journal = {"Pattern Recognition"},
-	volume = {"19"},
-	number = {"1"},
-	pages = {"41 - 47"},
-	year = {"1986"},
-	issn = {"0031-3203"},
-	doi = {"https://doi.org/10.1016/0031-3203(86)90030-0"},
-	url = {"http://www.sciencedirect.com/science/article/pii/0031320386900300"},
-	author = {"J. Kittler and J. Illingworth"},
-	keywords = {"Thresholding, Minimum error decision rule, Classification error, Dynamic clustering"},
-	abstract = {"A computationally efficient solution to the problem of minimum error thresholding is derived under the assumption of object and pixel grey level values being normally distributed. The method is applicable in multithreshold selection."}
+@ARTICLE{Kittler1986,
+	title = {Minimum error thresholding},
+	author = {J. Kittler and J. Illingworth},
+	journal = {Pattern Recognition},
+	volume = {19},
+	number = {1},
+	pages = {41 - 47},
+	year = {1986}
 }
 
 @ARTICLE{XueTitterington,
+	title={$t$ -Tests, $F$ -Tests and Otsu's Methods for Image Thresholding},
 	author={J. {Xue} and D. M. {Titterington}},
 	journal={IEEE Transactions on Image Processing},
-	title={$t$ -Tests, $F$ -Tests and Otsu's Methods for Image Thresholding},
 	year={2011},
 	volume={20},
 	number={8},
@@ -119,14 +113,34 @@
 }
 
 @ARTICLE{AbramovichBenjamini1996,
-	title = {"Adaptive thresholding of wavelet coefficients"},
-	journal = {"Computational Statistics \& Data Analysis"},
-	volume = {"22"},
-	number = {"4"},
-	pages = {"351 - 361"},
-	year = {"1996"},
-	issn = {"0167-9473"},
-	doi = {"https://doi.org/10.1016/0167-9473(96)00003-5"},
-	url = {"http://www.sciencedirect.com/science/article/pii/0167947396000035"},
-	author = {"Felix Abramovich and Yoav Benjamini"}
+	title = {Adaptive thresholding of wavelet coefficients},
+	author = {Felix Abramovich and Yoav Benjamini},
+	journal = {Computational Statistics \& Data Analysis},
+	volume = {22},
+	number = {4},
+	pages = {351 - 361},
+	year = {1996}
+}
+
+@ARTICLE{DonohoJohnstone1995,
+	title = {Adapting to Unknown Smoothness via Wavelet Shrinkage},
+	author = {David L. Donoho and Iain M. Johnstone},
+	journal = {Journal of the American Statistical Association},
+	volume = {90},
+	number = {432},
+	pages = {1200-1224},
+	year  = {1995},
+	publisher = {Taylor & Francis}
+}
+
+@ARTICLE{NonCentralChi,
+	title = {Another Derivation of the Non-Central Chi-Square Distribution},
+	author = {William C. Guenther},
+	journal = {Journal of the American Statistical Association},
+	volume = {59},
+	number = {307},
+	pages = {957-960},
+	year  = {1964},
+	month = {9},
+	publisher = {Taylor & Francis}
 }

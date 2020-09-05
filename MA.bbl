@@ -22,11 +22,11 @@
       {{hash=AF}{%
          family={Abramovich},
          familyi={A\bibinitperiod},
-         given={"Felix},
+         given={Felix},
          giveni={F\bibinitperiod},
       }}%
       {{hash=BY}{%
-         family={Benjamini"},
+         family={Benjamini},
          familyi={B\bibinitperiod},
          given={Yoav},
          giveni={Y\bibinitperiod},
@@ -39,19 +39,12 @@
     \field{labelalpha}{AB96}
     \field{sortinit}{A}
     \field{sortinithash}{A}
-    \verb{doi}
-    \verb "https://doi.org/10.1016/0167-9473(96)00003-5"
-    \endverb
-    \field{issn}{"0167-9473"}
-    \field{number}{"4"}
-    \field{pages}{"351 \bibrangedash  361"}
-    \field{title}{"Adaptive thresholding of wavelet coefficients"}
-    \verb{url}
-    \verb "http://www.sciencedirect.com/science/article/pii/0167947396000035"
-    \endverb
-    \field{volume}{"22"}
-    \field{journaltitle}{"Computational Statistics \& Data Analysis"}
-    \field{year}{"1996"}
+    \field{number}{4}
+    \field{pages}{351 \bibrangedash  361}
+    \field{title}{Adaptive thresholding of wavelet coefficients}
+    \field{volume}{22}
+    \field{journaltitle}{Computational Statistics \& Data Analysis}
+    \field{year}{1996}
   \endentry
 
   \entry{BazenGerez}{article}{}
@@ -76,10 +69,46 @@
     \field{labelalpha}{BG01}
     \field{sortinit}{B}
     \field{sortinithash}{B}
+    \field{pages}{276 \bibrangedash  280}
     \field{title}{Segmentation of Fingerprint Images}
     \field{volume}{12}
+    \field{journaltitle}{ProRISC 2001 Workshop on Circuits, Systems and Signal
+  Processing}
     \field{month}{12}
     \field{year}{2001}
+  \endentry
+
+  \entry{DonohoJohnstone1995}{article}{}
+    \name{author}{2}{}{%
+      {{hash=DDL}{%
+         family={Donoho},
+         familyi={D\bibinitperiod},
+         given={David\bibnamedelima L.},
+         giveni={D\bibinitperiod\bibinitdelim L\bibinitperiod},
+      }}%
+      {{hash=JIM}{%
+         family={Johnstone},
+         familyi={J\bibinitperiod},
+         given={Iain\bibnamedelima M.},
+         giveni={I\bibinitperiod\bibinitdelim M\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {Taylor & Francis}%
+    }
+    \strng{namehash}{DDLJIM1}
+    \strng{fullhash}{DDLJIM1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelalpha}{DJ95}
+    \field{sortinit}{D}
+    \field{sortinithash}{D}
+    \field{number}{432}
+    \field{pages}{1200\bibrangedash 1224}
+    \field{title}{Adapting to Unknown Smoothness via Wavelet Shrinkage}
+    \field{volume}{90}
+    \field{journaltitle}{Journal of the American Statistical Association}
+    \field{year}{1995}
   \endentry
 
   \entry{TISP}{book}{}
@@ -112,7 +141,36 @@
     \field{year}{2007}
   \endentry
 
-  \entry{Henry}{article}{}
+  \entry{NonCentralChi}{article}{}
+    \name{author}{1}{}{%
+      {{hash=GWC}{%
+         family={Guenther},
+         familyi={G\bibinitperiod},
+         given={William\bibnamedelima C.},
+         giveni={W\bibinitperiod\bibinitdelim C\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {Taylor & Francis}%
+    }
+    \strng{namehash}{GWC1}
+    \strng{fullhash}{GWC1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelalpha}{Gue64}
+    \field{sortinit}{G}
+    \field{sortinithash}{G}
+    \field{number}{307}
+    \field{pages}{957\bibrangedash 960}
+    \field{title}{Another Derivation of the Non-Central Chi-Square
+  Distribution}
+    \field{volume}{59}
+    \field{journaltitle}{Journal of the American Statistical Association}
+    \field{month}{09}
+    \field{year}{1964}
+  \endentry
+
+  \entry{Henry}{book}{}
     \name{author}{1}{}{%
       {{hash=HER}{%
          family={Henry},
@@ -120,6 +178,9 @@
          given={E.\bibnamedelima R.},
          giveni={E\bibinitperiod\bibinitdelim R\bibinitperiod},
       }}%
+    }
+    \list{publisher}{1}{%
+      {George Routledge \& Sons}%
     }
     \strng{namehash}{HER1}
     \strng{fullhash}{HER1}
@@ -130,6 +191,36 @@
     \field{sortinithash}{H}
     \field{title}{Classification and uses of finger prints}
     \field{year}{1900}
+  \endentry
+
+  \entry{Kittler1986}{article}{}
+    \name{author}{2}{}{%
+      {{hash=KJ}{%
+         family={Kittler},
+         familyi={K\bibinitperiod},
+         given={J.},
+         giveni={J\bibinitperiod},
+      }}%
+      {{hash=IJ}{%
+         family={Illingworth},
+         familyi={I\bibinitperiod},
+         given={J.},
+         giveni={J\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{KJIJ1}
+    \strng{fullhash}{KJIJ1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelalpha}{KI86}
+    \field{sortinit}{K}
+    \field{sortinithash}{K}
+    \field{number}{1}
+    \field{pages}{41 \bibrangedash  47}
+    \field{title}{Minimum error thresholding}
+    \field{volume}{19}
+    \field{journaltitle}{Pattern Recognition}
+    \field{year}{1986}
   \endentry
 
   \entry{adaboost}{article}{}
@@ -172,9 +263,6 @@
     \field{labelalpha}{Liu+11}
     \field{sortinit}{L}
     \field{sortinithash}{L}
-    \verb{doi}
-    \verb 10.1007/s11704-011-9134-x
-    \endverb
     \field{pages}{148\bibrangedash 157}
     \field{title}{Fingerprint segmentation based on an AdaBoost classifier}
     \field{volume}{5}
@@ -220,11 +308,12 @@
     \field{labelalpha}{Mal+09}
     \field{sortinit}{M}
     \field{sortinithash}{M}
+    \field{edition}{2nd}
     \field{title}{Handbook of fingerprint recognition}
     \field{year}{2009}
   \endentry
 
-  \entry{IntQFunction}{article}{}
+  \entry{IntQFunction}{misc}{}
     \name{author}{1}{}{%
       {{hash=NAH}{%
          family={Nuttall},
@@ -240,7 +329,7 @@
     \field{labelalpha}{Nut74}
     \field{sortinit}{N}
     \field{sortinithash}{N}
-    \field{title}{Some integrals involving the {$Q_M$}-function}
+    \field{title}{Some Integrals Involving the (Q sub M)-Function}
     \field{year}{1974}
   \endentry
 
@@ -270,6 +359,9 @@
          given={Charles},
          giveni={C\bibinitperiod},
       }}%
+    }
+    \list{publisher}{1}{%
+      {Cambridge University Press}%
     }
     \strng{namehash}{OF+1}
     \strng{fullhash}{OFLDBRCC1}
@@ -338,37 +430,10 @@
     \field{labelalpha}{THG16}
     \field{sortinit}{T}
     \field{sortinithash}{T}
-    \field{abstract}{%
-    Fingerprint recognition plays an important role in many commercial
-  applications and is used by millions of people every day, e.g. for unlocking
-  mobile phones. Fingerprint image segmentation is typically the first
-  processing step of most fingerprint algorithms and it divides an image into
-  foreground, the region of interest, and background. Two types of error can
-  occur during this step which both have a negative impact on the recognition
-  performance: ‘true’ foreground can be labeled as background and features
-  like minutiae can be lost, or conversely ‘true’ background can be
-  misclassified as foreground and spurious features can be introduced. The
-  contribution of this paper is threefold: firstly, we propose a novel
-  factorized directional bandpass (FDB) segmentation method for texture
-  extraction based on the directional Hilbert transform of a Butterworth
-  bandpass (DHBB) filter interwoven with soft-thresholding. Secondly, we
-  provide a manually marked ground truth segmentation for 10560 images as an
-  evaluation benchmark. Thirdly, we conduct a systematic performance comparison
-  between the FDB method and four of the most often cited fingerprint
-  segmentation algorithms showing that the FDB segmentation method clearly
-  outperforms these four widely used methods. The benchmark and the
-  implementation of the FDB method are made publicly available.%
-    }
-    \verb{doi}
-    \verb 10.1371/journal.pone.0154160
-    \endverb
     \field{number}{5}
     \field{pages}{1\bibrangedash 31}
     \field{title}{Filter Design and Performance Evaluation for Fingerprint
   Image Segmentation}
-    \verb{url}
-    \verb https://doi.org/10.1371/journal.pone.0154160
-    \endverb
     \field{volume}{11}
     \field{journaltitle}{PLOS ONE}
     \field{month}{05}
@@ -397,6 +462,37 @@
     \field{edition}{2nd}
     \field{title}{A treatise on the theory of Bessel functions}
     \field{year}{1966}
+  \endentry
+
+  \entry{XueTitterington}{article}{}
+    \name{author}{2}{}{%
+      {{hash=XJ}{%
+         family={{Xue}},
+         familyi={X\bibinitperiod},
+         given={J.},
+         giveni={J\bibinitperiod},
+      }}%
+      {{hash=TDM}{%
+         family={{Titterington}},
+         familyi={T\bibinitperiod},
+         given={D.\bibnamedelima M.},
+         giveni={D\bibinitperiod\bibinitdelim M\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{XJTDM1}
+    \strng{fullhash}{XJTDM1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelalpha}{XT11}
+    \field{sortinit}{X}
+    \field{sortinithash}{X}
+    \field{number}{8}
+    \field{pages}{2392\bibrangedash 2396}
+    \field{title}{$t$ -Tests, $F$ -Tests and Otsu's Methods for Image
+  Thresholding}
+    \field{volume}{20}
+    \field{journaltitle}{IEEE Transactions on Image Processing}
+    \field{year}{2011}
   \endentry
 \endsortlist
 \endinput

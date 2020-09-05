@@ -7,7 +7,8 @@ RV = RVSim(nr_noise, max_sigma, c_bg);
 lowerBound = zeros(1, max_sigma);
 upperBound = zeros(1, max_sigma);
 
-% Estimate lower and upper bound for the probability of a type II error:
+% Estimate lower and upper bound for the probability of a type
+% II error:
 for sigma = 1: max_sigma
     lowerBound(1, sigma) = sum(RV.('D2c2c')(:, sigma) <= sigma * t_alpha) / nr_noise;
     upperBound(1, sigma) = min(2 * sum(RV.('Dcc')(:, sigma) <= sigma * t_alpha) / nr_noise, 1);
